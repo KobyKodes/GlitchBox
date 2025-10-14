@@ -1,0 +1,179 @@
+<!-- ============================================
+     AD INTEGRATION GUIDE FOR JADSMOVIES.COM
+     ============================================
+
+     IMPORTANT: This file contains code snippets to add to your movie_tv_player.html
+     Follow the instructions below to integrate ads into your site.
+-->
+
+<!-- ==========================================
+     STEP 1: Add these scripts BEFORE </head> tag (line 3848)
+     ========================================== -->
+
+<!-- Google AdSense -->
+<!--
+     1. Sign up at: https://www.google.com/adsense
+     2. Add your site URL (retroflix.com)
+     3. Wait for approval (1-2 weeks)
+     4. Replace YOUR_ADSENSE_CLIENT_ID with your actual ID
+-->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_ADSENSE_CLIENT_ID"
+     crossorigin="anonymous"></script>
+
+<!-- PropellerAds (Instant Approval) -->
+<!--
+     1. Sign up at: https://propellerads.com/
+     2. Get instant approval
+     3. Replace YOUR_PROPELLER_ZONE_ID with your actual Zone ID
+     4. Choose ad types: Banner, Popunder, or Push Notifications
+-->
+<script>(function(s,u,z,p){s.src=u,s.setAttribute('data-zone',z),p.appendChild(s);})(document.createElement('script'),'https://iclickcdn.com/tag.min.js',YOUR_PROPELLER_ZONE_ID,document.body);</script>
+
+
+<!-- ==========================================
+     STEP 2: Add ad placements in strategic locations
+     ========================================== -->
+
+<!-- TOP BANNER AD (Best Revenue) -->
+<!-- Place this RIGHT AFTER the <body> tag (around line 3849) -->
+<div id="top-banner-ad" style="text-align: center; margin: 20px auto; max-width: 970px;">
+    <!-- Google AdSense Banner (970x90 or 728x90) -->
+    <ins class="adsbygoogle"
+         style="display:inline-block;width:970px;height:90px"
+         data-ad-client="ca-pub-YOUR_ADSENSE_CLIENT_ID"
+         data-ad-slot="YOUR_AD_SLOT_ID"></ins>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+</div>
+
+<!-- SIDEBAR AD (Medium Revenue) -->
+<!-- Add this in a sidebar div if you have one -->
+<div id="sidebar-ad" style="position: sticky; top: 20px; margin: 20px;">
+    <!-- Google AdSense Skyscraper (160x600 or 300x600) -->
+    <ins class="adsbygoogle"
+         style="display:inline-block;width:300px;height:600px"
+         data-ad-client="ca-pub-YOUR_ADSENSE_CLIENT_ID"
+         data-ad-slot="YOUR_AD_SLOT_ID"></ins>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+</div>
+
+<!-- IN-CONTENT AD (High Engagement) -->
+<!-- Place between movie/TV listings or after search results -->
+<div id="in-content-ad" style="text-align: center; margin: 30px auto; max-width: 728px;">
+    <!-- Google AdSense Leaderboard (728x90) -->
+    <ins class="adsbygoogle"
+         style="display:inline-block;width:728px;height:90px"
+         data-ad-client="ca-pub-YOUR_ADSENSE_CLIENT_ID"
+         data-ad-slot="YOUR_AD_SLOT_ID"></ins>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+</div>
+
+<!-- FOOTER AD (Low Revenue but Good for Fill) -->
+<!-- Place before </body> tag -->
+<div id="footer-ad" style="text-align: center; padding: 30px; margin-top: 50px; border-top: 2px solid #00ff9f;">
+    <!-- Google AdSense Leaderboard (728x90) -->
+    <ins class="adsbygoogle"
+         style="display:inline-block;width:728px;height:90px"
+         data-ad-client="ca-pub-YOUR_ADSENSE_CLIENT_ID"
+         data-ad-slot="YOUR_AD_SLOT_ID"></ins>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+</div>
+
+<!-- ==========================================
+     STEP 3: PropellerAds Additional Options
+     ========================================== -->
+
+<!-- Popunder Ad (Good revenue, slightly intrusive) -->
+<!-- Add this before </body> -->
+<script type="text/javascript">
+    var uid = 'YOUR_PROPELLER_USER_ID';
+    var wid = 'YOUR_PROPELLER_WEBSITE_ID';
+    var pop_tag = document.createElement('script');
+    pop_tag.src='//cdn.tsyndicate.com/sdk/v1/p.js';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(pop_tag, s);
+</script>
+
+<!-- Push Notifications (Passive income, non-intrusive) -->
+<!-- Add this in <head> section -->
+<script src="//cdn.webpushs.com/js/push/YOUR_PROPELLER_PUSH_ID.js" async></script>
+
+
+<!-- ==========================================
+     MONETIZATION TIPS
+     ========================================== -->
+
+<!--
+1. START WITH PROPELLERADS (instant approval):
+   - Sign up at propellerads.com
+   - Add your domain
+   - Get Zone IDs immediately
+   - Start earning right away
+
+2. APPLY TO GOOGLE ADSENSE (higher quality):
+   - Sign up at google.com/adsense
+   - Add site: retroflix.com
+   - Wait 1-2 weeks for review
+   - Higher CPM but stricter policies
+
+3. AD PLACEMENT STRATEGY:
+   Top Banner: $$$$ (most views)
+   In-Content: $$$ (high engagement)
+   Sidebar: $$ (always visible)
+   Footer: $ (low engagement)
+   Popunder: $$$ (one per visit)
+
+4. EXPECTED REVENUE (per 1000 visitors):
+   - PropellerAds: $2-10 CPM
+   - Google AdSense: $1-5 CPM
+   - With 100 concurrent users (assume 1000 daily visitors): $2-15/day
+
+5. OPTIMIZATION:
+   - Use both PropellerAds AND AdSense
+   - A/B test ad placements
+   - Monitor which positions perform best
+   - Balance user experience with revenue
+
+6. LEGAL COMPLIANCE:
+   - Add Privacy Policy page
+   - Add Terms of Service page
+   - Comply with GDPR/CCPA if needed
+   - Disclose ad usage to users
+-->
+
+
+<!-- ==========================================
+     NEXT STEPS FOR YOU:
+     ========================================== -->
+
+<!--
+1. SIGN UP FOR ADS:
+   ☐ PropellerAds (https://propellerads.com/) - DO THIS FIRST
+   ☐ Google AdSense (https://www.google.com/adsense)
+
+2. GET YOUR IDS:
+   ☐ PropellerAds Zone IDs
+   ☐ Google AdSense Client ID and Ad Slot IDs
+
+3. UPDATE HTML:
+   ☐ Replace YOUR_ADSENSE_CLIENT_ID in scripts above
+   ☐ Replace YOUR_PROPELLER_ZONE_ID in scripts above
+   ☐ Add ad placement divs to your HTML
+
+4. TEST:
+   ☐ Deploy to hosting
+   ☐ Visit site and check ads appear
+   ☐ Monitor ad performance in dashboards
+
+5. OPTIMIZE:
+   ☐ Track which ad positions make most money
+   ☐ Adjust placements for better UX
+   ☐ Scale up traffic with SEO/marketing
+-->
