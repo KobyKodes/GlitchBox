@@ -2374,6 +2374,9 @@
             transition: all 0.3s;
             line-height: 1;
             flex-shrink: 0;
+            z-index: 10;
+            position: relative;
+            pointer-events: auto;
         }
 
         .watchparty-close:hover {
@@ -4332,7 +4335,7 @@
                     <span class="watchparty-room-code" id="watchpartyRoomCodeLabel">Code:</span>
                     <div class="room-code-display" id="watchpartyRoomCode" onclick="copyRoomCode()" title="Click to copy">------</div>
                 </div>
-                <button class="watchparty-close" onclick="leaveWatchparty()">×</button>
+                <button class="watchparty-close" onclick="event.stopPropagation(); leaveWatchparty();">×</button>
             </div>
             <button class="copy-room-code" onclick="copyRoomCode()" style="display: none;">Copy Room Code</button>
         </div>
@@ -8390,10 +8393,13 @@
         }
 
         function leaveWatchparty() {
+            console.log('leaveWatchparty() called');
             // Show custom modal instead of default confirm
             const modal = document.getElementById('leaveWatchpartyModal');
+            console.log('Modal element:', modal);
             if (modal) {
                 modal.style.display = 'flex';
+                console.log('Modal should now be visible');
 
                 // Add escape key handler
                 const escapeHandler = (e) => {
@@ -8403,6 +8409,8 @@
                     }
                 };
                 document.addEventListener('keydown', escapeHandler);
+            } else {
+                console.error('leaveWatchpartyModal not found!');
             }
         }
 
