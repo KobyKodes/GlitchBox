@@ -4,6 +4,10 @@ Movie API Server - Flask backend for TMDB integration
 Provides REST API for movie search and streaming URL generation
 """
 
+# IMPORTANT: Eventlet monkey patching MUST be done before any other imports
+import eventlet
+eventlet.monkey_patch()
+
 from flask import Flask, request, jsonify, render_template_string, send_file, Response
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room, leave_room, rooms
