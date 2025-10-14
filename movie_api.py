@@ -27,7 +27,7 @@ app = Flask(__name__)
 # Generate a secure random secret key for production
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', os.urandom(24).hex())
 CORS(app)  # Enable CORS for frontend access
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 
 # Cache file paths
 CACHE_DIR = os.path.join(os.path.dirname(__file__), 'cache')
