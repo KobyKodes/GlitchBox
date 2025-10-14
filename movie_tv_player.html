@@ -2411,79 +2411,6 @@
 
         /* ============= END WATCHPARTY STYLES ============= */
 
-        /* ============= NGROK CONTROL STYLES ============= */
-        .ngrok-btn {
-            font-family: 'VT323', monospace;
-            background: #10B981;
-            color: #0f0f1e;
-            border: 3px solid #10B981;
-            font-size: 22px;
-            font-weight: 400;
-            cursor: pointer;
-            transition: all 0.1s;
-            box-shadow:
-                3px 3px 0 rgba(0, 0, 0, 0.4),
-                0 0 15px rgba(16, 185, 129, 0.4);
-        }
-
-        .ngrok-btn:hover {
-            background: #0f0f1e;
-            color: #10B981;
-            transform: translate(2px, 2px);
-            box-shadow:
-                1px 1px 0 rgba(0, 0, 0, 0.4),
-                0 0 20px rgba(16, 185, 129, 0.5);
-        }
-
-        .ngrok-btn:active {
-            transform: translate(3px, 3px);
-            box-shadow:
-                0 0 0 rgba(0, 0, 0, 0.4),
-                0 0 25px rgba(16, 185, 129, 0.6);
-        }
-
-        .ngrok-btn.running {
-            background: #EF4444;
-            border-color: #EF4444;
-            color: #0f0f1e;
-            box-shadow:
-                3px 3px 0 rgba(0, 0, 0, 0.4),
-                0 0 15px rgba(239, 68, 68, 0.4);
-        }
-
-        .ngrok-btn.running:hover {
-            background: #0f0f1e;
-            color: #EF4444;
-            box-shadow:
-                1px 1px 0 rgba(0, 0, 0, 0.4),
-                0 0 20px rgba(239, 68, 68, 0.5);
-        }
-
-        .ngrok-status {
-            font-family: 'VT323', monospace;
-            background: #1a1a2e;
-            color: #10B981;
-            padding: 12px 16px;
-            font-size: 18px;
-            text-align: center;
-            border: 2px solid #10B981;
-            box-shadow:
-                inset 1px 1px 0 rgba(0, 0, 0, 0.3),
-                0 0 15px rgba(16, 185, 129, 0.3);
-        }
-
-        .ngrok-status a {
-            color: #10B981;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .ngrok-status a:hover {
-            color: #00ff9f;
-            text-shadow: 0 0 10px rgba(0, 255, 159, 0.8);
-        }
-        /* ============= END NGROK CONTROL STYLES ============= */
-
         /* ============= THEME SYSTEM ============= */
 
         /* Theme Selector Button */
@@ -3902,12 +3829,6 @@
             Join Party
         </button>
 
-        <div style="margin-top: 16px; padding-top: 16px; border-top: 2px solid var(--secondary-color, #ff00ff);">
-            <button id="ngrokToggleBtn" class="effects-btn" onclick="toggleNgrok()" style="display: none; width: 100%; padding: 12px;">
-                <span id="ngrokBtnText">Start Internet Sharing</span>
-            </button>
-            <div id="ngrokStatus" style="display: none; margin-top: 8px; font-family: 'VT323', monospace; font-size: 14px; color: var(--primary-color, #00ff9f); text-align: center;"></div>
-        </div>
     </div>
 
     <!-- Background Effects Panel -->
@@ -4079,13 +4000,6 @@
                         <button onclick="joinWatchparty()" class="btn btn-secondary" style="width: 100%; padding: 16px;">
                             Join Watchparty
                         </button>
-
-                        <div style="margin-top: 24px; padding-top: 24px; border-top: 2px solid #ff00ff;">
-                            <button id="ngrokToggleBtn" class="ngrok-btn" onclick="toggleNgrok()" style="display: none; width: 100%; padding: 16px;">
-                                <span id="ngrokBtnText">Start Internet Sharing</span>
-                            </button>
-                            <div id="ngrokStatus" class="ngrok-status" style="display: none; margin-top: 12px;"></div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -8293,9 +8207,6 @@
 
             initSocket();
             document.getElementById('watchpartyMenuModal').style.display = 'flex';
-
-            // Show the ngrok button when watchparty menu opens
-            document.getElementById('ngrokToggleBtn').style.display = 'block';
         }
 
         function closeWatchpartyMenu() {
@@ -8726,113 +8637,6 @@
             console.log('Syncing with room state:', state);
             // In a real implementation, you would control the iframe here
         }
-
-        // ============= NGROK CONTROL =============
-        let ngrokRunning = false;
-
-        async function checkNgrokStatus() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/ngrok/status`);
-                const data = await response.json();
-
-                if (data.running && data.url) {
-                    ngrokRunning = true;
-                    updateNgrokUI(true, data.url);
-                } else {
-                    ngrokRunning = false;
-                    updateNgrokUI(false);
-                }
-            } catch (error) {
-                console.error('Failed to check ngrok status:', error);
-                ngrokRunning = false;
-                updateNgrokUI(false);
-            }
-        }
-
-        async function toggleNgrok() {
-            const btn = document.getElementById('ngrokToggleBtn');
-            const btnText = document.getElementById('ngrokBtnText');
-
-            if (ngrokRunning) {
-                // Stop ngrok
-                btnText.textContent = 'Stopping...';
-                btn.disabled = true;
-
-                try {
-                    const response = await fetch(`${API_BASE_URL}/ngrok/stop`, {
-                        method: 'POST'
-                    });
-                    const data = await response.json();
-
-                    if (data.success) {
-                        ngrokRunning = false;
-                        updateNgrokUI(false);
-                        showStatus('Internet sharing stopped');
-                    } else {
-                        throw new Error(data.error || 'Failed to stop ngrok');
-                    }
-                } catch (error) {
-                    showError('Failed to stop internet sharing: ' + error.message);
-                } finally {
-                    btn.disabled = false;
-                }
-            } else {
-                // Start ngrok
-                btnText.textContent = 'Starting...';
-                btn.disabled = true;
-
-                try {
-                    const response = await fetch(`${API_BASE_URL}/ngrok/start`, {
-                        method: 'POST'
-                    });
-                    const data = await response.json();
-
-                    if (data.success && data.url) {
-                        ngrokRunning = true;
-                        updateNgrokUI(true, data.url);
-                        showStatus('Internet sharing started!');
-                    } else {
-                        throw new Error(data.error || 'Failed to start ngrok');
-                    }
-                } catch (error) {
-                    showError('Failed to start internet sharing: ' + error.message);
-                    updateNgrokUI(false);
-                } finally {
-                    btn.disabled = false;
-                }
-            }
-        }
-
-        function updateNgrokUI(running, url = null) {
-            const btn = document.getElementById('ngrokToggleBtn');
-            const btnText = document.getElementById('ngrokBtnText');
-            const statusDiv = document.getElementById('ngrokStatus');
-
-            if (running && url) {
-                btn.classList.add('running');
-                btnText.textContent = 'Stop Internet Sharing';
-                statusDiv.innerHTML = `
-                    <strong style="color: var(--accent-color, #00d9ff);">Public URL:</strong><br>
-                    <a href="${url}" target="_blank" style="color: var(--secondary-color, #ff00ff); font-weight: bold; text-decoration: underline; font-size: 16px;">${url}</a><br>
-                    <small style="color: var(--primary-color, #00ff9f);">Share this URL with friends for watchparty!</small>
-                `;
-                statusDiv.style.display = 'block';
-            } else {
-                btn.classList.remove('running');
-                btnText.textContent = 'Start Internet Sharing';
-                statusDiv.style.display = 'none';
-            }
-
-            btn.style.display = 'block';
-        }
-
-        // Check ngrok status on page load
-        window.addEventListener('load', () => {
-            checkNgrokStatus();
-            // Check status every 30 seconds
-            setInterval(checkNgrokStatus, 30000);
-        });
-        // ============= END NGROK CONTROL =============
 
         // Initialize socket on page load
         window.addEventListener('load', () => {
