@@ -4090,25 +4090,6 @@
                 </div>
             </div>
 
-            <!-- Leave Watchparty Confirmation Popup -->
-            <div id="leaveWatchpartyModal" style="display: none; position: absolute; top: 40px; right: 0; background: #0f0f1e; border: 3px solid var(--secondary-color, #ff00ff); padding: 16px; box-shadow: 0 0 0 3px #1a1a2e, 0 0 20px rgba(255, 0, 255, 0.7), inset 0 0 15px rgba(255, 0, 255, 0.1); border-radius: 8px; z-index: 100000; min-width: 200px; max-width: 250px;">
-                <div style="text-align: center; margin-bottom: 12px;">
-                    <h3 style="margin: 0 0 8px 0; font-family: 'Press Start 2P', cursive; color: var(--secondary-color, #ff00ff); font-size: 12px; font-weight: 400; text-shadow: 1px 1px 0 var(--accent-color, #00d9ff);">Leave Party?</h3>
-                    <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; color: var(--accent-color, #00d9ff); font-size: 13px; line-height: 1.4; margin: 0;">
-                        Exit the watchparty?
-                    </p>
-                </div>
-
-                <div style="display: flex; flex-direction: column; gap: 8px;">
-                    <button onclick="event.stopPropagation(); confirmLeaveWatchparty();" class="btn" style="width: 100%; padding: 10px; background: var(--secondary-color, #ff00ff); border-color: var(--secondary-color, #ff00ff); font-size: 13px;">
-                        Yes, Leave
-                    </button>
-                    <button onclick="event.stopPropagation(); closeLeaveWatchpartyModal();" class="btn btn-secondary" style="width: 100%; padding: 10px; font-size: 13px;">
-                        Cancel
-                    </button>
-                </div>
-            </div>
-
             <!-- Sync Indicator -->
             <div id="syncIndicator" class="sync-indicator"></div>
 
@@ -4335,6 +4316,26 @@
                 </div>
                 <button class="watchparty-close" onclick="event.stopPropagation(); leaveWatchparty();">×</button>
             </div>
+
+            <!-- Leave Watchparty Confirmation Popup -->
+            <div id="leaveWatchpartyModal" style="display: none; position: absolute; top: 40px; right: 0; background: #0f0f1e; border: 3px solid var(--secondary-color, #ff00ff); padding: 16px; box-shadow: 0 0 0 3px #1a1a2e, 0 0 20px rgba(255, 0, 255, 0.7), inset 0 0 15px rgba(255, 0, 255, 0.1); border-radius: 8px; z-index: 100000; min-width: 200px; max-width: 250px;">
+                <div style="text-align: center; margin-bottom: 12px;">
+                    <h3 style="margin: 0 0 8px 0; font-family: 'Press Start 2P', cursive; color: var(--secondary-color, #ff00ff); font-size: 12px; font-weight: 400; text-shadow: 1px 1px 0 var(--accent-color, #00d9ff);">Leave Party?</h3>
+                    <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; color: var(--accent-color, #00d9ff); font-size: 13px; line-height: 1.4; margin: 0;">
+                        Exit the watchparty?
+                    </p>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <button onclick="event.stopPropagation(); confirmLeaveWatchparty();" class="btn" style="width: 100%; padding: 10px; background: var(--secondary-color, #ff00ff); border-color: var(--secondary-color, #ff00ff); font-size: 13px;">
+                        Yes, Leave
+                    </button>
+                    <button onclick="event.stopPropagation(); closeLeaveWatchpartyModal();" class="btn btn-secondary" style="width: 100%; padding: 10px; font-size: 13px;">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+
             <button class="copy-room-code" onclick="copyRoomCode()" style="display: none;">Copy Room Code</button>
         </div>
 
