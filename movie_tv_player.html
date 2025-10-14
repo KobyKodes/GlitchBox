@@ -2121,6 +2121,7 @@
             padding: 12px;
             border-bottom: 2px solid var(--secondary-color, #ff00ff);
             background: transparent;
+            position: relative;
         }
 
         .watchparty-title {
@@ -4089,25 +4090,22 @@
                 </div>
             </div>
 
-            <!-- Leave Watchparty Confirmation Modal -->
-            <div id="leaveWatchpartyModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.90); z-index: 99999; align-items: center; justify-content: center; padding: 20px;" onclick="closeLeaveWatchpartyModal()">
-                <div style="max-width: 450px; width: 90%; background: #0f0f1e; border: 4px solid var(--secondary-color, #ff00ff); padding: 32px; box-shadow: 0 0 0 4px #1a1a2e, 0 0 30px rgba(255, 0, 255, 0.5), inset 0 0 20px rgba(255, 0, 255, 0.1); border-radius: 8px;" onclick="event.stopPropagation()">
-                    <div style="text-align: center; margin-bottom: 24px;">
-                        <h2 style="margin: 0 0 16px 0; font-family: 'Press Start 2P', cursive; color: var(--secondary-color, #ff00ff); font-size: 18px; font-weight: 400; text-shadow: 2px 2px 0 var(--accent-color, #00d9ff);">Leave Watchparty?</h2>
-                        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; color: var(--accent-color, #00d9ff); font-size: 16px; line-height: 1.5; margin: 0;">
-                            Are you sure you want to leave the watchparty?<br>
-                            <span style="color: #999; font-size: 14px;">You'll need to rejoin with the room code.</span>
-                        </p>
-                    </div>
+            <!-- Leave Watchparty Confirmation Popup -->
+            <div id="leaveWatchpartyModal" style="display: none; position: absolute; top: 40px; right: 0; background: #0f0f1e; border: 3px solid var(--secondary-color, #ff00ff); padding: 16px; box-shadow: 0 0 0 3px #1a1a2e, 0 0 20px rgba(255, 0, 255, 0.7), inset 0 0 15px rgba(255, 0, 255, 0.1); border-radius: 8px; z-index: 100000; min-width: 200px; max-width: 250px;">
+                <div style="text-align: center; margin-bottom: 12px;">
+                    <h3 style="margin: 0 0 8px 0; font-family: 'Press Start 2P', cursive; color: var(--secondary-color, #ff00ff); font-size: 12px; font-weight: 400; text-shadow: 1px 1px 0 var(--accent-color, #00d9ff);">Leave Party?</h3>
+                    <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; color: var(--accent-color, #00d9ff); font-size: 13px; line-height: 1.4; margin: 0;">
+                        Exit the watchparty?
+                    </p>
+                </div>
 
-                    <div style="display: flex; gap: 12px; justify-content: center;">
-                        <button onclick="confirmLeaveWatchparty()" class="btn" style="flex: 1; padding: 14px 24px; background: var(--secondary-color, #ff00ff); border-color: var(--secondary-color, #ff00ff); font-size: 16px;">
-                            Yes, Leave
-                        </button>
-                        <button onclick="closeLeaveWatchpartyModal()" class="btn btn-secondary" style="flex: 1; padding: 14px 24px; font-size: 16px;">
-                            Cancel
-                        </button>
-                    </div>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <button onclick="event.stopPropagation(); confirmLeaveWatchparty();" class="btn" style="width: 100%; padding: 10px; background: var(--secondary-color, #ff00ff); border-color: var(--secondary-color, #ff00ff); font-size: 13px;">
+                        Yes, Leave
+                    </button>
+                    <button onclick="event.stopPropagation(); closeLeaveWatchpartyModal();" class="btn btn-secondary" style="width: 100%; padding: 10px; font-size: 13px;">
+                        Cancel
+                    </button>
                 </div>
             </div>
 
@@ -8394,12 +8392,23 @@
 
         function leaveWatchparty() {
             console.log('leaveWatchparty() called');
-            // Show custom modal instead of default confirm
+            // Show popup positioned near X button
             const modal = document.getElementById('leaveWatchpartyModal');
             console.log('Modal element:', modal);
             if (modal) {
-                modal.style.display = 'flex';
-                console.log('Modal should now be visible');
+                modal.style.display = 'block';
+                console.log('Popup should now be visible');
+
+                // Add click outside handler
+                setTimeout(() => {
+                    const clickOutsideHandler = (e) => {
+                        if (!modal.contains(e.target) && !e.target.classList.contains('watchparty-close')) {
+                            closeLeaveWatchpartyModal();
+                            document.removeEventListener('click', clickOutsideHandler);
+                        }
+                    };
+                    document.addEventListener('click', clickOutsideHandler);
+                }, 100);
 
                 // Add escape key handler
                 const escapeHandler = (e) => {
