@@ -1482,11 +1482,11 @@ def proxy_vidking():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/sw.js')
-def serve_sw():
-    """Serve Monetag service worker for push notifications"""
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    return send_file(os.path.join(current_dir, 'sw.js'), mimetype='application/javascript')
+# @app.route('/sw.js')
+# def serve_sw():
+#     """Serve Monetag service worker for push notifications"""
+#     current_dir = os.path.dirname(os.path.abspath(__file__))
+#     return send_file(os.path.join(current_dir, 'sw.js'), mimetype='application/javascript')
 
 @app.route('/health')
 def health_check():
