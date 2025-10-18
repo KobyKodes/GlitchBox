@@ -8723,17 +8723,39 @@
         function reloadPlayerWithTimestamp(timestamp) {
             if (!currentContentUrl) return;
 
-            // Add timestamp parameter to URL
-            const url = new URL(currentContentUrl, window.location.origin);
+            // Parse the URL correctly
+            let url;
+            try {
+                url = new URL(currentContentUrl);
+            } catch (e) {
+                // If it's a relative URL, use window.location.origin
+                url = new URL(currentContentUrl, window.location.origin);
+            }
 
-            // For VidKing and most video players, use 't' parameter for timestamp in seconds
-            url.searchParams.set('t', Math.floor(timestamp));
+            const timeInSeconds = Math.floor(timestamp);
+
+            // Remove any existing time parameters
+            url.searchParams.delete('t');
+            url.searchParams.delete('time');
+            url.searchParams.delete('start');
+            url.searchParams.delete('timestamp');
+
+            // VidKing uses 't' parameter for timestamp (like YouTube)
+            // Add it in the format most embedded players support
+            url.searchParams.set('t', timeInSeconds);
 
             const player = document.getElementById('contentPlayer');
-            player.src = url.toString();
+            const newUrl = url.toString();
 
-            console.log('Reloaded player with timestamp:', timestamp, 'URL:', url.toString());
-            showStatus(`Synced to ${formatTime(timestamp)}`);
+            // Force reload by setting src to empty first, then to new URL
+            player.src = 'about:blank';
+            setTimeout(() => {
+                player.src = newUrl;
+            }, 100);
+
+            console.log('Reloading player with timestamp:', timestamp, 'seconds');
+            console.log('New URL:', newUrl);
+            showStatus(`Syncing to ${formatTime(timestamp)}...`);
         }
 
         function syncPlaybackManually() {
