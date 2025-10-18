@@ -5828,50 +5828,37 @@
                 let seasonData;
 
                 if (episodeCache[cacheKey]) {
-                    // Use cached data
+                    // Use cached data (already has ratings)
                     seasonData = episodeCache[cacheKey];
                 } else {
-                    // Fetch episode details from TMDB
-                    const response = await fetch(`${API_BASE_URL}/tv/${currentContentId}/season/${seasonNumber}`);
+                    // Fetch episode details from TMDB WITHOUT ratings for fast display
+                    const response = await fetch(`${API_BASE_URL}/tv/${currentContentId}/season/${seasonNumber}?quick=true`);
                     seasonData = await response.json();
 
-                    // Cache the data
-                    episodeCache[cacheKey] = seasonData;
+                    // Don't cache quick data - we'll cache the full data with ratings later
                 }
 
                 episodeList.innerHTML = '';
 
                 if (seasonData.episodes && seasonData.episodes.length > 0) {
+                    // Display all episodes immediately WITHOUT ratings
+                    const episodeButtons = {};
+
                     seasonData.episodes.forEach(episode => {
                         const button = document.createElement('button');
                         button.className = 'effects-btn';
 
-                        // Create detailed episode text with IMDb and RT ratings
                         const episodeNum = `E${episode.episode_number}`;
                         const episodeName = episode.name || 'Untitled';
 
-                        // Build rating string with IMDb and Rotten Tomatoes
-                        let ratingParts = [];
-
-                        if (episode.omdb_imdb_rating && episode.omdb_imdb_rating !== 'N/A') {
-                            ratingParts.push(`IMDb ${episode.omdb_imdb_rating}`);
-                        }
-
-                        if (episode.omdb_ratings && Array.isArray(episode.omdb_ratings)) {
-                            const rtRating = episode.omdb_ratings.find(r => r.Source === 'Rotten Tomatoes');
-                            if (rtRating && rtRating.Value) {
-                                ratingParts.push(`RT ${rtRating.Value}`);
-                            }
-                        }
-
-                        const ratingText = ratingParts.length > 0 ? ratingParts.join(', ') : null;
-                        const displayRating = ratingParts.length > 0 ? ` (${ratingParts.join(', ')})` : '';
-
-                        button.textContent = `${episodeNum}: ${episodeName}${displayRating}`;
+                        // Initially display without ratings
+                        button.textContent = `${episodeNum}: ${episodeName}`;
                         button.style.textAlign = 'left';
-                        button.onclick = () => selectEpisode(episode.episode_number, episodeName, ratingText, episode.overview);
+                        button.setAttribute('data-episode-num', episode.episode_number);
+                        button.onclick = () => selectEpisode(episode.episode_number, episodeName, null, episode.overview);
 
                         episodeList.appendChild(button);
+                        episodeButtons[episode.episode_number] = button;
                     });
 
                     // Set first episode as default if not already set
@@ -5879,24 +5866,7 @@
                         const firstEp = seasonData.episodes[0];
                         currentSelectedEpisode = firstEp.episode_number;
 
-                        // Build rating for first episode
-                        let ratingParts = [];
-                        if (firstEp.omdb_imdb_rating && firstEp.omdb_imdb_rating !== 'N/A') {
-                            ratingParts.push(`IMDb ${firstEp.omdb_imdb_rating}`);
-                        }
-                        if (firstEp.omdb_ratings && Array.isArray(firstEp.omdb_ratings)) {
-                            const rtRating = firstEp.omdb_ratings.find(r => r.Source === 'Rotten Tomatoes');
-                            if (rtRating && rtRating.Value) {
-                                ratingParts.push(`RT ${rtRating.Value}`);
-                            }
-                        }
-                        const ratingText = ratingParts.length > 0 ? ratingParts.join(', ') : null;
-
-                        let buttonText = `E${firstEp.episode_number}: ${firstEp.name || 'Untitled'}`;
-                        if (ratingText) {
-                            buttonText += ` (${ratingText})`;
-                        }
-                        document.getElementById('episodeButtonText').textContent = buttonText;
+                        document.getElementById('episodeButtonText').textContent = `E${firstEp.episode_number}: ${firstEp.name || 'Untitled'}`;
 
                         // Update episode description for first episode
                         const descriptionSection = document.getElementById('episodeDescription');
@@ -5908,6 +5878,12 @@
                         } else {
                             descriptionSection.style.display = 'none';
                         }
+                    }
+
+                    // Now lazy load ratings for each episode in the background
+                    if (!episodeCache[cacheKey]) {
+                        // Only fetch ratings if not already cached
+                        loadEpisodeRatingsInBackground(seasonNumber, seasonData.episodes, episodeButtons);
                     }
                 } else {
                     // Fallback to simple numbering if API fails
@@ -5947,6 +5923,77 @@
                     currentSelectedEpisode = 1;
                     document.getElementById('episodeButtonText').textContent = 'Episode 1';
                 }
+            }
+        }
+
+        async function loadEpisodeRatingsInBackground(seasonNumber, episodes, episodeButtons) {
+            // Fetch ratings for each episode individually
+            const ratingPromises = episodes.map(async (episode) => {
+                try {
+                    const response = await fetch(
+                        `${API_BASE_URL}/tv/${currentContentId}/season/${seasonNumber}/episode/${episode.episode_number}/rating`
+                    );
+                    const ratingData = await response.json();
+
+                    if (ratingData.imdb_rating && ratingData.imdb_rating !== 'N/A') {
+                        // Update the episode button with rating
+                        const button = episodeButtons[episode.episode_number];
+                        if (button) {
+                            const episodeNum = `E${episode.episode_number}`;
+                            const episodeName = episode.name || 'Untitled';
+
+                            let ratingParts = [];
+                            ratingParts.push(`IMDb ${ratingData.imdb_rating}`);
+
+                            if (ratingData.ratings && Array.isArray(ratingData.ratings)) {
+                                const rtRating = ratingData.ratings.find(r => r.Source === 'Rotten Tomatoes');
+                                if (rtRating && rtRating.Value) {
+                                    ratingParts.push(`RT ${rtRating.Value}`);
+                                }
+                            }
+
+                            const displayRating = ` (${ratingParts.join(', ')})`;
+                            button.textContent = `${episodeNum}: ${episodeName}${displayRating}`;
+
+                            // Update the onclick to include rating text
+                            const ratingText = ratingParts.join(', ');
+                            button.onclick = () => selectEpisode(episode.episode_number, episodeName, ratingText, episode.overview);
+                        }
+
+                        // Also update the selected episode button text if it's the current episode
+                        if (episode.episode_number === currentSelectedEpisode) {
+                            const episodeButtonText = document.getElementById('episodeButtonText');
+                            if (episodeButtonText) {
+                                const episodeNum = `E${episode.episode_number}`;
+                                const episodeName = episode.name || 'Untitled';
+                                let ratingParts = [];
+                                ratingParts.push(`IMDb ${ratingData.imdb_rating}`);
+                                if (ratingData.ratings && Array.isArray(ratingData.ratings)) {
+                                    const rtRating = ratingData.ratings.find(r => r.Source === 'Rotten Tomatoes');
+                                    if (rtRating && rtRating.Value) {
+                                        ratingParts.push(`RT ${rtRating.Value}`);
+                                    }
+                                }
+                                episodeButtonText.textContent = `${episodeNum}: ${episodeName} (${ratingParts.join(', ')})`;
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error(`Error fetching rating for episode ${episode.episode_number}:`, error);
+                }
+            });
+
+            // Wait for all ratings to load, then cache the full season data
+            await Promise.all(ratingPromises);
+
+            // Now fetch the full season data with ratings to cache it
+            try {
+                const response = await fetch(`${API_BASE_URL}/tv/${currentContentId}/season/${seasonNumber}`);
+                const fullSeasonData = await response.json();
+                const cacheKey = `${currentContentId}_${seasonNumber}`;
+                episodeCache[cacheKey] = fullSeasonData;
+            } catch (error) {
+                console.error('Error caching full season data:', error);
             }
         }
 

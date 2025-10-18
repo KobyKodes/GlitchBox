@@ -225,43 +225,46 @@ class TMDBService:
             print(f"Error fetching episode external IDs: {e}")
             return {}
 
-    def get_tv_season_details(self, tv_id, season_number):
+    def get_tv_season_details(self, tv_id, season_number, include_ratings=True):
         """Get detailed season information"""
         try:
             # Check cache first
             cache_key = f"{tv_id}_{season_number}"
-            if cache_key in season_cache:
+            if cache_key in season_cache and include_ratings:
                 print(f"Loading season {cache_key} from cache")
                 return season_cache[cache_key]
 
-            print(f"Fetching season {cache_key} from API (not in cache)")
+            print(f"Fetching season {cache_key} from API (not in cache or quick mode)")
 
             params = {"api_key": self.api_key}
             response = requests.get(f"{self.base_url}/tv/{tv_id}/season/{season_number}", params=params)
             response.raise_for_status()
             season = response.json()
 
-            # Add full poster URLs for episodes and fetch OMDB data
+            # Add full poster URLs for episodes
             for episode in season.get('episodes', []):
                 if episode.get('still_path'):
                     episode['still_url'] = self.image_base_url + episode['still_path']
 
-                # Fetch external IDs and OMDB ratings (lightweight) for each episode
-                external_ids = self.get_tv_episode_external_ids(
-                    tv_id,
-                    season_number,
-                    episode['episode_number']
-                )
+            # Fetch OMDB ratings only if requested (not in quick mode)
+            if include_ratings:
+                for episode in season.get('episodes', []):
+                    # Fetch external IDs and OMDB ratings (lightweight) for each episode
+                    external_ids = self.get_tv_episode_external_ids(
+                        tv_id,
+                        season_number,
+                        episode['episode_number']
+                    )
 
-                if external_ids.get('imdb_id'):
-                    omdb_data = get_omdb_episode_ratings(external_ids['imdb_id'])
-                    if omdb_data:
-                        episode.update(omdb_data)
+                    if external_ids.get('imdb_id'):
+                        omdb_data = get_omdb_episode_ratings(external_ids['imdb_id'])
+                        if omdb_data:
+                            episode.update(omdb_data)
 
-            # Cache the result
-            season_cache[cache_key] = season
-            save_cache(SEASON_CACHE_FILE, season_cache)  # Save immediately
-            print(f"Cached season data for {cache_key}")
+                # Cache the result only if it includes ratings
+                season_cache[cache_key] = season
+                save_cache(SEASON_CACHE_FILE, season_cache)  # Save immediately
+                print(f"Cached season data for {cache_key}")
 
             return season
 
@@ -1049,8 +1052,27 @@ def get_tv_details(tv_id):
 @app.route('/api/tv/<int:tv_id>/season/<int:season_number>')
 def get_tv_season_details(tv_id, season_number):
     """Get detailed season information"""
-    season = tmdb.get_tv_season_details(tv_id, season_number)
+    # Support quick mode without ratings
+    quick = request.args.get('quick', 'false').lower() == 'true'
+    include_ratings = not quick
+    season = tmdb.get_tv_season_details(tv_id, season_number, include_ratings)
     return jsonify(season)
+
+@app.route('/api/tv/<int:tv_id>/season/<int:season_number>/episode/<int:episode_number>/rating')
+def get_episode_rating(tv_id, season_number, episode_number):
+    """Get IMDB rating for a specific episode"""
+    try:
+        external_ids = tmdb.get_tv_episode_external_ids(tv_id, season_number, episode_number)
+        if external_ids.get('imdb_id'):
+            omdb_data = get_omdb_episode_ratings(external_ids['imdb_id'])
+            return jsonify({
+                'episode_number': episode_number,
+                'imdb_rating': omdb_data.get('omdb_imdb_rating', 'N/A'),
+                'ratings': omdb_data.get('omdb_ratings', [])
+            })
+        return jsonify({'episode_number': episode_number, 'imdb_rating': 'N/A', 'ratings': []})
+    except Exception as e:
+        return jsonify({'error': str(e), 'episode_number': episode_number}), 500
 
 @app.route('/api/tv/popular')
 def get_popular_tv_shows():
