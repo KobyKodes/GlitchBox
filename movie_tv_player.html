@@ -4280,6 +4280,9 @@
         <div class="watchparty-users">
             <div class="watchparty-users-title">Watching (<span id="userCount">0</span>)</div>
             <div id="watchpartyUserList"></div>
+            <button id="syncPlaybackBtn" onclick="syncPlaybackManually()" class="btn" style="width: 100%; margin-top: 12px; padding: 10px; font-size: 13px; background: var(--accent-color, #00d9ff); border-color: var(--accent-color, #00d9ff); color: var(--bg-dark, #0f0f1e); display: none;">
+                🔄 Sync Playback
+            </button>
         </div>
 
         <div class="watchparty-chat">
@@ -8201,22 +8204,31 @@
 
             socket.on('play_sync', (data) => {
                 if (!isHost) {
-                    showSyncIndicator(`Host resumed playback`);
-                    // Note: Cannot control iframe playback due to cross-origin restrictions
+                    showSyncIndicator(`Host resumed playback at ${formatTime(data.currentTime)}`);
+                    // Reload player with timestamp to sync
+                    if (currentContentUrl && data.currentTime !== undefined) {
+                        reloadPlayerWithTimestamp(data.currentTime);
+                    }
                 }
             });
 
             socket.on('pause_sync', (data) => {
                 if (!isHost) {
-                    showSyncIndicator(`Host paused playback`);
-                    // Note: Cannot control iframe playback due to cross-origin restrictions
+                    showSyncIndicator(`Host paused at ${formatTime(data.currentTime)}`);
+                    // Reload player with timestamp to sync
+                    if (currentContentUrl && data.currentTime !== undefined) {
+                        reloadPlayerWithTimestamp(data.currentTime);
+                    }
                 }
             });
 
             socket.on('seek_sync', (data) => {
                 if (!isHost) {
-                    showSyncIndicator(`Host seeked to ${Math.floor(data.currentTime)}s`);
-                    // Note: Cannot control iframe playback due to cross-origin restrictions
+                    showSyncIndicator(`Host seeked to ${formatTime(data.currentTime)}`);
+                    // Reload player with timestamp to sync
+                    if (currentContentUrl && data.currentTime !== undefined) {
+                        reloadPlayerWithTimestamp(data.currentTime);
+                    }
                 }
             });
 
@@ -8408,6 +8420,13 @@
             userColorMap = {}; // Reset user colors for new session
             document.getElementById('watchpartySidebar').classList.remove('active');
             document.getElementById('chatMessages').innerHTML = '';
+
+            // Hide sync button
+            const syncBtn = document.getElementById('syncPlaybackBtn');
+            if (syncBtn) {
+                syncBtn.style.display = 'none';
+            }
+
             showStatus('Left watchparty');
         }
 
@@ -8432,6 +8451,12 @@
         function updateWatchpartyUI(data) {
             document.getElementById('watchpartyRoomCode').textContent = data.room_code;
             updateUsersList(data.users);
+
+            // Show sync button only for host
+            const syncBtn = document.getElementById('syncPlaybackBtn');
+            if (syncBtn) {
+                syncBtn.style.display = isHost ? 'block' : 'none';
+            }
         }
 
         function updateUsersList(users) {
@@ -8686,6 +8711,77 @@
             // This would sync the video player with the room state
             console.log('Syncing with room state:', state);
             // In a real implementation, you would control the iframe here
+        }
+
+        function formatTime(seconds) {
+            if (!seconds || seconds < 0) return '0:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function reloadPlayerWithTimestamp(timestamp) {
+            if (!currentContentUrl) return;
+
+            // Add timestamp parameter to URL
+            const url = new URL(currentContentUrl, window.location.origin);
+
+            // For VidKing and most video players, use 't' parameter for timestamp in seconds
+            url.searchParams.set('t', Math.floor(timestamp));
+
+            const player = document.getElementById('contentPlayer');
+            player.src = url.toString();
+
+            console.log('Reloaded player with timestamp:', timestamp, 'URL:', url.toString());
+            showStatus(`Synced to ${formatTime(timestamp)}`);
+        }
+
+        function syncPlaybackManually() {
+            if (!watchpartyActive || !socket) {
+                showError('You must be in a watchparty to sync');
+                return;
+            }
+
+            if (!isHost) {
+                showError('Only the host can sync playback');
+                return;
+            }
+
+            if (!currentContentUrl) {
+                showError('No content is currently playing');
+                return;
+            }
+
+            // Prompt host for current timestamp
+            const input = prompt('Enter current video timestamp in format MM:SS (e.g., 5:30 for 5 minutes 30 seconds):');
+
+            if (!input) return;
+
+            // Parse MM:SS format
+            const parts = input.split(':');
+            let timestamp = 0;
+
+            if (parts.length === 2) {
+                const mins = parseInt(parts[0]) || 0;
+                const secs = parseInt(parts[1]) || 0;
+                timestamp = mins * 60 + secs;
+            } else if (parts.length === 1) {
+                // Just seconds
+                timestamp = parseInt(parts[0]) || 0;
+            }
+
+            if (timestamp < 0) {
+                showError('Invalid timestamp');
+                return;
+            }
+
+            // Emit sync event to all guests
+            socket.emit('sync_seek', {
+                currentTime: timestamp
+            });
+
+            showStatus(`Synced playback to ${formatTime(timestamp)}`);
+            addSystemMessage(`Synced everyone to ${formatTime(timestamp)}`);
         }
 
         // Initialize socket on page load
