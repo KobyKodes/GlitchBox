@@ -3919,9 +3919,6 @@
                     <button id="playerWatchlistBtn" class="bg-animation-toggle" onclick="togglePlayerWatchlist()" style="display: none;">
                         <span id="playerWatchlistBtnText">♡ Add to Watchlist</span>
                     </button>
-                    <button id="videoSourceBtn" class="bg-animation-toggle" onclick="switchVideoSource()" style="display: none; margin-top: 8px;">
-                        <span id="videoSourceBtnText">Source: VidKing</span>
-                    </button>
                 </div>
                 <div class="current-content-info">
                     <h3 id="currentTitle">Title</h3>
@@ -3991,7 +3988,9 @@
             <div class="player-controls">
                 <button onclick="playNextEpisode()" class="btn" id="nextEpisodeBtn" style="display: none;">Next Episode</button>
                 <button onclick="toggleFullscreen()" class="btn btn-secondary">Fullscreen</button>
-                <button onclick="openInNewTab()" class="btn btn-secondary">Open in New Tab</button>
+                <button id="videoSourceBtn" class="btn btn-secondary" onclick="switchVideoSource()" style="display: none;">
+                    <span id="videoSourceBtnText">Source: VidKing</span>
+                </button>
                 <button onclick="copyCurrentUrl()" class="btn btn-secondary">Copy URL</button>
                 <button onclick="stopPlayback()" class="btn btn-secondary">Stop</button>
             </div>
@@ -6414,14 +6413,6 @@
             }
         }
 
-        function openInNewTab() {
-            if (currentContentUrl) {
-                window.open(currentContentUrl, '_blank');
-            } else {
-                showError('No content is currently loaded');
-            }
-        }
-
         function copyCurrentUrl() {
             if (currentContentUrl) {
                 navigator.clipboard.writeText(currentContentUrl).then(() => {
@@ -8044,8 +8035,8 @@
                         <div style="background: rgba(58, 58, 60, 0.12); border-radius: 12px; padding: 24px; margin-bottom: 32px; text-align: left;">
                             <h3 style="color: #007AFF; margin-bottom: 16px;">Option 3: Use with External Player</h3>
                             <p style="color: #ccc; margin-bottom: 16px; font-size: 14px;">
-                                1. Click "Open in New Tab" to open the video<br/>
-                                2. Use the URL above to load subtitles
+                                1. Click "Copy URL" to copy the video URL<br/>
+                                2. Open the URL in your external player along with the subtitle URL above
                             </p>
                         </div>
 
@@ -8109,19 +8100,6 @@
             window.open(subtitlePlayerUrl, '_blank', 'width=1280,height=720');
             showStatus('✓ Opened subtitle player! Click "📝 Get Subtitles" to find subtitles, then paste the URL in the new window.');
         }
-
-        // Add info about subtitle limitation on player open
-        const originalOpenInNewTab = openInNewTab;
-        openInNewTab = function() {
-            if (activeSubtitleUrl) {
-                const newWindow = window.open(currentContentUrl, '_blank');
-                // Note: We can't inject subtitles into the new window due to security restrictions
-                showStatus('Opened in new tab. Subtitle URL copied to console.');
-                console.log('Use this subtitle URL:', activeSubtitleUrl);
-            } else {
-                originalOpenInNewTab();
-            }
-        };
 
         // ============= WATCHPARTY FUNCTIONS =============
 
