@@ -8813,6 +8813,43 @@
 
         // ============= END WATCHPARTY FUNCTIONS =============
 
+        // ============= KEYBOARD SHORTCUTS =============
+
+        // Add keyboard shortcuts for player controls
+        document.addEventListener('keydown', (e) => {
+            // Ignore if user is typing in an input field
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                return;
+            }
+
+            // F key - Toggle Fullscreen
+            if (e.key === 'f' || e.key === 'F') {
+                e.preventDefault();
+                toggleFullscreen();
+            }
+
+            // N key - Next Episode (if watching TV show)
+            if (e.key === 'n' || e.key === 'N') {
+                e.preventDefault();
+                if (currentContentType === 'tv') {
+                    playNextEpisode();
+                } else {
+                    showStatus('No next episode available (not watching a TV show)');
+                }
+            }
+        });
+
+        // Add double-click to toggle fullscreen on player container
+        const playerContainer = document.querySelector('.player-container');
+        if (playerContainer) {
+            playerContainer.addEventListener('dblclick', (e) => {
+                e.preventDefault();
+                toggleFullscreen();
+            });
+        }
+
+        // ============= END KEYBOARD SHORTCUTS =============
+
         // ============= THEME SYSTEM =============
         const themes = {
             'matrix': { name: 'Matrix', color: '#00ff9f' },
