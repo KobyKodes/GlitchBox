@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta http-equiv="Permissions-Policy" content="fullscreen=*">
     <title>RetroFlix - Stream Movies & TV Shows</title>
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <!-- <script src="https://fpyf8.com/88/tag.min.js" data-zone="178035" async data-cfasync="false"></script> -->
@@ -1529,6 +1530,8 @@
                 padding: 32px 24px;
             }
         }
+
+        .video-frame { width: 100%; height: 480px; border: none; }
 
         /* Responsive design for content player */
         @media (max-width: 1200px) {
@@ -4118,7 +4121,9 @@
                 <button class="tab" onclick="showTab('movies')" id="moviesTab">Movies</button>
                 <button class="tab" onclick="showTab('tv-shows')" id="tvShowsTab">TV Shows</button>
                 <button class="tab" onclick="showTab('recommendations')" id="recommendationsTab">Recommendations</button>
-            </div>
+            
+<button class="tab" id="sportsTab">Sports</button>
+</div>
 
             <!-- Content Type Filters (shown for Movies/TV Shows tabs) -->
             <div id="contentTypeFilters" style="display: none; margin-top: 16px; text-align: center; gap: 12px; justify-content: center; flex-wrap: wrap;">
@@ -6383,27 +6388,61 @@
         function toggleFullscreen() {
             const container = document.querySelector('.player-container');
 
+            if (!container) {
+                console.error('Player container not found');
+                return;
+            }
+
             // Always use container for fullscreen (more reliable across devices)
             if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.webkitCurrentFullScreenElement) {
+                console.log('Attempting to enter fullscreen...');
                 // Try to enter fullscreen
                 if (container.requestFullscreen) {
-                    container.requestFullscreen().catch(err => {
-                        console.error('Fullscreen request failed:', err);
-                        showError('Fullscreen not supported on this device');
-                    });
+                    container.requestFullscreen()
+                        .then(() => {
+                            console.log('Fullscreen entered successfully');
+                            showStatus('Entered fullscreen mode');
+                        })
+                        .catch(err => {
+                            console.error('Fullscreen request failed:', err);
+                            showStatus('Fullscreen blocked - try clicking the player first');
+                        });
                 } else if (container.webkitRequestFullscreen) {
-                    container.webkitRequestFullscreen();
+                    try {
+                        container.webkitRequestFullscreen();
+                        console.log('Webkit fullscreen requested');
+                    } catch (err) {
+                        console.error('Webkit fullscreen failed:', err);
+                    }
                 } else if (container.mozRequestFullScreen) {
-                    container.mozRequestFullScreen();
+                    try {
+                        container.mozRequestFullScreen();
+                        console.log('Mozilla fullscreen requested');
+                    } catch (err) {
+                        console.error('Mozilla fullscreen failed:', err);
+                    }
                 } else if (container.msRequestFullscreen) {
-                    container.msRequestFullscreen();
+                    try {
+                        container.msRequestFullscreen();
+                        console.log('MS fullscreen requested');
+                    } catch (err) {
+                        console.error('MS fullscreen failed:', err);
+                    }
                 } else {
-                    showError('Fullscreen not supported on this browser');
+                    showStatus('Fullscreen not supported on this browser');
                 }
             } else {
+                console.log('Attempting to exit fullscreen...');
                 // Try to exit fullscreen
                 if (document.exitFullscreen) {
-                    document.exitFullscreen();
+                    document.exitFullscreen()
+                        .then(() => {
+                            console.log('Exited fullscreen successfully');
+                            showStatus('Exited fullscreen mode');
+                        })
+                        .catch(err => {
+                            console.error('Exit fullscreen failed:', err);
+                        });
                 } else if (document.webkitExitFullscreen) {
                     document.webkitExitFullscreen();
                 } else if (document.webkitCancelFullScreen) {
@@ -8815,38 +8854,102 @@
 
         // ============= KEYBOARD SHORTCUTS =============
 
-        // Add keyboard shortcuts for player controls
-        document.addEventListener('keydown', (e) => {
-            // Ignore if user is typing in an input field
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-                return;
+        let playerContainerFocused = false;
+
+        // Setup keyboard shortcuts when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            // Setup player container for keyboard shortcuts
+            const playerContainer = document.querySelector('.player-container');
+            if (playerContainer) {
+                console.log('Player container found, setting up keyboard shortcuts');
+
+                // Make player container focusable
+                playerContainer.setAttribute('tabindex', '0');
+                playerContainer.style.outline = 'none'; // Remove focus outline for aesthetics
+
+                // Track focus state
+                playerContainer.addEventListener('click', () => {
+                    playerContainerFocused = true;
+                    playerContainer.focus();
+                    console.log('Player container clicked and focused');
+                });
+
+                playerContainer.addEventListener('focus', () => {
+                    playerContainerFocused = true;
+                    console.log('Player container focused');
+                });
+
+                playerContainer.addEventListener('blur', () => {
+                    playerContainerFocused = false;
+                    console.log('Player container blurred');
+                });
+
+                // Add double-click to toggle fullscreen
+                playerContainer.addEventListener('dblclick', (e) => {
+                    e.preventDefault();
+                    toggleFullscreen();
+                    console.log('Fullscreen toggled via double-click');
+                });
+
+                // Add keyboard shortcuts directly to player container
+                playerContainer.addEventListener('keydown', (e) => {
+                    console.log('Key pressed on player container:', e.key);
+
+                    // F key - Toggle Fullscreen
+                    if (e.key === 'f' || e.key === 'F') {
+                        e.preventDefault();
+                        toggleFullscreen();
+                        console.log('Fullscreen toggled via F key (player focused)');
+                    }
+
+                    // N key - Next Episode (if watching TV show)
+                    if (e.key === 'n' || e.key === 'N') {
+                        e.preventDefault();
+                        if (currentContentType === 'tv') {
+                            playNextEpisode();
+                            console.log('Next episode via N key (player focused)');
+                        } else {
+                            showStatus('No next episode available (not watching a TV show)');
+                        }
+                    }
+                });
+            } else {
+                console.error('Player container not found!');
             }
 
-            // F key - Toggle Fullscreen
-            if (e.key === 'f' || e.key === 'F') {
-                e.preventDefault();
-                toggleFullscreen();
-            }
-
-            // N key - Next Episode (if watching TV show)
-            if (e.key === 'n' || e.key === 'N') {
-                e.preventDefault();
-                if (currentContentType === 'tv') {
-                    playNextEpisode();
-                } else {
-                    showStatus('No next episode available (not watching a TV show)');
+            // Global keyboard shortcuts as backup (work everywhere except input fields)
+            document.addEventListener('keydown', (e) => {
+                // Ignore if user is typing in an input field
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                    return;
                 }
-            }
-        });
 
-        // Add double-click to toggle fullscreen on player container
-        const playerContainer = document.querySelector('.player-container');
-        if (playerContainer) {
-            playerContainer.addEventListener('dblclick', (e) => {
-                e.preventDefault();
-                toggleFullscreen();
+                // Only process if player container is NOT focused (avoid duplicate handling)
+                if (playerContainerFocused) {
+                    return;
+                }
+
+                console.log('Global key pressed:', e.key);
+
+                // F key - Toggle Fullscreen
+                if (e.key === 'f' || e.key === 'F') {
+                    e.preventDefault();
+                    toggleFullscreen();
+                    console.log('Fullscreen toggled via global F key');
+                }
+
+                // N key - Next Episode (if watching TV show)
+                if (e.key === 'n' || e.key === 'N') {
+                    e.preventDefault();
+                    if (currentContentType === 'tv') {
+                        playNextEpisode();
+                        console.log('Next episode via global N key');
+                    } else {
+                        showStatus('No next episode available (not watching a TV show)');
+                    }
+                }
             });
-        }
+        });
 
         // ============= END KEYBOARD SHORTCUTS =============
 
@@ -9177,5 +9280,173 @@
 
         // ============= END THEME & ANIMATION SYSTEM =============
     </script>
+
+<script>
+(() => {
+  const SPORTS_API = {
+    base: "https://westream.top",
+    endpoints: {
+      matches: "/matches",
+      live: "/matches/live",
+      sports: "/sports",
+      matchesBySport: (sport) => `/matches/${encodeURIComponent(sport)}`,
+      stream: (source, id) => `/stream/${encodeURIComponent(source)}/${encodeURIComponent(id)}`
+    },
+    embedBase: "https://westream.top/embed"
+  };
+
+  const qs = (sel, root=document) => root.querySelector(sel);
+  const qsa = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+  // Tab wiring
+  const sportsTab = qs('#sportsTab');
+  const sportsSection = qs('#sportsSection');
+  if (sportsTab && sportsSection) {
+    sportsTab.addEventListener('click', () => {
+      // deactivate other tabs
+      qsa('.tab').forEach(t => t.classList.remove('active'));
+      sportsTab.classList.add('active');
+
+      // show sports section, hide others that are section-like
+      qsa('.player-section, .continue-watching-section, .watchlist-section, #movies-content, #tvshows-content, #recommendations').forEach(sec => {
+        if (sec && sec !== sportsSection) sec.style.display = 'none';
+      });
+      sportsSection.style.display = '';
+
+      // initial load: live matches
+      loadLiveMatches();
+    });
+  }
+
+  const statusEl = qs('#sportsStatus');
+  const matchesGrid = qs('#sportsMatchesGrid');
+  const sportPicker = qs('#sportPicker');
+  const btnLive = qs('#btnLiveMatches');
+  const btnAllSports = qs('#btnAllSports');
+  const player = qs('#sportsPlayer');
+
+  function setStatus(text) {
+    if (statusEl) statusEl.textContent = text;
+  }
+
+  async function apiGet(path) {
+    const url = `${SPORTS_API.base}${path}`;
+    const res = await fetch(url, { credentials: "omit" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  }
+
+  function renderMatches(list) {
+    matchesGrid.innerHTML = "";
+    if (!list || !list.length) {
+      matchesGrid.innerHTML = '<div class="error">No matches found.</div>';
+      return;
+    }
+    for (const m of list) {
+      const card = document.createElement('div');
+      card.className = 'content-card';
+      card.style.minHeight = '120px';
+      card.innerHTML = \`
+        <div class="content-info">
+          <div class="content-title">\${m.title || m.league || 'Match'}</div>
+          <div class="content-year">\${m.time || m.kickoff || ''}</div>
+          <div class="content-genres">\${[m.homeTeam, 'vs', m.awayTeam].filter(Boolean).join(' ')}</div>
+          <div class="content-genres">\${m.source ? 'Source: ' + m.source : ''}</div>
+        </div>\`;
+      card.addEventListener('click', () => {
+        if (!m.source || !m.id) {
+          setStatus('Missing stream info for this match.');
+          return;
+        }
+        loadStreams(m.source, m.id);
+        // auto scroll to player
+        player.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      matchesGrid.appendChild(card);
+    }
+  }
+
+  async function loadLiveMatches() {
+    try {
+      setStatus('Loading live matches...');
+      matchesGrid.innerHTML = '<div class="loading">Loading…</div>';
+      const data = await apiGet(SPORTS_API.endpoints.live);
+      renderMatches(Array.isArray(data) ? data : (data?.matches || []));
+      setStatus('Sports: Live Matches');
+    } catch (e) {
+      console.error(e);
+      matchesGrid.innerHTML = '<div class="error">Could not load live matches.</div>';
+      setStatus('Error loading live matches');
+    }
+  }
+
+  async function loadAllSports() {
+    try {
+      setStatus('Loading sports...');
+      sportPicker.style.display = 'none';
+      matchesGrid.innerHTML = '<div class="loading">Loading…</div>';
+      const sports = await apiGet(SPORTS_API.endpoints.sports);
+      sportPicker.innerHTML = '';
+      (Array.isArray(sports) ? sports : []).forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id || s.slug || s.name || s;
+        opt.textContent = s.name || s.title || s;
+        sportPicker.appendChild(opt);
+      });
+      sportPicker.style.display = '';
+      setStatus('Pick a sport');
+    } catch (e) {
+      console.error(e);
+      matchesGrid.innerHTML = '<div class="error">Could not load sports.</div>';
+      setStatus('Error loading sports');
+    }
+  }
+
+  async function loadMatchesBySport(sport) {
+    try {
+      setStatus(\`Loading \${sport} matches...\`);
+      matchesGrid.innerHTML = '<div class="loading">Loading…</div>';
+      const data = await apiGet(SPORTS_API.endpoints.matchesBySport(sport));
+      renderMatches(Array.isArray(data) ? data : (data?.matches || []));
+      setStatus(\`\${sport}: Matches\`);
+    } catch (e) {
+      console.error(e);
+      matchesGrid.innerHTML = '<div class="error">Could not load matches for this sport.</div>';
+      setStatus('Error loading matches by sport');
+    }
+  }
+
+  async function loadStreams(source, id) {
+    try {
+      setStatus('Loading streams...');
+      // We don't actually need the stream list to embed; but we call it to respect API usage
+      await apiGet(SPORTS_API.endpoints.stream(source, id));
+      const streamNo = 1; // default to first stream; could add list UI later
+      const src = \`\${SPORTS_API.embedBase}/\${encodeURIComponent(source)}/\${encodeURIComponent(id)}/\${streamNo}\`;
+      player.innerHTML = '<iframe class="video-frame" allowfullscreen frameborder="0"></iframe>';
+      const iframe = player.querySelector('iframe');
+      iframe.src = src;
+      setStatus('Streaming');
+    } catch (e) {
+      console.error(e);
+      player.innerHTML = '<div class="error">Could not start the stream.</div>';
+      setStatus('Error loading stream');
+    }
+  }
+
+  if (btnLive) btnLive.addEventListener('click', loadLiveMatches);
+  if (btnAllSports) btnAllSports.addEventListener('click', loadAllSports);
+  if (sportPicker) sportPicker.addEventListener('change', (e) => {
+    const v = e.target.value;
+    if (v) loadMatchesBySport(v);
+  });
+
+  // Optional: allow deep link via hash like #sports
+  if (location.hash.replace('#','') === 'sports' && sportsTab) {
+    sportsTab.click();
+  }
+})();
+</script>
+
 </body>
 </html>
