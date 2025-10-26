@@ -2106,12 +2106,29 @@
             right: 20px;
             z-index: 2147483647;
             max-height: 50vh;
+            pointer-events: auto;
+        }
+
+        .watchparty-sidebar.fullscreen-mode .chat-input {
+            pointer-events: auto;
+            user-select: text;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+        }
+
+        .watchparty-sidebar.fullscreen-mode * {
+            pointer-events: auto;
         }
 
         .player-container:fullscreen iframe,
         .player-container:-webkit-full-screen iframe,
         .player-container:-moz-full-screen iframe,
-        .player-container:-ms-fullscreen iframe {
+        .player-container:-ms-fullscreen iframe,
+        .player-container:fullscreen video,
+        .player-container:-webkit-full-screen video,
+        .player-container:-moz-full-screen video,
+        .player-container:-ms-fullscreen video {
             position: absolute;
             top: 0;
             left: 0;
@@ -6325,9 +6342,16 @@
 
                     if (isFullscreen) {
                         // When entering fullscreen: move sidebar into player-container
-                        if (sidebar && container.contains(document.fullscreenElement)) {
+                        // Check if the container itself is fullscreen OR if it contains the fullscreen element
+                        const containerIsFullscreen = isFullscreen === container ||
+                                                     (container && container.contains(isFullscreen));
+
+                        if (sidebar && containerIsFullscreen) {
                             sidebar.classList.add('fullscreen-mode');
-                            container.appendChild(sidebar);
+                            // Only append if not already in container
+                            if (!container.contains(sidebar)) {
+                                container.appendChild(sidebar);
+                            }
                         }
                     } else {
                         // When exiting fullscreen: move sidebar back out and remove class
@@ -6335,7 +6359,7 @@
                             sidebar.classList.remove('fullscreen-mode');
                             // Move sidebar back to its original position (outside container, after script tag)
                             const containerDiv = document.querySelector('.container');
-                            if (containerDiv && containerDiv.parentNode) {
+                            if (containerDiv && containerDiv.parentNode && container.contains(sidebar)) {
                                 // Insert after the container div
                                 containerDiv.parentNode.insertBefore(sidebar, containerDiv.nextSibling);
                             }
@@ -8957,7 +8981,14 @@
                 playerContainer.style.outline = 'none'; // Remove focus outline for aesthetics
 
                 // Track focus state
-                playerContainer.addEventListener('click', () => {
+                playerContainer.addEventListener('click', (e) => {
+                    // Don't steal focus if clicking on watchparty elements
+                    const watchpartySidebar = document.getElementById('watchpartySidebar');
+                    if (watchpartySidebar && watchpartySidebar.contains(e.target)) {
+                        console.log('Click on watchparty sidebar - not stealing focus');
+                        return; // Let the watchparty elements handle their own focus
+                    }
+
                     playerContainerFocused = true;
                     playerContainer.focus();
                     console.log('Player container clicked and focused');
@@ -8972,72 +9003,9 @@
                     playerContainerFocused = false;
                     console.log('Player container blurred');
                 });
-
-                // Add double-click to toggle fullscreen
-                playerContainer.addEventListener('dblclick', (e) => {
-                    e.preventDefault();
-                    toggleFullscreen();
-                    console.log('Fullscreen toggled via double-click');
-                });
-
-                // Add keyboard shortcuts directly to player container
-                playerContainer.addEventListener('keydown', (e) => {
-                    console.log('Key pressed on player container:', e.key);
-
-                    // F key - Toggle Fullscreen
-                    if (e.key === 'f' || e.key === 'F') {
-                        e.preventDefault();
-                        toggleFullscreen();
-                        console.log('Fullscreen toggled via F key (player focused)');
-                    }
-
-                    // N key - Next Episode (if watching TV show)
-                    if (e.key === 'n' || e.key === 'N') {
-                        e.preventDefault();
-                        if (currentContentType === 'tv') {
-                            playNextEpisode();
-                            console.log('Next episode via N key (player focused)');
-                        } else {
-                            showStatus('No next episode available (not watching a TV show)');
-                        }
-                    }
-                });
             } else {
                 console.error('Player container not found!');
             }
-
-            // Global keyboard shortcuts as backup (work everywhere except input fields)
-            document.addEventListener('keydown', (e) => {
-                // Ignore if user is typing in an input field
-                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-                    return;
-                }
-
-                // Only process if player container is NOT focused (avoid duplicate handling)
-                if (playerContainerFocused) {
-                    return;
-                }
-
-                console.log('Global key pressed:', e.key);
-
-                // F key - Toggle Fullscreen
-                if (e.key === 'f' || e.key === 'F') {
-                    e.preventDefault();
-                    toggleFullscreen();
-                    console.log('Fullscreen toggled via global F key');
-                }
-
-                // N key - Next Episode (if watching TV show)
-                if (e.key === 'n' || e.key === 'N') {
-                    e.preventDefault();
-                    if (currentContentType === 'tv') {
-                        playNextEpisode();
-                        console.log('Next episode via global N key');
-                    } else {
-                        showStatus('No next episode available (not watching a TV show)');
-                    }
-                }
-            });
         });
 
         // ============= END KEYBOARD SHORTCUTS =============
@@ -9892,23 +9860,23 @@
         // All TV Channels data organized by country
         const allWorldChannels = [
             // Lebanon
-            { name: 'Aghani Aghani TV', url: 'https://streaming-a-1035.cdn.nextologies.com/6zj8y5nemi8a32vyjjbkv0oqx/77pcakd8reik3g8qdqnexlkmq/playlist.m3u8', category: 'Music', country: 'Lebanon', countryCode: 'LB' },
+            { name: 'Aghani Aghani TV', url: 'https://streaming-a-1035.cdn.nextologies.com/6zj8y5nemi8a32vyjjbkv0oqx/77pcakd8reik3g8qdqnexlkmq/playlist.m3u8', category: 'Music', country: 'Lebanon', countryCode: 'LB', logo: 'https://i.imgur.com/o6HSfNg.png' },
             { name: 'Al Ittihad', url: 'http://185.105.4.151:8080/_defapp_/ittihad/index.m3u8', category: 'News', country: 'Lebanon', countryCode: 'LB' },
-            { name: 'Al Jadeed', url: 'http://185.9.2.18/chid_391/mono.m3u8', category: 'General', country: 'Lebanon', countryCode: 'LB' },
-            { name: 'Al Manar', url: 'https://edge.fastpublish.me/live/index.m3u8', category: 'News', country: 'Lebanon', countryCode: 'LB' },
-            { name: 'Al Mayadeen', url: 'https://mdnlv.cdn.octivid.com/almdn/smil:mpegts.stream.smil/playlist.m3u8', category: 'News', country: 'Lebanon', countryCode: 'LB' },
+            { name: 'Al Jadeed', url: 'http://185.9.2.18/chid_391/mono.m3u8', category: 'General', country: 'Lebanon', countryCode: 'LB', logo: 'https://i.imgur.com/CfxR8o3.png' },
+            { name: 'Al Manar', url: 'https://edge.fastpublish.me/live/index.m3u8', category: 'News', country: 'Lebanon', countryCode: 'LB', logo: 'https://i.imgur.com/sOQLV7L.png' },
+            { name: 'Al Mayadeen', url: 'https://mdnlv.cdn.octivid.com/almdn/smil:mpegts.stream.smil/playlist.m3u8', category: 'News', country: 'Lebanon', countryCode: 'LB', logo: 'https://i.imgur.com/GtQOKeW.png' },
             { name: 'ALWifak News TV', url: 'http://alwifaklive.info:1935/live/myStream/playlist.m3u8', category: 'News', country: 'Lebanon', countryCode: 'LB' },
-            { name: 'Arabica TV', url: 'http://istream.binarywaves.com:8081/hls/arabica/playlist.m3u8', category: 'Music', country: 'Lebanon', countryCode: 'LB' },
-            { name: 'Future TV', url: 'https://live.kwikmotion.com/futurelive/ftv.smil/playlist.m3u8', category: 'General', country: 'Lebanon', countryCode: 'LB' },
+            { name: 'Arabica TV', url: 'http://istream.binarywaves.com:8081/hls/arabica/playlist.m3u8', category: 'Music', country: 'Lebanon', countryCode: 'LB', logo: 'https://i.imgur.com/sTOoDy1.png' },
+            { name: 'Future TV', url: 'https://live.kwikmotion.com/futurelive/ftv.smil/playlist.m3u8', category: 'General', country: 'Lebanon', countryCode: 'LB', logo: 'https://i.postimg.cc/43Ww9bQV/futuretv.png' },
             { name: 'LTV', url: 'https://p-ltv.akamaized.net/ltv/ltv.m3u8', category: 'General', country: 'Lebanon', countryCode: 'LB' },
             { name: 'Nabaa TV', url: 'http://31.14.40.237:1935/live/Nabaa/playlist.m3u8', category: 'News', country: 'Lebanon', countryCode: 'LB' },
-            { name: 'NBN', url: 'http://5.9.119.146:8883/nbn/index.m3u8', category: 'General', country: 'Lebanon', countryCode: 'LB' },
-            { name: 'OTV', url: 'https://fl1002.bozztv.com/ga-otvlebanon/index.m3u8', category: 'General', country: 'Lebanon', countryCode: 'LB' },
+            { name: 'NBN', url: 'http://5.9.119.146:8883/nbn/index.m3u8', category: 'General', country: 'Lebanon', countryCode: 'LB', logo: 'https://i.imgur.com/EefFcIk.png' },
+            { name: 'OTV', url: 'https://fl1002.bozztv.com/ga-otvlebanon/index.m3u8', category: 'General', country: 'Lebanon', countryCode: 'LB', logo: 'https://i.imgur.com/toxFMeY.png' },
             { name: 'Red TV Lebanon', url: 'https://live.kwikmotion.com/redtvlive/redtv.smil/playlist.m3u8', category: 'General', country: 'Lebanon', countryCode: 'LB' },
             { name: 'Senses TV', url: 'https://sensestv.com:4433/hls/sensesonline/index.m3u8', category: 'Entertainment', country: 'Lebanon', countryCode: 'LB' },
-            { name: 'Tele Liban', url: 'https://cdn.catiacast.video/abr/ed8f807e2548db4507d2a6f4ba0c4a06/playlist.m3u8', category: 'General', country: 'Lebanon', countryCode: 'LB' },
+            { name: 'Tele Liban', url: 'https://cdn.catiacast.video/abr/ed8f807e2548db4507d2a6f4ba0c4a06/playlist.m3u8', category: 'General', country: 'Lebanon', countryCode: 'LB', logo: 'https://i.postimg.cc/d3RWtcXq/teleliban.png' },
             { name: 'UNews', url: 'https://cdn.catiacast.video/abr/9436b5ab3c1171ab04a59af11951292f/playlist.m3u8', category: 'News', country: 'Lebanon', countryCode: 'LB' },
-            { name: 'Voice of Lebanon', url: 'https://svs.itworkscdn.net/vdltvlive/vdltv.smil/playlist.m3u8', category: 'News', country: 'Lebanon', countryCode: 'LB' },
+            { name: 'Voice of Lebanon', url: 'https://svs.itworkscdn.net/vdltvlive/vdltv.smil/playlist.m3u8', category: 'News', country: 'Lebanon', countryCode: 'LB', logo: 'https://i.imgur.com/f8WcqRY.png' },
 
             // Saudi Arabia
             { name: 'Al Arabiya Al Hadath', url: 'https://av.alarabiya.net/alarabiapublish/alhadath.smil/playlist.m3u8', category: 'News', country: 'Saudi Arabia', countryCode: 'SA' },
@@ -9983,18 +9951,18 @@
             { name: 'WDR Fernsehen', url: 'https://wdr-live.ard-mcdn.de/wdr/live/hls/de/master.m3u8', category: 'General', country: 'Germany', countryCode: 'DE' },
 
             // USA
-            { name: 'ABC News New York', url: 'https://content.uplynk.com/channel/ext/72750b711f704e4a94b5cfe6dc99f5e1/wabc_24x7_news.m3u8', category: 'News', country: 'USA', countryCode: 'US' },
+            { name: 'ABC News New York', url: 'https://content.uplynk.com/channel/ext/72750b711f704e4a94b5cfe6dc99f5e1/wabc_24x7_news.m3u8', category: 'News', country: 'USA', countryCode: 'US', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/WABC_TV_New_2021.svg/512px-WABC_TV_New_2021.svg.png' },
             { name: 'CBS News New York', url: 'https://cbsn-ny.cbsnstream.cbsnews.com/out/v1/ec3897d58a9b45129a77d67aa247d136/master.m3u8', category: 'News', country: 'USA', countryCode: 'US' },
             { name: 'CBS News Chicago', url: 'https://cbsn-chi.cbsnstream.cbsnews.com/out/v1/b2fc0d5715d54908adf07f97d2616646/master.m3u8', category: 'News', country: 'USA', countryCode: 'US' },
             { name: 'CBS News Los Angeles', url: 'https://cbsn-la.cbsnstream.cbsnews.com/out/v1/57b6c4534a164accb6b1872b501e0028/master.m3u8', category: 'News', country: 'USA', countryCode: 'US' },
             { name: 'Cheddar News', url: 'https://cheddar-us.samsung.wurl.tv/playlist.m3u8', category: 'News', country: 'USA', countryCode: 'US' },
-            { name: 'Bloomberg TV', url: 'https://bloomberg-bloomberg-3-br.samsung.wurl.tv/manifest/playlist.m3u8', category: 'News', country: 'USA', countryCode: 'US' },
+            { name: 'Bloomberg TV', url: 'https://bloomberg-bloomberg-3-br.samsung.wurl.tv/manifest/playlist.m3u8', category: 'News', country: 'USA', countryCode: 'US', logo: 'https://i.imgur.com/OuogLHx.png' },
             { name: 'C-SPAN', url: 'https://fl1.moveonjoy.com/C-SPAN/index.m3u8', category: 'News', country: 'USA', countryCode: 'US' },
-            { name: 'CNBC', url: 'https://fl1.moveonjoy.com/CNBC/index.m3u8', category: 'News', country: 'USA', countryCode: 'US' },
-            { name: 'AMC', url: 'https://fl1.moveonjoy.com/AMC_NETWORK/index.m3u8', category: 'Entertainment', country: 'USA', countryCode: 'US' },
+            { name: 'CNBC', url: 'https://fl1.moveonjoy.com/CNBC/index.m3u8', category: 'News', country: 'USA', countryCode: 'US', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/CNBC_logo.svg/512px-CNBC_logo.svg.png' },
+            { name: 'AMC', url: 'https://fl1.moveonjoy.com/AMC_NETWORK/index.m3u8', category: 'Entertainment', country: 'USA', countryCode: 'US', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/AMC_logo_2019.svg/512px-AMC_logo_2019.svg.png' },
             { name: 'BBC America', url: 'https://bcovlive-a.akamaihd.net/7f5ec16d102f4b5d92e8e27bc95ff424/us-east-1/6240731308001/playlist.m3u8', category: 'Entertainment', country: 'USA', countryCode: 'US' },
-            { name: 'Bravo', url: 'https://fl1.moveonjoy.com/BRAVO/index.m3u8', category: 'Entertainment', country: 'USA', countryCode: 'US' },
-            { name: 'Comedy Central', url: 'https://fl1.moveonjoy.com/Comedy_Central/index.m3u8', category: 'Entertainment', country: 'USA', countryCode: 'US' },
+            { name: 'Bravo', url: 'https://fl1.moveonjoy.com/BRAVO/index.m3u8', category: 'Entertainment', country: 'USA', countryCode: 'US', logo: 'https://i.imgur.com/JmTIRLF.png' },
+            { name: 'Comedy Central', url: 'https://fl1.moveonjoy.com/Comedy_Central/index.m3u8', category: 'Entertainment', country: 'USA', countryCode: 'US', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Comedy_Central_2018.svg/512px-Comedy_Central_2018.svg.png' },
             { name: 'Comet', url: 'https://fast-channels.sinclairstoryline.com/COMET/index.m3u8', category: 'Movies', country: 'USA', countryCode: 'US' },
             { name: 'Cozi TV', url: 'https://fl1.moveonjoy.com/COZI_TV/index.m3u8', category: 'Entertainment', country: 'USA', countryCode: 'US' },
             { name: 'CMT', url: 'https://fl1.moveonjoy.com/CMT/index.m3u8', category: 'Music', country: 'USA', countryCode: 'US' },
@@ -10002,8 +9970,8 @@
             { name: 'Bounce', url: 'https://fl1.moveonjoy.com/BOUNCE_TV/index.m3u8', category: 'Entertainment', country: 'USA', countryCode: 'US' },
             { name: 'Buzzr', url: 'https://fl1.moveonjoy.com/Buzzr/index.m3u8', category: 'Entertainment', country: 'USA', countryCode: 'US' },
             { name: 'Aspire', url: 'https://fl1.moveonjoy.com/Aspire/index.m3u8', category: 'Entertainment', country: 'USA', countryCode: 'US' },
-            { name: 'beIN Sports USA', url: 'http://fl1.moveonjoy.com/BEIN_SPORTS/index.m3u8', category: 'Sports', country: 'USA', countryCode: 'US' },
-            { name: 'CBS Sports Network', url: 'https://fl1.moveonjoy.com/CBS_SPORTS_NETWORK/index.m3u8', category: 'Sports', country: 'USA', countryCode: 'US' },
+            { name: 'beIN Sports USA', url: 'http://fl1.moveonjoy.com/BEIN_SPORTS/index.m3u8', category: 'Sports', country: 'USA', countryCode: 'US', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Bein_Sports_Logo.svg/512px-Bein_Sports_Logo.svg.png' },
+            { name: 'CBS Sports Network', url: 'https://fl1.moveonjoy.com/CBS_SPORTS_NETWORK/index.m3u8', category: 'Sports', country: 'USA', countryCode: 'US', logo: 'https://i.imgur.com/A8CnA8g.png' },
             { name: 'ACC Network', url: 'https://fl1.moveonjoy.com/ACC_NETWORK/index.m3u8', category: 'Sports', country: 'USA', countryCode: 'US' },
             { name: 'AXS TV', url: 'https://fl1.moveonjoy.com/Axs_TV/index.m3u8', category: 'Entertainment', country: 'USA', countryCode: 'US' },
             { name: '3ABN Kids', url: 'https://3abn.bozztv.com/3abn2/Kids_live/smil:Kids_live.smil/playlist.m3u8', category: 'Kids', country: 'USA', countryCode: 'US' },
@@ -10129,7 +10097,15 @@
                         </div>
 
                         <div style="text-align: center; margin: 20px 0;">
-                            <div style="font-size: 32px; margin-bottom: 8px;">📺</div>
+                            ${channel.logo ? `
+                                <img src="${channel.logo}"
+                                     alt="${channel.name}"
+                                     style="max-width: 120px; max-height: 80px; margin-bottom: 12px; object-fit: contain; filter: drop-shadow(0 0 10px ${categoryColor});"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div style="font-size: 32px; margin-bottom: 8px; display: none;">📺</div>
+                            ` : `
+                                <div style="font-size: 32px; margin-bottom: 8px;">📺</div>
+                            `}
                             <div style="font-size: 24px; font-weight: bold; color: #00ff9f; margin-bottom: 8px;">
                                 ${channel.name}
                             </div>
