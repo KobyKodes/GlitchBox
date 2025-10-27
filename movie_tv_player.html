@@ -4008,8 +4008,8 @@
             <div class="player-controls">
                 <button onclick="playNextEpisode()" class="btn" id="nextEpisodeBtn" style="display: none;">Next Episode</button>
                 <button onclick="toggleFullscreen()" class="btn btn-secondary">Fullscreen</button>
-                <button id="videoSourceBtn" class="btn btn-secondary" onclick="switchVideoSource()" style="display: none;">
-                    <span id="videoSourceBtnText">Source: VidKing</span>
+                <button id="videoSourceBtn" class="btn btn-secondary" onclick="showSourceSelector()" style="display: none;">
+                    <span id="videoSourceBtnText">Source: VidSrc</span>
                 </button>
                 <button id="sportsSourceBtn" class="btn btn-secondary" onclick="switchSportsSource()" style="display: none;">
                     <span id="sportsSourceBtnText">Source 1</span>
@@ -4072,6 +4072,35 @@
                         <input type="text" id="newWatchlistName" placeholder="Enter watchlist name..."
                                style="font-family: 'VT323', monospace; width: 100%; padding: 12px; background: var(--bg-dark, #0f0f1e); border: 2px solid var(--primary-color, #00ff9f); color: var(--primary-color, #00ff9f); font-size: 18px; margin-bottom: 12px;">
                         <button onclick="createNewWatchlist()" class="effects-btn" style="width: 100%; padding: 12px;">Create Watchlist</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Source Selector Modal -->
+            <div id="sourceSelectorModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.90); z-index: 10000; align-items: center; justify-content: center; padding: 20px;" onclick="closeSourceSelector()">
+                <div style="max-width: 500px; width: 90%; background: #0f0f1e; border: 4px solid var(--primary-color, #00ff9f); padding: 32px; box-shadow: 0 0 0 4px #1a1a2e, 0 0 30px var(--primary-glow, rgba(0, 255, 159, 0.5)), inset 0 0 20px var(--primary-glow, rgba(0, 255, 159, 0.1)); max-height: 80vh; overflow-y: auto;" onclick="event.stopPropagation()">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h2 style="font-family: 'VT323', monospace; font-size: 32px; color: var(--primary-color, #00ff9f); margin: 0; text-shadow: 0 0 10px var(--primary-glow, rgba(0, 255, 159, 0.5));">◆ SELECT SOURCE</h2>
+                        <button onclick="closeSourceSelector()" class="btn btn-secondary" style="padding: 8px 16px;">× Close</button>
+                    </div>
+
+                    <p style="font-family: 'VT323', monospace; color: #00d9ff; font-size: 20px; margin-bottom: 24px; line-height: 1.4;">
+                        Choose a streaming source. Different sources may have better quality or reliability.
+                    </p>
+
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <button onclick="selectVideoSource('vidsrc')" class="btn" style="width: 100%; padding: 16px; text-align: left; display: flex; align-items: center; justify-content: space-between;">
+                            <span style="font-size: 18px;">🎬 VidSrc</span>
+                            <span id="vidsrc-check" style="color: #00ff9f; display: none;">✓</span>
+                        </button>
+                        <button onclick="selectVideoSource('vidking')" class="btn" style="width: 100%; padding: 16px; text-align: left; display: flex; align-items: center; justify-content: space-between;">
+                            <span style="font-size: 18px;">👑 VidKing</span>
+                            <span id="vidking-check" style="color: #00ff9f; display: none;">✓</span>
+                        </button>
+                        <button onclick="selectVideoSource('superembed')" class="btn" style="width: 100%; padding: 16px; text-align: left; display: flex; align-items: center; justify-content: space-between;">
+                            <span style="font-size: 18px;">⚡ SuperEmbed</span>
+                            <span id="superembed-check" style="color: #00ff9f; display: none;">✓</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -4361,9 +4390,6 @@
         <div class="watchparty-users">
             <div class="watchparty-users-title">Watching (<span id="userCount">0</span>)</div>
             <div id="watchpartyUserList"></div>
-            <button id="syncPlaybackBtn" onclick="syncPlaybackManually()" class="btn" style="width: 100%; margin-top: 12px; padding: 10px; font-size: 13px; background: var(--accent-color, #00d9ff); border-color: var(--accent-color, #00d9ff); color: var(--bg-dark, #0f0f1e); display: none;">
-                🔄 Sync Playback
-            </button>
         </div>
 
         <div class="watchparty-chat">
@@ -4398,8 +4424,8 @@
         let currentContentFilter = 'popular'; // 'popular', 'trending', 'now-playing', 'upcoming'
         let currentLanguage = null; // null = all languages, 'en', 'ar', 'ko', 'ja', 'zh'
 
-        // Video source preference: 'vidking' or 'superembed'
-        let videoSource = localStorage.getItem('videoSource') || 'vidking';
+        // Video source preference: 'vidsrc', 'vidking', or 'superembed'
+        let videoSource = localStorage.getItem('videoSource') || 'vidsrc';
 
         // ============= WATCHPARTY VARIABLES =============
         let socket = null;
@@ -6081,27 +6107,58 @@
         }
 
         async function playMovie(movieId, startTime = null) {
+            console.log(`[Play Movie] Starting playMovie(${movieId}, startTime: ${startTime})`);
+            console.log(`[Play Movie] Current video source: ${videoSource}`);
+            console.log(`[Play Movie] Watchparty active: ${watchpartyActive}, Is host: ${isHost}`);
+
             try {
                 const response = await fetch(`${API_BASE_URL}/stream/${movieId}`);
                 const data = await response.json();
+
+                console.log('[Play Movie] API Response:', data); // Debug: see full API response
 
                 if (data.error) {
                     throw new Error(data.error);
                 }
 
-                // Determine URL based on selected video source
+                // Determine URL and type based on selected video source
+                let streamUrl, streamType;
+                const tmdbId = currentContentData?.id || movieId;
+
                 if (videoSource === 'superembed') {
-                    // Use TMDB ID for SuperEmbed
-                    const tmdbId = currentContentData?.id || movieId;
-                    currentContentUrl = `${window.location.origin}/se_player.php?video_id=${tmdbId}&tmdb=1`;
-                    console.log('SuperEmbed URL:', currentContentUrl);
+                    streamUrl = `${window.location.origin}/se_player.php?video_id=${tmdbId}&tmdb=1`;
+                    streamType = 'embed';
+                    console.log('SuperEmbed URL:', streamUrl);
+                } else if (videoSource === 'vidking') {
+                    streamUrl = `https://www.vidking.net/embed/movie/${tmdbId}`;
+                    streamType = 'embed';
+                    console.log('VidKing URL:', streamUrl);
                 } else {
-                    // Default to VidKing
-                    currentContentUrl = data.vidking_autoplay_url;
-                    console.log('VidKing URL:', currentContentUrl);
+                    // VidSrc - Use stream extraction from API
+                    streamUrl = data.stream_url || data.vidsrc_url;
+                    streamType = data.stream_type || 'embed';
+                    console.log('VidSrc URL:', streamUrl);
+                    console.log('Stream type:', streamType);
+
+                    // Additional check to ensure URL is valid
+                    if (!streamUrl) {
+                        console.error('No stream URL found in API response');
+                        throw new Error('No stream URL available');
+                    }
                 }
 
-                loadPlayerContent(currentContentUrl, startTime);
+                currentContentUrl = streamUrl;
+
+                // Show the player section
+                const playerSection = document.getElementById('playerSection');
+                if (playerSection) {
+                    playerSection.style.display = 'block';
+                    // Scroll to player for better UX
+                    playerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+
+                // Load with appropriate player (video element for direct, iframe for embed)
+                loadPlayerContent(streamUrl, startTime, streamType);
                 showStatus(`Now playing: ${data.title}`);
 
                 // Broadcast content change to watchparty if host
@@ -6126,23 +6183,50 @@
                 const response = await fetch(`${API_BASE_URL}/tv/stream/${tvId}?season=${season}&episode=${episode}`);
                 const data = await response.json();
 
+                console.log('API Response:', data); // Debug: see full API response
+
                 if (data.error) {
                     throw new Error(data.error);
                 }
 
-                // Determine URL based on selected video source
+                // Determine URL and type based on selected video source
+                let streamUrl, streamType;
+                const tmdbId = currentContentData?.id || tvId;
+
                 if (videoSource === 'superembed') {
-                    // Use TMDB ID for SuperEmbed with season and episode
-                    const tmdbId = currentContentData?.id || tvId;
-                    currentContentUrl = `${window.location.origin}/se_player.php?video_id=${tmdbId}&tmdb=1&s=${season}&e=${episode}`;
-                    console.log('SuperEmbed URL:', currentContentUrl);
+                    streamUrl = `${window.location.origin}/se_player.php?video_id=${tmdbId}&tmdb=1&s=${season}&e=${episode}`;
+                    streamType = 'embed';
+                    console.log('SuperEmbed URL:', streamUrl);
+                } else if (videoSource === 'vidking') {
+                    streamUrl = `https://www.vidking.net/embed/tv/${tmdbId}/${season}/${episode}`;
+                    streamType = 'embed';
+                    console.log('VidKing URL:', streamUrl);
                 } else {
-                    // Default to VidKing
-                    currentContentUrl = data.vidking_autoplay_url;
-                    console.log('VidKing URL:', currentContentUrl);
+                    // VidSrc - Use stream extraction from API
+                    streamUrl = data.stream_url || data.vidsrc_url;
+                    streamType = data.stream_type || 'embed';
+                    console.log('VidSrc URL:', streamUrl);
+                    console.log('Stream type:', streamType);
+
+                    // Additional check to ensure URL is valid
+                    if (!streamUrl) {
+                        console.error('No stream URL found in API response');
+                        throw new Error('No stream URL available');
+                    }
                 }
 
-                loadPlayerContent(currentContentUrl, startTime);
+                currentContentUrl = streamUrl;
+
+                // Show the player section
+                const playerSection = document.getElementById('playerSection');
+                if (playerSection) {
+                    playerSection.style.display = 'block';
+                    // Scroll to player for better UX
+                    playerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+
+                // Load with appropriate player (video element for direct, iframe for embed)
+                loadPlayerContent(streamUrl, startTime, streamType);
                 showStatus(`Now playing: ${data.title} S${season}E${episode}`);
 
                 // Show next episode button and check if there's a next episode
@@ -6173,15 +6257,30 @@
             }
         }
 
-        function switchVideoSource() {
-            // Toggle between vidking and superembed
-            videoSource = videoSource === 'vidking' ? 'superembed' : 'vidking';
+        function showSourceSelector() {
+            const modal = document.getElementById('sourceSelectorModal');
+            modal.style.display = 'flex';
 
-            // Save preference
+            // Update checkmarks
+            ['vidsrc', 'vidking', 'superembed'].forEach(source => {
+                const check = document.getElementById(`${source}-check`);
+                if (check) {
+                    check.style.display = source === videoSource ? 'inline' : 'none';
+                }
+            });
+        }
+
+        function closeSourceSelector() {
+            document.getElementById('sourceSelectorModal').style.display = 'none';
+        }
+
+        function selectVideoSource(source) {
+            videoSource = source;
             localStorage.setItem('videoSource', videoSource);
-
-            // Update button text
             updateVideoSourceButton();
+
+            // Close modal
+            closeSourceSelector();
 
             // Reload current content with new source
             if (currentContentId) {
@@ -6192,7 +6291,12 @@
                 }
             }
 
-            showStatus(`Switched to ${videoSource === 'vidking' ? 'VidKing' : 'SuperEmbed'}`);
+            const sourceNames = {
+                'vidsrc': 'VidSrc',
+                'vidking': 'VidKing',
+                'superembed': 'SuperEmbed'
+            };
+            showStatus(`Switched to ${sourceNames[source]}`);
         }
 
         function updateVideoSourceButton() {
@@ -6205,8 +6309,12 @@
             btn.style.display = 'inline-block';
 
             // Update text to show current source
-            const sourceName = videoSource === 'vidking' ? 'VidKing' : 'SuperEmbed';
-            btnText.textContent = `Source: ${sourceName}`;
+            const sourceNames = {
+                'vidsrc': 'VidSrc',
+                'vidking': 'VidKing',
+                'superembed': 'SuperEmbed'
+            };
+            btnText.textContent = `Source: ${sourceNames[videoSource] || 'VidSrc'}`;
 
             // Hide sports source button when playing movies/TV
             const sportsSourceBtn = document.getElementById('sportsSourceBtn');
@@ -6284,32 +6392,153 @@
             playTVEpisode(currentContentId, currentSelectedSeason, currentSelectedEpisode);
         }
 
-        function loadPlayerContent(url, startTime = null) {
-            const player = document.getElementById('contentPlayer');
+        function loadPlayerContent(url, startTime = null, streamType = 'embed') {
+            const playerIframe = document.getElementById('contentPlayer');
+            const playerVideo = document.getElementById('playerVideo');
             const placeholder = document.getElementById('playerPlaceholder');
 
             console.log('Loading player with URL:', url);
+            console.log('Stream type:', streamType);
 
-            // Detect Safari (but not Chrome)
-            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-
-            if (isSafari) {
-                // Show Safari subtitle info
-                showStatus('Safari: VidKing subtitles may not work.', 'warning');
+            // Defensive check: ensure URL is valid
+            if (!url) {
+                console.error('loadPlayerContent called with undefined/null URL');
+                showError('Failed to load stream - no URL provided');
+                return;
             }
 
-            player.src = url;
-            player.style.display = 'block';
-            placeholder.style.display = 'none';
+            // Check if it's a direct stream (.m3u8) or embed
+            if (streamType === 'direct' || url.includes('.m3u8')) {
+                console.log('Using VIDEO element for direct stream');
 
-            console.log('Player iframe src set to:', player.src);
+                // Hide iframe and placeholder
+                if (playerIframe) playerIframe.style.display = 'none';
+                if (placeholder) placeholder.style.display = 'none';
 
-            // If startTime is provided, seek to that position once the video is loaded
-            if (startTime !== null && startTime > 0) {
-                player.addEventListener('loadedmetadata', function setStartTime() {
-                    player.currentTime = startTime;
-                    player.removeEventListener('loadedmetadata', setStartTime);
-                }, { once: true });
+                // Show video element
+                if (playerVideo) {
+                    playerVideo.style.display = 'block';
+
+                    // Check if HLS.js is supported
+                    if (Hls.isSupported()) {
+                        // Destroy existing HLS instance if any
+                        if (window.hls) {
+                            window.hls.destroy();
+                        }
+
+                        // Create new HLS instance
+                        window.hls = new Hls({
+                            enableWorker: true,
+                            lowLatencyMode: false,
+                            backBufferLength: 90,
+                            maxBufferLength: 30,
+                            maxMaxBufferLength: 600
+                        });
+
+                        // Load the source
+                        window.hls.loadSource(url);
+                        window.hls.attachMedia(playerVideo);
+
+                        // Handle events
+                        window.hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                            console.log('HLS manifest parsed, ready to play');
+
+                            // Seek to start time if provided
+                            if (startTime !== null && startTime > 0) {
+                                playerVideo.currentTime = startTime;
+                            }
+
+                            playerVideo.play().catch(e => console.log('Autoplay prevented:', e));
+                        });
+
+                        // Setup watchparty sync listeners for movies/TV
+                        videoSyncListenersAttached = false; // Reset flag
+                        setupVideoSyncListeners(playerVideo);
+
+                        window.hls.on(Hls.Events.ERROR, function(event, data) {
+                            console.error('HLS error:', data);
+                            if (data.fatal) {
+                                switch(data.type) {
+                                    case Hls.ErrorTypes.NETWORK_ERROR:
+                                        showError('Network error - trying to recover...');
+                                        window.hls.startLoad();
+                                        break;
+                                    case Hls.ErrorTypes.MEDIA_ERROR:
+                                        showError('Media error - trying to recover...');
+                                        window.hls.recoverMediaError();
+                                        break;
+                                    default:
+                                        showError('Fatal error - cannot play this stream. Try switching sources.');
+                                        window.hls.destroy();
+                                        break;
+                                }
+                            }
+                        });
+                    }
+                    // Check if the browser supports HLS natively (Safari)
+                    else if (playerVideo.canPlayType('application/vnd.apple.mpegurl')) {
+                        playerVideo.src = url;
+
+                        if (startTime !== null && startTime > 0) {
+                            playerVideo.addEventListener('loadedmetadata', function() {
+                                playerVideo.currentTime = startTime;
+                                playerVideo.play().catch(e => console.log('Autoplay prevented:', e));
+                            }, { once: true });
+                        } else {
+                            playerVideo.addEventListener('loadedmetadata', function() {
+                                playerVideo.play().catch(e => console.log('Autoplay prevented:', e));
+                            }, { once: true });
+                        }
+
+                        // Setup watchparty sync listeners
+                        videoSyncListenersAttached = false;
+                        setupVideoSyncListeners(playerVideo);
+                    } else {
+                        showError('HLS playback not supported in this browser');
+                    }
+                }
+
+                showStatus('Loading direct stream with full sync support...');
+
+            } else {
+                console.log('Using IFRAME for embed');
+
+                // Hide video element
+                if (playerVideo) {
+                    playerVideo.style.display = 'none';
+                    playerVideo.pause();
+                    playerVideo.src = '';
+                }
+
+                // Destroy HLS instance
+                if (window.hls) {
+                    window.hls.destroy();
+                    window.hls = null;
+                }
+
+                // Detect Safari (but not Chrome)
+                const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+                if (isSafari) {
+                    // Show Safari subtitle info
+                    showStatus('Safari: Subtitles may not work in embed mode.', 'warning');
+                }
+
+                playerIframe.src = url;
+                playerIframe.style.display = 'block';
+                placeholder.style.display = 'none';
+
+                console.log('Player iframe src set to:', playerIframe.src);
+
+                // For iframe embeds, we need to manually track play/pause since we can't access iframe internals
+                // But we CAN receive sync commands from others
+                if (watchpartyActive) {
+                    console.log('[Watchparty] Iframe loaded - can receive sync but cannot auto-send');
+                    console.warn('[Watchparty] ⚠ For best watchparty experience, use VidSrc source (direct stream)');
+                    showStatus('⚠ Limited sync with this source - Switch to VidSrc for full sync', 'warning');
+                } else {
+                    showStatus('Loaded embed player');
+                }
             }
 
             // Prevent iframe from auto-fullscreening on mobile
@@ -8319,9 +8548,21 @@
                 updateWatchpartyUI(data);
                 closeWatchpartyMenu();
                 showStatus(`Watchparty created! Room code: ${data.room_code}`);
+
+                // Re-setup video sync listeners for already-playing content
+                const playerVideo = document.getElementById('playerVideo');
+                if (playerVideo && playerVideo.style.display !== 'none') {
+                    console.log('[Party Created] Re-attaching sync listeners to active video');
+                    videoSyncListenersAttached = false; // Reset flag to allow re-attachment
+                    setupVideoSyncListeners(playerVideo);
+                } else {
+                    console.log('[Party Created] No active video to attach sync listeners');
+                }
             });
 
             socket.on('party_joined', (data) => {
+                console.log('[Party Joined] Received data:', data);
+
                 watchpartyActive = true;
                 watchpartyRoomCode = data.room_code;
                 isHost = data.is_host;
@@ -8331,9 +8572,25 @@
                 closeWatchpartyMenu();
                 showStatus(`Joined watchparty: ${data.room_code}`);
 
+                // Re-setup video sync listeners if joining as host
+                if (isHost) {
+                    const playerVideo = document.getElementById('playerVideo');
+                    if (playerVideo && playerVideo.style.display !== 'none') {
+                        console.log('[Party Joined as Host] Re-attaching sync listeners to active video');
+                        videoSyncListenersAttached = false; // Reset flag to allow re-attachment
+                        setupVideoSyncListeners(playerVideo);
+                    } else {
+                        console.log('[Party Joined as Host] No active video to attach sync listeners');
+                    }
+                }
+
                 // Sync content if joining as guest
+                console.log('[Party Joined] Is host:', isHost, 'Content:', data.content);
                 if (!isHost && data.content && data.content.id) {
+                    console.log('[Party Joined] Guest syncing content from host');
                     syncContentFromHost(data.content);
+                } else if (!isHost) {
+                    console.log('[Party Joined] No content to sync (host hasnt loaded anything yet)');
                 }
             });
 
@@ -8364,38 +8621,38 @@
                     hostBadge.style.display = isHost ? 'block' : 'none';
                 }
 
-                const syncBtn = document.getElementById('syncPlaybackBtn');
-                if (syncBtn) {
-                    syncBtn.style.display = isHost ? 'block' : 'none';
-                }
-
-                // Re-setup video sync listeners
-                const playerVideo = document.getElementById('playerVideo');
-                if (playerVideo && playerVideo.style.display !== 'none') {
-                    videoSyncListenersAttached = false;
-                    setupVideoSyncListeners(playerVideo);
-                }
-
+                // Re-setup video sync listeners if I'm the new host
                 if (isHost) {
+                    const playerVideo = document.getElementById('playerVideo');
+                    if (playerVideo && playerVideo.style.display !== 'none') {
+                        console.log('[New Host] Re-attaching sync listeners to active video');
+                        videoSyncListenersAttached = false; // Reset flag to allow re-attachment
+                        setupVideoSyncListeners(playerVideo);
+                    } else {
+                        console.log('[New Host] No active video to attach sync listeners');
+                    }
                     showStatus('You are now the host! You control playback for all guests.');
                 }
             });
 
             socket.on('play_sync', (data) => {
                 if (!isHost) {
+                    console.log('[Guest] Received play_sync from host:', data);
                     showSyncIndicator(`Host resumed playback at ${formatTime(data.currentTime)}`);
 
                     // Set syncing flag to prevent loop
                     isSyncing = true;
 
-                    // Check if using video element (live channels) or iframe (movies/TV)
+                    // Check if using video element (live channels OR movies/TV with direct streams) or iframe (movies/TV embeds)
                     const playerVideo = document.getElementById('playerVideo');
                     if (playerVideo && playerVideo.style.display !== 'none') {
-                        // For live channels: directly control video element
+                        // For direct streams: control video element (works for live channels AND movies/TV)
+                        console.log('[Guest] Syncing video element play at', data.currentTime);
                         playerVideo.currentTime = data.currentTime;
                         playerVideo.play().catch(e => console.log('Play prevented:', e));
                     } else if (currentContentUrl && data.currentTime !== undefined) {
-                        // For movies/TV: reload iframe with timestamp
+                        // For embed iframes: reload with timestamp (movies/TV only)
+                        console.log('[Guest] Reloading iframe with timestamp', data.currentTime);
                         reloadPlayerWithTimestamp(data.currentTime);
                     }
 
@@ -8406,19 +8663,22 @@
 
             socket.on('pause_sync', (data) => {
                 if (!isHost) {
+                    console.log('[Guest] Received pause_sync from host:', data);
                     showSyncIndicator(`Host paused at ${formatTime(data.currentTime)}`);
 
                     // Set syncing flag to prevent loop
                     isSyncing = true;
 
-                    // Check if using video element (live channels) or iframe (movies/TV)
+                    // Check if using video element (live channels OR movies/TV with direct streams) or iframe (movies/TV embeds)
                     const playerVideo = document.getElementById('playerVideo');
                     if (playerVideo && playerVideo.style.display !== 'none') {
-                        // For live channels: directly control video element
+                        // For direct streams: control video element (works for live channels AND movies/TV)
+                        console.log('[Guest] Syncing video element pause at', data.currentTime);
                         playerVideo.currentTime = data.currentTime;
                         playerVideo.pause();
                     } else if (currentContentUrl && data.currentTime !== undefined) {
-                        // For movies/TV: reload iframe with timestamp
+                        // For embed iframes: reload with timestamp (movies/TV only)
+                        console.log('[Guest] Reloading iframe with timestamp', data.currentTime);
                         reloadPlayerWithTimestamp(data.currentTime);
                     }
 
@@ -8429,18 +8689,21 @@
 
             socket.on('seek_sync', (data) => {
                 if (!isHost) {
+                    console.log('[Guest] Received seek_sync from host:', data);
                     showSyncIndicator(`Host seeked to ${formatTime(data.currentTime)}`);
 
                     // Set syncing flag to prevent loop
                     isSyncing = true;
 
-                    // Check if using video element (live channels) or iframe (movies/TV)
+                    // Check if using video element (live channels OR movies/TV with direct streams) or iframe (movies/TV embeds)
                     const playerVideo = document.getElementById('playerVideo');
                     if (playerVideo && playerVideo.style.display !== 'none') {
-                        // For live channels: directly control video element
+                        // For direct streams: control video element (works for live channels AND movies/TV)
+                        console.log('[Guest] Syncing video element seek to', data.currentTime);
                         playerVideo.currentTime = data.currentTime;
                     } else if (currentContentUrl && data.currentTime !== undefined) {
-                        // For movies/TV: reload iframe with timestamp
+                        // For embed iframes: reload with timestamp (movies/TV only)
+                        console.log('[Guest] Reloading iframe with timestamp', data.currentTime);
                         reloadPlayerWithTimestamp(data.currentTime);
                     }
 
@@ -8467,9 +8730,112 @@
                 addChatMessage(data);
             });
 
+            // ============= PLAYBACK SYNC LISTENERS =============
+
+            socket.on('playback_play', (data) => {
+                console.log('[Sync] Received playback_play from', data.username, 'at', data.currentTime);
+                const playerVideo = document.getElementById('playerVideo');
+                const playerIframe = document.getElementById('contentPlayer');
+
+                isSyncing = true; // Prevent sync loop
+
+                if (playerVideo && playerVideo.style.display !== 'none') {
+                    // Direct video element
+                    playerVideo.currentTime = data.currentTime;
+                    playerVideo.play().catch(e => console.log('[Sync] Play prevented:', e));
+                } else if (playerIframe && playerIframe.style.display !== 'none') {
+                    // For iframes, try postMessage (works with some embeds)
+                    try {
+                        playerIframe.contentWindow.postMessage({
+                            action: 'play',
+                            currentTime: data.currentTime
+                        }, '*');
+                    } catch (e) {
+                        console.log('[Sync] Cannot control iframe:', e);
+                    }
+                }
+
+                showStatus(`▶ ${data.username} played`);
+                setTimeout(() => { isSyncing = false; }, 500);
+            });
+
+            socket.on('playback_pause', (data) => {
+                console.log('[Sync] Received playback_pause from', data.username, 'at', data.currentTime);
+                const playerVideo = document.getElementById('playerVideo');
+                const playerIframe = document.getElementById('contentPlayer');
+
+                isSyncing = true; // Prevent sync loop
+
+                if (playerVideo && playerVideo.style.display !== 'none') {
+                    // Direct video element
+                    playerVideo.currentTime = data.currentTime;
+                    playerVideo.pause();
+                } else if (playerIframe && playerIframe.style.display !== 'none') {
+                    // For iframes, try postMessage
+                    try {
+                        playerIframe.contentWindow.postMessage({
+                            action: 'pause',
+                            currentTime: data.currentTime
+                        }, '*');
+                    } catch (e) {
+                        console.log('[Sync] Cannot control iframe:', e);
+                    }
+                }
+
+                showStatus(`⏸ ${data.username} paused`);
+                setTimeout(() => { isSyncing = false; }, 500);
+            });
+
+            socket.on('playback_seek', (data) => {
+                console.log('[Sync] Received playback_seek from', data.username, 'to', data.currentTime);
+                const playerVideo = document.getElementById('playerVideo');
+                const playerIframe = document.getElementById('contentPlayer');
+
+                isSyncing = true; // Prevent sync loop
+
+                if (playerVideo && playerVideo.style.display !== 'none') {
+                    // Direct video element
+                    playerVideo.currentTime = data.currentTime;
+                } else if (playerIframe && playerIframe.style.display !== 'none') {
+                    // For iframes, try postMessage
+                    try {
+                        playerIframe.contentWindow.postMessage({
+                            action: 'seek',
+                            currentTime: data.currentTime
+                        }, '*');
+                    } catch (e) {
+                        console.log('[Sync] Cannot control iframe:', e);
+                    }
+                }
+
+                showStatus(`⏩ ${data.username} seeked`);
+                setTimeout(() => { isSyncing = false; }, 500);
+            });
+
+            socket.on('sync_status', (data) => {
+                const playerVideo = document.getElementById('playerVideo');
+
+                if (playerVideo && playerVideo.style.display !== 'none' && !playerVideo.paused) {
+                    const currentTime = playerVideo.currentTime;
+                    const expectedTime = data.currentTime;
+                    const drift = Math.abs(currentTime - expectedTime);
+
+                    console.log('[Drift] Current:', currentTime.toFixed(1), 'Expected:', expectedTime.toFixed(1), 'Drift:', drift.toFixed(1) + 's');
+
+                    // If drift is more than 2 seconds, auto-correct
+                    if (drift > 2) {
+                        console.log('[Drift] ⚠ Drift detected! Auto-correcting...');
+                        isSyncing = true;
+                        playerVideo.currentTime = expectedTime;
+                        setTimeout(() => { isSyncing = false; }, 500);
+                    }
+                }
+            });
+
             socket.on('party_left', () => {
                 resetWatchparty();
             });
+
         }
 
         function showWatchpartyMenu() {
@@ -8635,14 +9001,12 @@
             isHost = false;
             watchpartyUsers = [];
             userColorMap = {}; // Reset user colors for new session
+            videoSyncListenersAttached = false; // Allow re-attachment for next party
             document.getElementById('watchpartySidebar').classList.remove('active');
             document.getElementById('chatMessages').innerHTML = '';
 
-            // Hide sync button
-            const syncBtn = document.getElementById('syncPlaybackBtn');
-            if (syncBtn) {
-                syncBtn.style.display = 'none';
-            }
+            // Stop drift correction
+            stopDriftCorrection();
 
             showStatus('Left watchparty');
         }
@@ -8675,12 +9039,6 @@
                 hostBadge.style.display = isHost ? 'block' : 'none';
             }
 
-            // Show sync button only for host
-            const syncBtn = document.getElementById('syncPlaybackBtn');
-            if (syncBtn) {
-                syncBtn.style.display = isHost ? 'block' : 'none';
-            }
-
             // Re-setup video sync listeners when host status changes
             const playerVideo = document.getElementById('playerVideo');
             if (playerVideo && playerVideo.style.display !== 'none') {
@@ -8693,16 +9051,22 @@
             const userList = document.getElementById('watchpartyUserList');
             document.getElementById('userCount').textContent = users.length;
 
-            userList.innerHTML = users.map((user, index) => `
-                <div class="user-item">
-                    <div class="user-avatar">${user.charAt(0).toUpperCase()}</div>
-                    <div class="user-name">
-                        ${user}
-                        ${index === 0 ? ' <span style="color: #ffd700; font-size: 14px; margin-left: 4px;" title="Host controls playback">★</span>' : ''}
+            userList.innerHTML = users.map((user, index) => {
+                // Handle both old format (string) and new format (object with username/socket_id)
+                const username = typeof user === 'string' ? user : user.username;
+                const firstChar = username.charAt(0).toUpperCase();
+
+                return `
+                    <div class="user-item">
+                        <div class="user-avatar">${firstChar}</div>
+                        <div class="user-name">
+                            ${username}
+                            ${index === 0 ? ' <span style="color: #ffd700; font-size: 14px; margin-left: 4px;" title="Host controls playback">★</span>' : ''}
+                        </div>
+                        ${index === 0 ? '<span class="host-badge" style="background: linear-gradient(135deg, #ffd700, #ff8c00); border: 1px solid #ffa500;">HOST</span>' : ''}
                     </div>
-                    ${index === 0 ? '<span class="host-badge" style="background: linear-gradient(135deg, #ffd700, #ff8c00); border: 1px solid #ffa500;">HOST</span>' : ''}
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         function copyRoomCode() {
@@ -8771,29 +9135,61 @@
         }
 
         // ============= WATCHPARTY CONTENT SYNC =============
-        function syncContentFromHost(content) {
-            if (!content || !content.id) return;
+        async function syncContentFromHost(content) {
+            console.log('[Content Sync] Received content from host:', content);
+
+            if (!content || !content.id) {
+                console.log('[Content Sync] No valid content to sync');
+                return;
+            }
 
             const { id, title, type, season, episode } = content;
 
+            console.log(`[Content Sync] Syncing ${type}: ${title}`, { id, season, episode });
             showStatus(`Syncing content: ${title}`);
 
-            // Load the same content as the host
-            if (type === 'tv' && season && episode) {
-                playContent(id, title, type);
-                // After content loads, select the same season and episode
-                setTimeout(async () => {
-                    currentSelectedSeason = season;
-                    currentSelectedEpisode = episode;
-                    const seasonBtn = document.getElementById('seasonButtonText');
-                    const episodeBtn = document.getElementById('episodeButtonText');
-                    if (seasonBtn) seasonBtn.textContent = `Season ${season}`;
-                    await updateEpisodeSelector(season);
-                    if (episodeBtn) episodeBtn.textContent = `Episode ${episode}`;
-                    playTVEpisode(id, season, episode);
-                }, 1000);
-            } else if (type === 'movie') {
-                playContent(id, title, type);
+            try {
+                // Load the same content as the host
+                if (type === 'tv') {
+                    if (season && episode) {
+                        console.log(`[Content Sync] Loading TV show: ${title} S${season}E${episode}`);
+
+                        // First load the content to populate selectors
+                        playContent(id, title, type);
+
+                        // After content loads, play the specific episode
+                        setTimeout(async () => {
+                            console.log(`[Content Sync] Playing episode S${season}E${episode}`);
+                            currentSelectedSeason = season;
+                            currentSelectedEpisode = episode;
+
+                            const seasonBtn = document.getElementById('seasonButtonText');
+                            const episodeBtn = document.getElementById('episodeButtonText');
+
+                            if (seasonBtn) seasonBtn.textContent = `Season ${season}`;
+
+                            await updateEpisodeSelector(season);
+
+                            if (episodeBtn) episodeBtn.textContent = `Episode ${episode}`;
+
+                            playTVEpisode(id, season, episode);
+                        }, 1500);
+                    } else {
+                        // Just load the TV show details page (no specific episode yet)
+                        console.log(`[Content Sync] Loading TV show details: ${title}`);
+                        playContent(id, title, type);
+                    }
+                } else if (type === 'movie') {
+                    console.log(`[Content Sync] Loading movie: ${title} (ID: ${id})`);
+                    console.log(`[Content Sync] Calling playMovie(${id})...`);
+                    await playMovie(id);
+                    console.log(`[Content Sync] playMovie() completed`);
+                } else {
+                    console.warn('[Content Sync] Unknown content type or missing data:', type);
+                }
+            } catch (error) {
+                console.error('[Content Sync] Error syncing content:', error);
+                showError('Failed to sync content from host');
             }
         }
 
@@ -8991,122 +9387,119 @@
             showStatus(`Syncing to ${formatTime(timestamp)}...`);
         }
 
-        function syncPlaybackManually() {
-            if (!watchpartyActive || !socket) {
-                showError('You must be in a watchparty to sync');
-                return;
-            }
-
-            if (!isHost) {
-                showError('Only the host can sync playback');
-                return;
-            }
-
-            if (!currentContentUrl) {
-                showError('No content is currently playing');
-                return;
-            }
-
-            // Prompt host for current timestamp
-            const input = prompt('Enter current video timestamp in format MM:SS (e.g., 5:30 for 5 minutes 30 seconds):');
-
-            if (!input) return;
-
-            // Parse MM:SS format
-            const parts = input.split(':');
-            let timestamp = 0;
-
-            if (parts.length === 2) {
-                const mins = parseInt(parts[0]) || 0;
-                const secs = parseInt(parts[1]) || 0;
-                timestamp = mins * 60 + secs;
-            } else if (parts.length === 1) {
-                // Just seconds
-                timestamp = parseInt(parts[0]) || 0;
-            }
-
-            if (timestamp < 0) {
-                showError('Invalid timestamp');
-                return;
-            }
-
-            // Emit sync event to all guests
-            socket.emit('sync_seek', {
-                currentTime: timestamp
-            });
-
-            showStatus(`Synced playback to ${formatTime(timestamp)}`);
-            addSystemMessage(`Synced everyone to ${formatTime(timestamp)}`);
-        }
-
         // Initialize socket on page load
         window.addEventListener('load', () => {
             initSocket();
         });
 
+
         // Setup video sync listeners for watchparty
         let isSyncing = false; // Flag to prevent sync loops
         let videoSyncListenersAttached = false; // Track if listeners are already attached
+        let driftCorrectionInterval = null; // Interval for drift correction
 
         function setupVideoSyncListeners(videoElement) {
-            if (!videoElement) return;
-
-            // Prevent duplicate listeners
-            if (videoSyncListenersAttached) {
-                console.log('Video sync listeners already attached, skipping');
+            if (!videoElement) {
+                console.log('[Sync] No video element provided, skipping sync listener setup');
                 return;
             }
 
-            // Only host can send sync events
-            if (watchpartyActive && isHost) {
-                console.log('Setting up host sync listeners for video playback');
+            // Prevent duplicate listeners
+            if (videoSyncListenersAttached) {
+                console.log('[Sync] Video sync listeners already attached, skipping');
+                return;
+            }
+
+            // Anyone in watchparty can send sync events (Mode 2: Shared controls)
+            if (watchpartyActive) {
+                console.log('[Sync] Setting up automatic sync listeners for video playback');
+                console.log('[Sync] Watchparty active:', watchpartyActive);
 
                 // Play event
                 videoElement.addEventListener('play', function() {
-                    if (isSyncing) return; // Prevent sync loops
+                    if (isSyncing) {
+                        console.log('[Sync] Skipping play sync (isSyncing flag is true)');
+                        return; // Prevent sync loops
+                    }
 
                     const currentTime = Math.floor(videoElement.currentTime);
-                    console.log('Host played video at', currentTime);
+                    console.log('[Sync] Video played at', currentTime, '- emitting playback_play');
 
-                    socket.emit('sync_play', {
+                    socket.emit('playback_play', {
                         currentTime: currentTime
                     });
-
-                    addSystemMessage(`Synced play to all guests at ${formatTime(currentTime)}`);
                 });
 
                 // Pause event
                 videoElement.addEventListener('pause', function() {
-                    if (isSyncing) return; // Prevent sync loops
+                    if (isSyncing) {
+                        console.log('[Sync] Skipping pause sync (isSyncing flag is true)');
+                        return; // Prevent sync loops
+                    }
 
                     const currentTime = Math.floor(videoElement.currentTime);
-                    console.log('Host paused video at', currentTime);
+                    console.log('[Sync] Video paused at', currentTime, '- emitting playback_pause');
 
-                    socket.emit('sync_pause', {
+                    socket.emit('playback_pause', {
                         currentTime: currentTime
                     });
-
-                    addSystemMessage(`Synced pause to all guests at ${formatTime(currentTime)}`);
                 });
 
                 // Seeked event (when user scrubs through video)
                 videoElement.addEventListener('seeked', function() {
-                    if (isSyncing) return; // Prevent sync loops
+                    if (isSyncing) {
+                        console.log('[Sync] Skipping seek sync (isSyncing flag is true)');
+                        return; // Prevent sync loops
+                    }
 
                     const currentTime = Math.floor(videoElement.currentTime);
-                    console.log('Host seeked video to', currentTime);
+                    console.log('[Sync] Video seeked to', currentTime, '- emitting playback_seek');
 
-                    socket.emit('sync_seek', {
+                    socket.emit('playback_seek', {
                         currentTime: currentTime
                     });
-
-                    addSystemMessage(`Synced seek to all guests at ${formatTime(currentTime)}`);
                 });
 
                 videoSyncListenersAttached = true;
-                console.log('Host video sync listeners attached successfully');
-            } else if (watchpartyActive && !isHost) {
-                console.log('Guest mode - no sync listeners needed (guests sync from server)');
+                console.log('[Sync] ✓ Video sync listeners attached successfully - automatic sync enabled');
+
+                // Start drift correction
+                startDriftCorrection(videoElement);
+            } else {
+                console.log('[Sync] Not in active watchparty - no sync listeners attached');
+            }
+        }
+
+        function startDriftCorrection(videoElement) {
+            // Clear any existing interval
+            if (driftCorrectionInterval) {
+                clearInterval(driftCorrectionInterval);
+            }
+
+            console.log('[Drift] Starting drift correction (checks every 5 seconds)');
+
+            driftCorrectionInterval = setInterval(() => {
+                if (!watchpartyActive || !videoElement) {
+                    stopDriftCorrection();
+                    return;
+                }
+
+                // Only check drift if video is playing
+                if (videoElement.paused) {
+                    return;
+                }
+
+                // Request current time from backend by emitting a drift check
+                // Backend will respond with the authoritative time
+                socket.emit('request_sync_status');
+            }, 5000); // Check every 5 seconds
+        }
+
+        function stopDriftCorrection() {
+            if (driftCorrectionInterval) {
+                console.log('[Drift] Stopping drift correction');
+                clearInterval(driftCorrectionInterval);
+                driftCorrectionInterval = null;
             }
         }
 

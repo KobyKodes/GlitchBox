@@ -22,6 +22,8 @@ import string
 from datetime import datetime
 import json
 import atexit
+import re
+from urllib.parse import urlparse, parse_qs
 
 # Load API keys from environment variables (secure for production)
 TMDB_API_KEY = os.environ.get('TMDB_API_KEY', 'e577f3394a629d69efa3a9414e172237')
@@ -1176,32 +1178,150 @@ def get_tv_recommendations(tv_id):
     results = tmdb.get_tv_recommendations(tv_id, page)
     return jsonify(results)
 
+def extract_vidsrc_stream(tmdb_id, content_type='movie', season=None, episode=None):
+    """
+    Extract direct stream URL from VidSrc
+    Returns .m3u8 URL if successful, embed URL as fallback
+    """
+    try:
+        from bs4 import BeautifulSoup
+
+        # Build vidsrc.to URL
+        if content_type == 'movie':
+            vidsrc_url = f"https://vidsrc.to/embed/movie/{tmdb_id}"
+        else:
+            vidsrc_url = f"https://vidsrc.to/embed/tv/{tmdb_id}/{season}/{episode}"
+
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Referer': 'https://vidsrc.to/',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+        }
+
+        print(f"[Stream Extractor] Fetching: {vidsrc_url}")
+
+        # Fetch the embed page
+        response = requests.get(vidsrc_url, headers=headers, timeout=10)
+        response.raise_for_status()
+
+        # Parse the HTML
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        # Look for data-id attribute (vidsrc.to uses this)
+        data_id = None
+        iframe = soup.find('iframe', {'id': 'player_iframe'})
+
+        if iframe and iframe.get('src'):
+            iframe_src = iframe.get('src')
+            print(f"[Stream Extractor] Found iframe src: {iframe_src}")
+
+            # If it's a relative URL, make it absolute
+            if iframe_src.startswith('/'):
+                iframe_src = f"https://vidsrc.to{iframe_src}"
+
+            # Try to fetch the iframe source
+            try:
+                iframe_response = requests.get(iframe_src, headers=headers, timeout=10)
+                iframe_soup = BeautifulSoup(iframe_response.content, 'html.parser')
+
+                # Look for .m3u8 URLs in scripts or sources
+                scripts = iframe_soup.find_all('script')
+                for script in scripts:
+                    if script.string:
+                        # Look for .m3u8 URLs
+                        m3u8_matches = re.findall(r'https?://[^\s"\'<>]+\.m3u8[^\s"\'<>]*', script.string)
+                        if m3u8_matches:
+                            m3u8_url = m3u8_matches[0]
+                            print(f"[Stream Extractor] Found m3u8 URL: {m3u8_url}")
+                            return {
+                                'type': 'direct',
+                                'url': m3u8_url,
+                                'source': 'vidsrc.to'
+                            }
+
+                # Look for source tags
+                video_source = iframe_soup.find('source', {'type': 'application/x-mpegURL'}) or \
+                              iframe_soup.find('source', {'src': re.compile(r'\.m3u8')})
+
+                if video_source and video_source.get('src'):
+                    m3u8_url = video_source.get('src')
+                    print(f"[Stream Extractor] Found m3u8 in source tag: {m3u8_url}")
+                    return {
+                        'type': 'direct',
+                        'url': m3u8_url,
+                        'source': 'vidsrc.to'
+                    }
+
+            except Exception as iframe_error:
+                print(f"[Stream Extractor] Error fetching iframe: {iframe_error}")
+
+        # Fallback: return embed URL
+        print(f"[Stream Extractor] Could not extract direct stream, using embed URL")
+        return {
+            'type': 'embed',
+            'url': vidsrc_url,
+            'source': 'vidsrc.to'
+        }
+
+    except Exception as e:
+        print(f"[Stream Extractor] Error: {e}")
+        # Return embed URL as absolute fallback
+        if content_type == 'movie':
+            fallback_url = f"https://vidsrc.to/embed/movie/{tmdb_id}"
+        else:
+            fallback_url = f"https://vidsrc.to/embed/tv/{tmdb_id}/{season}/{episode}"
+
+        return {
+            'type': 'embed',
+            'url': fallback_url,
+            'source': 'vidsrc.to'
+        }
+
 @app.route('/api/stream/<int:movie_id>')
 def generate_stream_url(movie_id):
-    """Generate VidKing streaming URL"""
+    """Generate streaming URL with direct stream support"""
     try:
         # Get movie details first
         movie = tmdb.get_movie_details(movie_id)
         if 'error' in movie:
             return jsonify(movie), 404
 
+        # Fallback URLs
         vidking_url = f"https://www.vidking.net/embed/movie/{movie_id}"
+        vidsrc_url = f"https://vidsrc.to/embed/movie/{movie_id}"
+
+        # Try to get direct stream
+        stream_info = extract_vidsrc_stream(movie_id, 'movie')
+
+        # Defensive: ensure stream_info has the expected structure
+        if stream_info and isinstance(stream_info, dict):
+            stream_url = stream_info.get('url', vidsrc_url)
+            stream_type = stream_info.get('type', 'embed')
+            print(f"[API] Movie {movie_id} - Stream URL: {stream_url}, Type: {stream_type}")
+        else:
+            print(f"[API] Movie {movie_id} - No stream info, using fallback")
+            stream_url = vidsrc_url
+            stream_type = 'embed'
 
         return jsonify({
             "movie_id": movie_id,
             "title": movie.get('title'),
             "year": movie.get('release_date', '')[:4] if movie.get('release_date') else None,
+            "stream_url": stream_url,
+            "stream_type": stream_type,
             "vidking_url": vidking_url,
-            "vidking_autoplay_url": f"{vidking_url}?color=9146ff&autoPlay=true&quality=720p&sub.default=en",
+            "vidsrc_url": vidsrc_url,
             "movie_details": movie
         })
 
     except Exception as e:
+        print(f"[API] Error in generate_stream_url: {e}")
         return jsonify({"error": str(e)}), 500
 
 @app.route('/api/tv/stream/<int:tv_id>')
 def generate_tv_stream_url(tv_id):
-    """Generate VidKing streaming URL for TV show"""
+    """Generate streaming URL for TV show with direct stream support"""
     season = request.args.get('season', 1, type=int)
     episode = request.args.get('episode', 1, type=int)
 
@@ -1211,9 +1331,22 @@ def generate_tv_stream_url(tv_id):
         if 'error' in show:
             return jsonify(show), 404
 
-        # Generate VidKing TV URLs (trying different possible formats)
-        base_vidking_url = f"https://www.vidking.net/embed/tv/{tv_id}"
-        episode_vidking_url = f"https://www.vidking.net/embed/tv/{tv_id}/{season}/{episode}"
+        # Fallback URLs
+        vidking_url = f"https://www.vidking.net/embed/tv/{tv_id}/{season}/{episode}"
+        vidsrc_url = f"https://vidsrc.to/embed/tv/{tv_id}/{season}/{episode}"
+
+        # Try to get direct stream
+        stream_info = extract_vidsrc_stream(tv_id, 'tv', season, episode)
+
+        # Defensive: ensure stream_info has the expected structure
+        if stream_info and isinstance(stream_info, dict):
+            stream_url = stream_info.get('url', vidsrc_url)
+            stream_type = stream_info.get('type', 'embed')
+            print(f"[API] TV {tv_id} S{season}E{episode} - Stream URL: {stream_url}, Type: {stream_type}")
+        else:
+            print(f"[API] TV {tv_id} S{season}E{episode} - No stream info, using fallback")
+            stream_url = vidsrc_url
+            stream_type = 'embed'
 
         return jsonify({
             "tv_id": tv_id,
@@ -1221,9 +1354,10 @@ def generate_tv_stream_url(tv_id):
             "year": show.get('first_air_date', '')[:4] if show.get('first_air_date') else None,
             "season": season,
             "episode": episode,
-            "vidking_url": base_vidking_url,
-            "vidking_episode_url": episode_vidking_url,
-            "vidking_autoplay_url": f"{episode_vidking_url}?color=9146ff&autoPlay=true&quality=720p&sub.default=en",
+            "stream_url": stream_url,
+            "stream_type": stream_type,
+            "vidking_url": vidking_url,
+            "vidsrc_url": vidsrc_url,
             "show_details": show
         })
 
@@ -1703,10 +1837,14 @@ def handle_disconnect():
             if sid in room['users']:
                 del room['users'][sid]
 
+            # Convert users dict to list of user objects with socket_id
+            users_list = [{'username': uname, 'socket_id': usid} for usid, uname in room['users'].items()]
+
             # Notify others in room
             emit('user_left', {
                 'username': username,
-                'users': list(room['users'].values())
+                'socket_id': sid,
+                'users': users_list
             }, room=room_code)
 
             # If host left, assign new host or delete room
@@ -1756,7 +1894,7 @@ def handle_create_party(data):
         'room_code': room_code,
         'is_host': True,
         'content': content,
-        'users': [username]
+        'users': [{'username': username, 'socket_id': sid}]
     })
 
 @socketio.on('join_party')
@@ -1780,19 +1918,23 @@ def handle_join_party(data):
 
     print(f"{username} joined party: {room_code}")
 
+    # Convert users dict to list of user objects with socket_id
+    users_list = [{'username': uname, 'socket_id': usid} for usid, uname in room['users'].items()]
+
     # Notify user who joined
     emit('party_joined', {
         'room_code': room_code,
         'is_host': (sid == room['host']),
         'content': room['content'],
-        'users': list(room['users'].values()),
+        'users': users_list,
         'state': room['state']
     })
 
     # Notify others in room
     emit('user_joined', {
         'username': username,
-        'users': list(room['users'].values())
+        'socket_id': sid,
+        'users': users_list
     }, room=room_code, skip_sid=sid)
 
 @socketio.on('leave_party')
@@ -1812,10 +1954,14 @@ def handle_leave_party():
 
             leave_room(room_code)
 
+            # Convert users dict to list of user objects with socket_id
+            users_list = [{'username': uname, 'socket_id': usid} for usid, uname in room['users'].items()]
+
             # Notify others
             emit('user_left', {
                 'username': username,
-                'users': list(room['users'].values())
+                'socket_id': sid,
+                'users': users_list
             }, room=room_code)
 
             # Handle host leaving
@@ -1847,10 +1993,13 @@ def handle_sync_play(data):
             room['state']['currentTime'] = current_time
             room['state']['timestamp'] = datetime.now().isoformat()
 
+            print(f"[Sync] Host {room['users'][sid]} played at {current_time}s - broadcasting to room {room_code}")
             emit('play_sync', {
                 'currentTime': current_time,
                 'username': room['users'][sid]
             }, room=room_code, skip_sid=sid)
+        else:
+            print(f"[Sync] Play sync rejected - not host or room not found")
 
 @socketio.on('sync_pause')
 def handle_sync_pause(data):
@@ -1867,10 +2016,13 @@ def handle_sync_pause(data):
             room['state']['currentTime'] = current_time
             room['state']['timestamp'] = datetime.now().isoformat()
 
+            print(f"[Sync] Host {room['users'][sid]} paused at {current_time}s - broadcasting to room {room_code}")
             emit('pause_sync', {
                 'currentTime': current_time,
                 'username': room['users'][sid]
             }, room=room_code, skip_sid=sid)
+        else:
+            print(f"[Sync] Pause sync rejected - not host or room not found")
 
 @socketio.on('sync_seek')
 def handle_sync_seek(data):
@@ -1886,10 +2038,13 @@ def handle_sync_seek(data):
             room['state']['currentTime'] = current_time
             room['state']['timestamp'] = datetime.now().isoformat()
 
+            print(f"[Sync] Host {room['users'][sid]} seeked to {current_time}s - broadcasting to room {room_code}")
             emit('seek_sync', {
                 'currentTime': current_time,
                 'username': room['users'][sid]
             }, room=room_code, skip_sid=sid)
+        else:
+            print(f"[Sync] Seek sync rejected - not host or room not found")
 
 @socketio.on('sync_content')
 def handle_sync_content(data):
@@ -1919,9 +2074,104 @@ def handle_sync_stop():
 
         if room and room['host'] == sid:  # Only host can control playback
             room['state']['playing'] = False
-            room['state']['currentTime'] = 0
 
-            emit('stop_sync', {}, room=room_code, skip_sid=sid)
+# ============= PLAYBACK SYNC HANDLERS =============
+
+@socketio.on('playback_play')
+def handle_playback_play(data):
+    """Handle play event - anyone can play"""
+    sid = request.sid
+
+    if sid in user_rooms:
+        room_code = user_rooms[sid]
+        room = watchparty_rooms.get(room_code)
+
+        if room:
+            current_time = data.get('currentTime', 0)
+            room['state']['playing'] = True
+            room['state']['currentTime'] = current_time
+            room['state']['timestamp'] = datetime.now().isoformat()
+
+            username = room['users'].get(sid, 'Unknown')
+            print(f"[Playback] {username} played at {current_time}s in room {room_code}")
+
+            # Broadcast to all OTHER users in the room
+            emit('playback_play', {
+                'currentTime': current_time,
+                'username': username
+            }, room=room_code, skip_sid=sid)
+
+@socketio.on('playback_pause')
+def handle_playback_pause(data):
+    """Handle pause event - anyone can pause"""
+    sid = request.sid
+
+    if sid in user_rooms:
+        room_code = user_rooms[sid]
+        room = watchparty_rooms.get(room_code)
+
+        if room:
+            current_time = data.get('currentTime', 0)
+            room['state']['playing'] = False
+            room['state']['currentTime'] = current_time
+            room['state']['timestamp'] = datetime.now().isoformat()
+
+            username = room['users'].get(sid, 'Unknown')
+            print(f"[Playback] {username} paused at {current_time}s in room {room_code}")
+
+            # Broadcast to all OTHER users in the room
+            emit('playback_pause', {
+                'currentTime': current_time,
+                'username': username
+            }, room=room_code, skip_sid=sid)
+
+@socketio.on('playback_seek')
+def handle_playback_seek(data):
+    """Handle seek event - anyone can seek"""
+    sid = request.sid
+
+    if sid in user_rooms:
+        room_code = user_rooms[sid]
+        room = watchparty_rooms.get(room_code)
+
+        if room:
+            current_time = data.get('currentTime', 0)
+            room['state']['currentTime'] = current_time
+            room['state']['timestamp'] = datetime.now().isoformat()
+
+            username = room['users'].get(sid, 'Unknown')
+            print(f"[Playback] {username} seeked to {current_time}s in room {room_code}")
+
+            # Broadcast to all OTHER users in the room
+            emit('playback_seek', {
+                'currentTime': current_time,
+                'username': username
+            }, room=room_code, skip_sid=sid)
+
+@socketio.on('request_sync_status')
+def handle_request_sync_status():
+    """Send current playback state to requesting user for drift correction"""
+    sid = request.sid
+
+    if sid in user_rooms:
+        room_code = user_rooms[sid]
+        room = watchparty_rooms.get(room_code)
+
+        if room:
+            state = room['state']
+            # Calculate expected current time based on when last action happened
+            from datetime import datetime
+            last_update = datetime.fromisoformat(state['timestamp'])
+            time_elapsed = (datetime.now() - last_update).total_seconds()
+
+            expected_time = state['currentTime']
+            if state['playing']:
+                expected_time += time_elapsed
+
+            emit('sync_status', {
+                'playing': state['playing'],
+                'currentTime': expected_time
+            })
 
 @socketio.on('chat_message')
 def handle_chat_message(data):
