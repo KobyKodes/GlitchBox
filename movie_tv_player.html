@@ -4323,7 +4323,12 @@
     <div id="watchpartySidebar" class="watchparty-sidebar">
         <div class="watchparty-header">
             <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
-                <div class="watchparty-title">Watchparty</div>
+                <div class="watchparty-title">
+                    Watchparty
+                    <div id="hostBadge" style="display: none; font-size: 10px; background: linear-gradient(135deg, #ffd700, #ff8c00); color: #0f0f1e; padding: 2px 8px; border-radius: 4px; margin-top: 4px; font-weight: bold; text-shadow: none; border: 2px solid #ffa500; box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);">
+                        ★ YOU ARE HOST
+                    </div>
+                </div>
                 <div style="display: flex; align-items: center; gap: 6px; flex: 1; justify-content: center;">
                     <span class="watchparty-room-code" id="watchpartyRoomCodeLabel">Code:</span>
                     <div class="room-code-display" id="watchpartyRoomCode" onclick="copyRoomCode()" title="Click to copy">------</div>
@@ -8349,38 +8354,98 @@
             });
 
             socket.on('new_host', (data) => {
-                isHost = (socket.id === data.username); // This needs to be checked differently
+                isHost = (username === data.username);
                 addSystemMessage(`${data.username} is now the host`);
                 showStatus(`${data.username} is now controlling playback`);
+
+                // Update UI to show/hide host indicators
+                const hostBadge = document.getElementById('hostBadge');
+                if (hostBadge) {
+                    hostBadge.style.display = isHost ? 'block' : 'none';
+                }
+
+                const syncBtn = document.getElementById('syncPlaybackBtn');
+                if (syncBtn) {
+                    syncBtn.style.display = isHost ? 'block' : 'none';
+                }
+
+                // Re-setup video sync listeners
+                const playerVideo = document.getElementById('playerVideo');
+                if (playerVideo && playerVideo.style.display !== 'none') {
+                    videoSyncListenersAttached = false;
+                    setupVideoSyncListeners(playerVideo);
+                }
+
+                if (isHost) {
+                    showStatus('You are now the host! You control playback for all guests.');
+                }
             });
 
             socket.on('play_sync', (data) => {
                 if (!isHost) {
                     showSyncIndicator(`Host resumed playback at ${formatTime(data.currentTime)}`);
-                    // Reload player with timestamp to sync
-                    if (currentContentUrl && data.currentTime !== undefined) {
+
+                    // Set syncing flag to prevent loop
+                    isSyncing = true;
+
+                    // Check if using video element (live channels) or iframe (movies/TV)
+                    const playerVideo = document.getElementById('playerVideo');
+                    if (playerVideo && playerVideo.style.display !== 'none') {
+                        // For live channels: directly control video element
+                        playerVideo.currentTime = data.currentTime;
+                        playerVideo.play().catch(e => console.log('Play prevented:', e));
+                    } else if (currentContentUrl && data.currentTime !== undefined) {
+                        // For movies/TV: reload iframe with timestamp
                         reloadPlayerWithTimestamp(data.currentTime);
                     }
+
+                    // Reset flag after a delay
+                    setTimeout(() => { isSyncing = false; }, 1000);
                 }
             });
 
             socket.on('pause_sync', (data) => {
                 if (!isHost) {
                     showSyncIndicator(`Host paused at ${formatTime(data.currentTime)}`);
-                    // Reload player with timestamp to sync
-                    if (currentContentUrl && data.currentTime !== undefined) {
+
+                    // Set syncing flag to prevent loop
+                    isSyncing = true;
+
+                    // Check if using video element (live channels) or iframe (movies/TV)
+                    const playerVideo = document.getElementById('playerVideo');
+                    if (playerVideo && playerVideo.style.display !== 'none') {
+                        // For live channels: directly control video element
+                        playerVideo.currentTime = data.currentTime;
+                        playerVideo.pause();
+                    } else if (currentContentUrl && data.currentTime !== undefined) {
+                        // For movies/TV: reload iframe with timestamp
                         reloadPlayerWithTimestamp(data.currentTime);
                     }
+
+                    // Reset flag after a delay
+                    setTimeout(() => { isSyncing = false; }, 1000);
                 }
             });
 
             socket.on('seek_sync', (data) => {
                 if (!isHost) {
                     showSyncIndicator(`Host seeked to ${formatTime(data.currentTime)}`);
-                    // Reload player with timestamp to sync
-                    if (currentContentUrl && data.currentTime !== undefined) {
+
+                    // Set syncing flag to prevent loop
+                    isSyncing = true;
+
+                    // Check if using video element (live channels) or iframe (movies/TV)
+                    const playerVideo = document.getElementById('playerVideo');
+                    if (playerVideo && playerVideo.style.display !== 'none') {
+                        // For live channels: directly control video element
+                        playerVideo.currentTime = data.currentTime;
+                    } else if (currentContentUrl && data.currentTime !== undefined) {
+                        // For movies/TV: reload iframe with timestamp
                         reloadPlayerWithTimestamp(data.currentTime);
                     }
+
+                    // Reset flag after a delay
+                    setTimeout(() => { isSyncing = false; }, 1000);
                 }
             });
 
@@ -8604,10 +8669,23 @@
             document.getElementById('watchpartyRoomCode').textContent = data.room_code;
             updateUsersList(data.users);
 
+            // Show host badge only for host
+            const hostBadge = document.getElementById('hostBadge');
+            if (hostBadge) {
+                hostBadge.style.display = isHost ? 'block' : 'none';
+            }
+
             // Show sync button only for host
             const syncBtn = document.getElementById('syncPlaybackBtn');
             if (syncBtn) {
                 syncBtn.style.display = isHost ? 'block' : 'none';
+            }
+
+            // Re-setup video sync listeners when host status changes
+            const playerVideo = document.getElementById('playerVideo');
+            if (playerVideo && playerVideo.style.display !== 'none') {
+                videoSyncListenersAttached = false; // Reset flag
+                setupVideoSyncListeners(playerVideo);
             }
         }
 
@@ -8618,8 +8696,11 @@
             userList.innerHTML = users.map((user, index) => `
                 <div class="user-item">
                     <div class="user-avatar">${user.charAt(0).toUpperCase()}</div>
-                    <div class="user-name">${user}</div>
-                    ${index === 0 ? '<span class="host-badge">HOST</span>' : ''}
+                    <div class="user-name">
+                        ${user}
+                        ${index === 0 ? ' <span style="color: #ffd700; font-size: 14px; margin-left: 4px;" title="Host controls playback">★</span>' : ''}
+                    </div>
+                    ${index === 0 ? '<span class="host-badge" style="background: linear-gradient(135deg, #ffd700, #ff8c00); border: 1px solid #ffa500;">HOST</span>' : ''}
                 </div>
             `).join('');
         }
@@ -8962,6 +9043,72 @@
         window.addEventListener('load', () => {
             initSocket();
         });
+
+        // Setup video sync listeners for watchparty
+        let isSyncing = false; // Flag to prevent sync loops
+        let videoSyncListenersAttached = false; // Track if listeners are already attached
+
+        function setupVideoSyncListeners(videoElement) {
+            if (!videoElement) return;
+
+            // Prevent duplicate listeners
+            if (videoSyncListenersAttached) {
+                console.log('Video sync listeners already attached, skipping');
+                return;
+            }
+
+            // Only host can send sync events
+            if (watchpartyActive && isHost) {
+                console.log('Setting up host sync listeners for video playback');
+
+                // Play event
+                videoElement.addEventListener('play', function() {
+                    if (isSyncing) return; // Prevent sync loops
+
+                    const currentTime = Math.floor(videoElement.currentTime);
+                    console.log('Host played video at', currentTime);
+
+                    socket.emit('sync_play', {
+                        currentTime: currentTime
+                    });
+
+                    addSystemMessage(`Synced play to all guests at ${formatTime(currentTime)}`);
+                });
+
+                // Pause event
+                videoElement.addEventListener('pause', function() {
+                    if (isSyncing) return; // Prevent sync loops
+
+                    const currentTime = Math.floor(videoElement.currentTime);
+                    console.log('Host paused video at', currentTime);
+
+                    socket.emit('sync_pause', {
+                        currentTime: currentTime
+                    });
+
+                    addSystemMessage(`Synced pause to all guests at ${formatTime(currentTime)}`);
+                });
+
+                // Seeked event (when user scrubs through video)
+                videoElement.addEventListener('seeked', function() {
+                    if (isSyncing) return; // Prevent sync loops
+
+                    const currentTime = Math.floor(videoElement.currentTime);
+                    console.log('Host seeked video to', currentTime);
+
+                    socket.emit('sync_seek', {
+                        currentTime: currentTime
+                    });
+
+                    addSystemMessage(`Synced seek to all guests at ${formatTime(currentTime)}`);
+                });
+
+                videoSyncListenersAttached = true;
+                console.log('Host video sync listeners attached successfully');
+            } else if (watchpartyActive && !isHost) {
+                console.log('Guest mode - no sync listeners needed (guests sync from server)');
+            }
+        }
 
         // ============= END WATCHPARTY FUNCTIONS =============
 
@@ -9996,14 +10143,22 @@
 
         // Populate country filter dropdown
         function populateCountryFilter() {
-            const countries = ['All', ...new Set(allChannels.map(ch => ch.country))].sort();
+            const countries = ['Favourites', 'All', ...new Set(allChannels.map(ch => ch.country))].sort((a, b) => {
+                // Keep Favourites first, All second, then alphabetical
+                if (a === 'Favourites') return -1;
+                if (b === 'Favourites') return 1;
+                if (a === 'All') return -1;
+                if (b === 'All') return 1;
+                return a.localeCompare(b);
+            });
             const container = document.getElementById('countryFilterButtons');
             if (!container) return;
 
             container.innerHTML = countries.map(country => {
                 const isActive = country === selectedCountry ? 'active' : '';
+                const icon = country === 'Favourites' ? '★' : '◆';
                 return `<button class="bg-animation-toggle ${isActive}" onclick="filterByCountry('${country}')" id="country_${country.replace(/\s+/g, '_')}">
-                    ◆ ${country}
+                    ${icon} ${country}
                 </button>`;
             }).join('');
         }
@@ -10020,7 +10175,10 @@
             if (activeBtn) activeBtn.classList.add('active');
 
             // Filter channels
-            if (country === 'All') {
+            if (country === 'Favourites') {
+                const channelFavourites = JSON.parse(localStorage.getItem('channelFavourites') || '[]');
+                currentDisplayedChannels = channelFavourites;
+            } else if (country === 'All') {
                 currentDisplayedChannels = [...allChannels];
             } else {
                 currentDisplayedChannels = allChannels.filter(ch => ch.country === country);
@@ -10083,8 +10241,17 @@
             };
             const flag = countryFlags[channel.countryCode] || '🌍';
 
+            // Check if channel is in favourites
+            const channelFavourites = JSON.parse(localStorage.getItem('channelFavourites') || '[]');
+            const isFavourited = channelFavourites.some(fav => fav.name === channel.name && fav.url === channel.url);
+
             return `
                 <div class="content-card" onclick='playChannel(${index})' style="--accent-color: ${categoryColor}; --primary-color: #00ff9f;">
+                    <button type="button" class="watchlist-btn ${isFavourited ? 'added' : ''}"
+                            onclick="event.stopPropagation(); event.preventDefault(); toggleChannelFavourite(${index}); return false;"
+                            title="${isFavourited ? 'Remove from Favourites' : 'Add to Favourites'}">
+                        ${isFavourited ? '★' : '☆'}
+                    </button>
                     <div class="content-type-badge" style="background: rgba(255,0,0,0.9); border-color: #ff0000; animation: pulse 2s infinite;">
                         🔴 LIVE
                     </div>
@@ -10137,8 +10304,16 @@
                 clearBtn.style.display = query ? 'block' : 'none';
             }
 
-            // Start with channels filtered by country
-            let baseChannels = selectedCountry === 'All' ? allChannels : allChannels.filter(ch => ch.country === selectedCountry);
+            // Start with channels filtered by country or favourites
+            let baseChannels;
+            if (selectedCountry === 'Favourites') {
+                const channelFavourites = JSON.parse(localStorage.getItem('channelFavourites') || '[]');
+                baseChannels = channelFavourites;
+            } else if (selectedCountry === 'All') {
+                baseChannels = allChannels;
+            } else {
+                baseChannels = allChannels.filter(ch => ch.country === selectedCountry);
+            }
 
             if (!query) {
                 currentDisplayedChannels = baseChannels;
@@ -10166,10 +10341,49 @@
             if (clearBtn) clearBtn.style.display = 'none';
 
             // Respect country filter when clearing search
-            if (selectedCountry === 'All') {
+            if (selectedCountry === 'Favourites') {
+                const channelFavourites = JSON.parse(localStorage.getItem('channelFavourites') || '[]');
+                currentDisplayedChannels = channelFavourites;
+            } else if (selectedCountry === 'All') {
                 currentDisplayedChannels = allChannels;
             } else {
                 currentDisplayedChannels = allChannels.filter(ch => ch.country === selectedCountry);
+            }
+            displayLiveChannels(currentDisplayedChannels);
+        }
+
+        // Toggle channel favourite
+        function toggleChannelFavourite(channelIndex) {
+            const channel = currentDisplayedChannels[channelIndex];
+            if (!channel) return;
+
+            let channelFavourites = JSON.parse(localStorage.getItem('channelFavourites') || '[]');
+            const existingIndex = channelFavourites.findIndex(fav => fav.name === channel.name && fav.url === channel.url);
+
+            if (existingIndex > -1) {
+                // Remove from favourites
+                channelFavourites.splice(existingIndex, 1);
+                showStatus(`Removed ${channel.name} from favourites`);
+            } else {
+                // Add to favourites
+                channelFavourites.push({
+                    name: channel.name,
+                    url: channel.url,
+                    category: channel.category,
+                    country: channel.country,
+                    countryCode: channel.countryCode,
+                    logo: channel.logo || null,
+                    addedAt: new Date().toISOString()
+                });
+                showStatus(`Added ${channel.name} to favourites`);
+            }
+
+            // Save to localStorage
+            localStorage.setItem('channelFavourites', JSON.stringify(channelFavourites));
+
+            // Refresh the display - if on Favourites view, update currentDisplayedChannels
+            if (selectedCountry === 'Favourites') {
+                currentDisplayedChannels = channelFavourites;
             }
             displayLiveChannels(currentDisplayedChannels);
         }
@@ -10286,6 +10500,9 @@
                         playerVideo.play().catch(e => console.log('Autoplay prevented:', e));
                     });
 
+                    // Add watchparty sync listeners for live channels
+                    setupVideoSyncListeners(playerVideo);
+
                     window.hls.on(Hls.Events.ERROR, function(event, data) {
                         console.error('HLS error:', data);
                         if (data.fatal) {
@@ -10312,6 +10529,9 @@
                     playerVideo.addEventListener('loadedmetadata', function() {
                         playerVideo.play().catch(e => console.log('Autoplay prevented:', e));
                     });
+
+                    // Add watchparty sync listeners for live channels
+                    setupVideoSyncListeners(playerVideo);
                 } else {
                     showError('HLS playback not supported in this browser');
                 }
