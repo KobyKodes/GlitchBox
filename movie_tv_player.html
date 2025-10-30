@@ -3838,6 +3838,122 @@
         }
 
         /* ============= END ANIMATED BACKGROUNDS ============= */
+
+        /* ============= USER MENU DROPDOWN ============= */
+        .user-menu-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100002;
+        }
+
+        .user-menu-btn {
+            font-family: 'VT323', monospace;
+            padding: 12px 16px;
+            background: rgba(0, 122, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--primary-color, #00ff9f);
+            color: var(--primary-color, #00ff9f);
+            font-size: 24px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 0 15px rgba(0, 255, 159, 0.3);
+        }
+
+        .user-menu-btn:hover {
+            background: var(--primary-color, #00ff9f);
+            color: var(--bg-dark, #0f0f1e);
+            box-shadow: 0 0 20px rgba(0, 255, 159, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .user-menu-btn.logged-in {
+            border-color: var(--accent-color, #00d9ff);
+            color: var(--accent-color, #00d9ff);
+            box-shadow: 0 0 15px rgba(0, 217, 255, 0.3);
+        }
+
+        .user-menu-btn.logged-in:hover {
+            background: var(--accent-color, #00d9ff);
+            color: var(--bg-dark, #0f0f1e);
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.6);
+        }
+
+        .user-menu-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            left: 0;
+            min-width: 200px;
+            background: rgba(15, 15, 30, 0.98);
+            backdrop-filter: blur(20px);
+            border: 2px solid var(--primary-color, #00ff9f);
+            border-radius: 8px;
+            padding: 8px;
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 255, 159, 0.3);
+            animation: slideDown 0.3s ease;
+        }
+
+        .user-menu-dropdown.show {
+            display: flex;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .user-menu-item {
+            font-family: 'VT323', monospace;
+            padding: 12px 16px;
+            background: transparent;
+            border: 2px solid transparent;
+            color: var(--primary-color, #00ff9f);
+            font-size: 20px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-menu-item:hover {
+            background: rgba(0, 255, 159, 0.1);
+            border-color: var(--primary-color, #00ff9f);
+            transform: translateX(4px);
+        }
+
+        .user-menu-divider {
+            height: 2px;
+            background: var(--secondary-color, #ff00ff);
+            margin: 4px 0;
+            opacity: 0.3;
+        }
+
+        .user-menu-username {
+            font-family: 'VT323', monospace;
+            padding: 8px 16px;
+            color: var(--accent-color, #00d9ff);
+            font-size: 18px;
+            text-align: center;
+            border-bottom: 2px solid rgba(0, 217, 255, 0.3);
+            margin-bottom: 4px;
+        }
+        /* ============= END USER MENU DROPDOWN ============= */
     </style>
 
     <!-- Monetag Ads Integration -->
@@ -3859,14 +3975,22 @@
         };
     </script>
     <script type="text/javascript" src="//www.highperformanceformat.com/8af468976c973602ab1d62e5e750e8e3/invoke.js"></script>
+-->
+    
 
-    <!-- Vignette Banner - Zone 10039524 -->
-    <!-- <script type="text/javascript" src="//pl25015901.cpmrevenuegate.com/a0/68/32/a068325c84aa3c0c31ed11cdd3b976d7.js"></script> -->
-
-    <!-- Native Banner (Interstitial) - Zone 10039523 -->
-    <!-- <script type="text/javascript" src="//pl25015897.cpmrevenuegate.com/5d/40/d6/5d40d6b4e87afefe485e6c69f47de7c5.js"></script> --> -->
-    <!-- Background Animation Container -->
+    
     <div id="bgAnimation"></div>
+
+    <!-- User Menu Dropdown -->
+    <div class="user-menu-container">
+        <button class="user-menu-btn" id="userMenuBtn" onclick="toggleUserMenu()">
+            <span id="userMenuIcon">👤</span>
+            <span id="userMenuText" style="display: none;"></span>
+        </button>
+        <div class="user-menu-dropdown" id="userMenuDropdown">
+            <!-- Content dynamically populated by updateAuthUI() -->
+        </div>
+    </div>
 
     <!-- Theme Selector Button -->
     <!-- Top-right Control Button -->
@@ -3953,11 +4077,12 @@
                 <h1>RetroFlix</h1>
                 <p>your one stop streaming shop</p>
             </div>
-            <div id="authButtons" style="display: flex; gap: 12px; align-items: center;">
+            <!-- Old auth buttons hidden - now using top-left user menu -->
+            <div id="authButtons" style="display: none;">
                 <button class="btn" onclick="showLoginModal()" style="padding: 10px 20px;">Login</button>
                 <button class="btn" onclick="showRegisterModal()" style="padding: 10px 20px;">Sign Up</button>
             </div>
-            <div id="userMenu" style="display: none; align-items: center; gap: 12px;">
+            <div id="userMenu" style="display: none;">
                 <span id="usernameDisplay" style="color: var(--primary-color); font-family: 'VT323', monospace; font-size: 20px;"></span>
                 <button class="btn" onclick="showFriendsModal()" style="padding: 10px 20px;">Friends</button>
                 <button class="btn" onclick="logout()" style="padding: 10px 20px;">Logout</button>
@@ -4070,7 +4195,7 @@
                 </button>
                 <button onclick="toggleComments()" class="btn btn-secondary" id="commentsBtn" style="display: none;">💬 Comments</button>
                 <button onclick="copyCurrentUrl()" class="btn btn-secondary">Copy URL</button>
-                <button onclick="stopPlayback()" class="btn btn-secondary">Stop</button>
+                <button onclick="stopPlayback()" class="btn btn-secondary" id="stopBtn" style="display: none;">Stop</button>
             </div>
 
             <!-- Old Watchparty Menu Modal (Hidden - Using Panel Instead) -->
@@ -6662,11 +6787,13 @@
                 if (playerIframe) playerIframe.style.display = 'none';
                 if (placeholder) placeholder.style.display = 'none';
 
-                // Show video element and comments button
+                // Show video element, comments button, and stop button
                 if (playerVideo) {
                     playerVideo.style.display = 'block';
                     const commentsBtn = document.getElementById('commentsBtn');
                     if (commentsBtn && authToken) commentsBtn.style.display = 'inline-block';
+                    const stopBtn = document.getElementById('stopBtn');
+                    if (stopBtn) stopBtn.style.display = 'inline-block';
 
                     // Check if HLS.js is supported
                     if (Hls.isSupported()) {
@@ -6777,9 +6904,11 @@
                 playerIframe.style.display = 'block';
                 placeholder.style.display = 'none';
 
-                // Show comments button
+                // Show comments button and stop button
                 const commentsBtn = document.getElementById('commentsBtn');
                 if (commentsBtn && authToken) commentsBtn.style.display = 'inline-block';
+                const stopBtn = document.getElementById('stopBtn');
+                if (stopBtn) stopBtn.style.display = 'inline-block';
 
                 console.log('Player iframe src set to:', playerIframe.src);
 
@@ -6968,6 +7097,10 @@
             currentContentId = null;
             currentContentData = null;
             showStatus('Playback stopped');
+
+            // Hide stop button
+            const stopBtn = document.getElementById('stopBtn');
+            if (stopBtn) stopBtn.style.display = 'none';
 
             // Broadcast stop to watchparty if host
             if (watchpartyActive && isHost && socket) {
@@ -11227,9 +11360,11 @@
             if (playerIframe) playerIframe.style.display = 'none';
             if (placeholder) placeholder.style.display = 'none';
 
-            // Show video element
+            // Show video element and stop button
             if (playerVideo) {
                 playerVideo.style.display = 'block';
+                const stopBtn = document.getElementById('stopBtn');
+                if (stopBtn) stopBtn.style.display = 'inline-block';
 
                 // Check if HLS.js is supported
                 if (Hls.isSupported()) {
@@ -11463,16 +11598,73 @@
             const authButtons = document.getElementById('authButtons');
             const userMenu = document.getElementById('userMenu');
             const usernameDisplay = document.getElementById('usernameDisplay');
+            const userMenuBtn = document.getElementById('userMenuBtn');
+            const userMenuDropdown = document.getElementById('userMenuDropdown');
+            const userMenuText = document.getElementById('userMenuText');
 
             if (authToken && currentUser) {
+                // Hide old buttons
                 authButtons.style.display = 'none';
-                userMenu.style.display = 'flex';
-                usernameDisplay.textContent = currentUser.username;
-            } else {
-                authButtons.style.display = 'flex';
                 userMenu.style.display = 'none';
+                usernameDisplay.textContent = currentUser.username;
+
+                // Update new user menu
+                userMenuBtn.classList.add('logged-in');
+                userMenuText.textContent = currentUser.username;
+                userMenuText.style.display = 'inline';
+
+                // Populate dropdown for logged-in user
+                userMenuDropdown.innerHTML = `
+                    <div class="user-menu-username">@${currentUser.username}</div>
+                    <button class="user-menu-item" onclick="showFriendsModal(); closeUserMenu();">
+                        <span>👥</span> Friends
+                    </button>
+                    <div class="user-menu-divider"></div>
+                    <button class="user-menu-item" onclick="logout(); closeUserMenu();">
+                        <span>🚪</span> Logout
+                    </button>
+                `;
+            } else {
+                // Hide old buttons
+                authButtons.style.display = 'none';
+                userMenu.style.display = 'none';
+
+                // Update new user menu
+                userMenuBtn.classList.remove('logged-in');
+                userMenuText.textContent = '';
+                userMenuText.style.display = 'none';
+
+                // Populate dropdown for guest user
+                userMenuDropdown.innerHTML = `
+                    <button class="user-menu-item" onclick="showLoginModal(); closeUserMenu();">
+                        <span>🔓</span> Login
+                    </button>
+                    <button class="user-menu-item" onclick="showRegisterModal(); closeUserMenu();">
+                        <span>✨</span> Sign Up
+                    </button>
+                `;
             }
         }
+
+        // User Menu Toggle Functions
+        window.toggleUserMenu = function() {
+            const dropdown = document.getElementById('userMenuDropdown');
+            dropdown.classList.toggle('show');
+        };
+
+        window.closeUserMenu = function() {
+            const dropdown = document.getElementById('userMenuDropdown');
+            dropdown.classList.remove('show');
+        };
+
+        // Close user menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const userMenuContainer = document.querySelector('.user-menu-container');
+            const dropdown = document.getElementById('userMenuDropdown');
+            if (userMenuContainer && !userMenuContainer.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
 
         // Load user data on page load
         async function loadUserData() {
