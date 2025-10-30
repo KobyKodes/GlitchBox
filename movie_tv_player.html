@@ -1,10 +1,50 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="midnight">
+<html lang="en" data-theme="jspecial">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <meta http-equiv="Permissions-Policy" content="fullscreen=*">
     <title>RetroFlix - Stream Movies & TV Shows</title>
+
+    <!-- IMPORTANT: Define all onclick handler functions FIRST before any HTML is parsed -->
+    <script>
+        console.log('[HEAD] Defining global functions for onclick handlers...');
+
+        // These functions will be properly implemented later in the body script
+        // For now, they're just placeholders to prevent "not defined" errors
+        window.showTab = window.showTab || function() {};
+        window.showLoginModal = window.showLoginModal || function() {};
+        window.showRegisterModal = window.showRegisterModal || function() {};
+        window.logout = window.logout || function() {};
+        window.searchContent = window.searchContent || function() {};
+        window.showFriendsModal = window.showFriendsModal || function() {};
+        window.closeFriendsModal = window.closeFriendsModal || function() {};
+        window.closeLoginModal = window.closeLoginModal || function() {};
+        window.closeRegisterModal = window.closeRegisterModal || function() {};
+        window.toggleFullscreen = window.toggleFullscreen || function() {};
+        window.toggleThemeSelector = window.toggleThemeSelector || function() {};
+        window.toggleEffectsPanel = window.toggleEffectsPanel || function() {};
+        window.toggleWatchpartyPanel = window.toggleWatchpartyPanel || function() {};
+        window.togglePlayerWatchlist = window.togglePlayerWatchlist || function() {};
+        window.toggleSeasonPanel = window.toggleSeasonPanel || function() {};
+        window.toggleEpisodePanel = window.toggleEpisodePanel || function() {};
+        window.stopPlayback = window.stopPlayback || function() {};
+        window.playNextEpisode = window.playNextEpisode || function() {};
+        window.showSourceSelector = window.showSourceSelector || function() {};
+        window.copyCurrentUrl = window.copyCurrentUrl || function() {};
+        window.createWatchparty = window.createWatchparty || function() {};
+        window.joinWatchparty = window.joinWatchparty || function() {};
+        window.closeWatchpartyMenu = window.closeWatchpartyMenu || function() {};
+        window.toggleEffect = window.toggleEffect || function() {};
+        window.enableAllEffects = window.enableAllEffects || function() {};
+        window.disableAllEffects = window.disableAllEffects || function() {};
+        window.switchSportsSource = window.switchSportsSource || function() {};
+        window.toggleComments = window.toggleComments || function() {};
+        window.submitComment = window.submitComment || function() {};
+
+        console.log('[HEAD] Global functions defined successfully');
+    </script>
+
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <!-- <script src="https://fpyf8.com/88/tag.min.js" data-zone="178035" async data-cfasync="false"></script> -->
@@ -39,6 +79,9 @@
         }
 
         .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             text-align: center;
             margin-bottom: 48px;
             padding: 32px 20px;
@@ -3906,8 +3949,19 @@
 
     <div class="container">
         <div class="header">
-            <h1>RetroFlix</h1>
-            <p>The only streaming app you need (fuck netflix)</p>
+            <div style="flex: 1;">
+                <h1>RetroFlix</h1>
+                <p>your one stop streaming shop</p>
+            </div>
+            <div id="authButtons" style="display: flex; gap: 12px; align-items: center;">
+                <button class="btn" onclick="showLoginModal()" style="padding: 10px 20px;">Login</button>
+                <button class="btn" onclick="showRegisterModal()" style="padding: 10px 20px;">Sign Up</button>
+            </div>
+            <div id="userMenu" style="display: none; align-items: center; gap: 12px;">
+                <span id="usernameDisplay" style="color: var(--primary-color); font-family: 'VT323', monospace; font-size: 20px;"></span>
+                <button class="btn" onclick="showFriendsModal()" style="padding: 10px 20px;">Friends</button>
+                <button class="btn" onclick="logout()" style="padding: 10px 20px;">Logout</button>
+            </div>
         </div>
 
         <div class="search-section">
@@ -4014,6 +4068,7 @@
                 <button id="sportsSourceBtn" class="btn btn-secondary" onclick="switchSportsSource()" style="display: none;">
                     <span id="sportsSourceBtnText">Source 1</span>
                 </button>
+                <button onclick="toggleComments()" class="btn btn-secondary" id="commentsBtn" style="display: none;">💬 Comments</button>
                 <button onclick="copyCurrentUrl()" class="btn btn-secondary">Copy URL</button>
                 <button onclick="stopPlayback()" class="btn btn-secondary">Stop</button>
             </div>
@@ -4053,6 +4108,27 @@
 
             <!-- Sync Indicator -->
             <div id="syncIndicator" class="sync-indicator"></div>
+
+            <!-- Comments Section -->
+            <div id="commentsSection" style="display: none; background: #0f0f1e; border: 3px solid var(--accent-color, #00d9ff); padding: 24px; margin-top: 24px; box-shadow: 0 0 15px rgba(0, 217, 255, 0.3);">
+                <h3 style="font-family: 'Press Start 2P', cursive; font-size: 16px; color: var(--accent-color, #00d9ff); margin-bottom: 20px; text-shadow: 0 0 10px rgba(0, 217, 255, 0.5);">
+                    Friends' Comments
+                </h3>
+
+                <div id="commentsList" style="max-height: 300px; overflow-y: auto; margin-bottom: 20px;">
+                    <!-- Comments will be loaded here -->
+                </div>
+
+                <div id="addCommentSection" style="border-top: 2px solid rgba(0, 217, 255, 0.3); padding-top: 16px;">
+                    <textarea id="commentTextarea" placeholder="Share your thoughts with friends..."
+                              style="width: 100%; padding: 12px; background: #1a1a2e; border: 2px solid var(--secondary-color, #ff00ff); color: #e0e0e0; font-family: 'VT323', monospace; font-size: 18px; resize: vertical; min-height: 80px; border-radius: 4px;"
+                              maxlength="500"></textarea>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
+                        <span id="commentCharCount" style="color: #666; font-family: 'VT323', monospace; font-size: 14px;">0/500</span>
+                        <button onclick="submitComment()" class="btn" style="padding: 10px 24px;">Post Comment</button>
+                    </div>
+                </div>
+            </div>
 
             <!-- Watchlist Modal -->
             <div id="watchlistModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.90); z-index: 2147483647; align-items: center; justify-content: center; padding: 20px;" onclick="closeWatchlistModal()">
@@ -4161,12 +4237,96 @@
             </div>
         </div>
 
+        <!-- Login Modal -->
+        <div id="loginModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 10000; align-items: center; justify-content: center; padding: 20px;">
+            <div style="max-width: 450px; width: 90%; background: #0f0f1e; border: 4px solid var(--primary-color, #00ff9f); padding: 32px; box-shadow: 0 0 0 4px #1a1a2e, 0 0 30px var(--primary-glow, rgba(0, 255, 159, 0.5));" onclick="event.stopPropagation()">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <h2 style="font-family: 'Press Start 2P', cursive; font-size: 18px; color: var(--primary-color, #00ff9f); margin: 0;">Login</h2>
+                    <button onclick="closeLoginModal()" style="background: none; border: none; color: #ff00ff; font-size: 24px; cursor: pointer; padding: 0; line-height: 1;">×</button>
+                </div>
+                <div id="loginError" style="display: none; color: #ff6b6b; margin-bottom: 16px; padding: 12px; background: rgba(255, 107, 107, 0.1); border: 1px solid #ff6b6b; border-radius: 4px;"></div>
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; color: #a1a1a6; margin-bottom: 8px; font-family: 'VT323', monospace; font-size: 18px;">Username</label>
+                        <input type="text" id="loginUsername" class="search-input" required style="width: 100%; padding: 12px;">
+                    </div>
+                    <div style="margin-bottom: 24px;">
+                        <label style="display: block; color: #a1a1a6; margin-bottom: 8px; font-family: 'VT323', monospace; font-size: 18px;">Password</label>
+                        <input type="password" id="loginPassword" class="search-input" required style="width: 100%; padding: 12px;">
+                    </div>
+                    <button type="submit" class="btn" style="width: 100%; padding: 14px; font-size: 16px;">Login</button>
+                    <div style="text-align: center; margin-top: 16px; color: #a1a1a6;">
+                        Don't have an account? <a href="#" onclick="event.preventDefault(); closeLoginModal(); showRegisterModal();" style="color: var(--primary-color); text-decoration: none;">Sign up</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Register Modal -->
+        <div id="registerModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 10000; align-items: center; justify-content: center; padding: 20px;">
+            <div style="max-width: 450px; width: 90%; background: #0f0f1e; border: 4px solid var(--secondary-color, #ff00ff); padding: 32px; box-shadow: 0 0 0 4px #1a1a2e, 0 0 30px var(--secondary-glow, rgba(255, 0, 255, 0.5));" onclick="event.stopPropagation()">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <h2 style="font-family: 'Press Start 2P', cursive; font-size: 18px; color: var(--secondary-color, #ff00ff); margin: 0;">Sign Up</h2>
+                    <button onclick="closeRegisterModal()" style="background: none; border: none; color: #ff00ff; font-size: 24px; cursor: pointer; padding: 0; line-height: 1;">×</button>
+                </div>
+                <div id="registerError" style="display: none; color: #ff6b6b; margin-bottom: 16px; padding: 12px; background: rgba(255, 107, 107, 0.1); border: 1px solid #ff6b6b; border-radius: 4px;"></div>
+                <form id="registerForm" onsubmit="handleRegister(event)">
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; color: #a1a1a6; margin-bottom: 8px; font-family: 'VT323', monospace; font-size: 18px;">Username</label>
+                        <input type="text" id="registerUsername" class="search-input" required style="width: 100%; padding: 12px;">
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; color: #a1a1a6; margin-bottom: 8px; font-family: 'VT323', monospace; font-size: 18px;">Email</label>
+                        <input type="email" id="registerEmail" class="search-input" required style="width: 100%; padding: 12px;">
+                    </div>
+                    <div style="margin-bottom: 24px;">
+                        <label style="display: block; color: #a1a1a6; margin-bottom: 8px; font-family: 'VT323', monospace; font-size: 18px;">Password</label>
+                        <input type="password" id="registerPassword" class="search-input" required minlength="6" style="width: 100%; padding: 12px;">
+                    </div>
+                    <button type="submit" class="btn" style="width: 100%; padding: 14px; font-size: 16px;">Create Account</button>
+                    <div style="text-align: center; margin-top: 16px; color: #a1a1a6;">
+                        Already have an account? <a href="#" onclick="event.preventDefault(); closeRegisterModal(); showLoginModal();" style="color: var(--secondary-color); text-decoration: none;">Login</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Friends Modal -->
+        <div id="friendsModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 10000; padding: 40px; overflow-y: auto;">
+            <div style="max-width: 700px; margin: 0 auto; background: #0f0f1e; border: 4px solid #00d9ff; padding: 32px; box-shadow: 0 0 0 4px #1a1a2e, 0 0 30px rgba(0, 217, 255, 0.5);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <h2 style="font-family: 'Press Start 2P', cursive; font-size: 18px; color: #00d9ff; margin: 0;">Friends</h2>
+                    <button onclick="closeFriendsModal()" style="background: none; border: none; color: #ff00ff; font-size: 32px; cursor: pointer; padding: 0; line-height: 1;">×</button>
+                </div>
+
+                <!-- Friend Requests -->
+                <div id="friendRequestsSection" style="margin-bottom: 24px;">
+                    <h3 style="color: var(--primary-color); font-family: 'VT323', monospace; font-size: 20px; margin-bottom: 12px;">Friend Requests</h3>
+                    <div id="friendRequestsList"></div>
+                </div>
+
+                <!-- Add Friend -->
+                <div style="margin-bottom: 24px;">
+                    <h3 style="color: var(--primary-color); font-family: 'VT323', monospace; font-size: 20px; margin-bottom: 12px;">Add Friend</h3>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="friendSearchInput" class="search-input" placeholder="Search username..." oninput="searchFriends()" style="flex: 1; padding: 12px;">
+                    </div>
+                    <div id="friendSearchResults" style="margin-top: 12px;"></div>
+                </div>
+
+                <!-- My Friends -->
+                <div>
+                    <h3 style="color: var(--primary-color); font-family: 'VT323', monospace; font-size: 20px; margin-bottom: 12px;">My Friends</h3>
+                    <div id="friendsList"></div>
+                </div>
+            </div>
+        </div>
+
         <div class="popular-section">
             <div class="tabs">
                 <button class="tab active" onclick="showTab('continue-watching')" id="continueWatchingTab">Continue Watching</button>
                 <button class="tab" onclick="showTab('watchlist')" id="watchlistTab">My Watchlist</button>
                 <button class="tab" onclick="showTab('statistics')" id="statisticsTab">Stats</button>
-                <button class="tab" onclick="showTab('search-results')">Search Results</button>
                 <button class="tab" onclick="showTab('movies')" id="moviesTab">Movies</button>
                 <button class="tab" onclick="showTab('tv-shows')" id="tvShowsTab">TV Shows</button>
                 <button class="tab" onclick="showTab('recommendations')" id="recommendationsTab">Recommendations</button>
@@ -4408,6 +4568,17 @@
     </div>
 
     <script>
+        // Define global functions FIRST for onclick handlers
+        console.log('[INIT] Script loading...');
+
+        // These must be defined early for onclick handlers to work
+        window.showTab = function(tabName) { console.log('showTab called but not initialized'); };
+        window.showLoginModal = function() { console.log('showLoginModal called but not initialized'); };
+        window.showRegisterModal = function() { console.log('showRegisterModal called but not initialized'); };
+        window.logout = function() { console.log('logout called but not initialized'); };
+        window.searchContent = function() { console.log('searchContent called but not initialized'); };
+        window.showFriendsModal = function() { console.log('showFriendsModal called but not initialized'); };
+
         const API_BASE_URL = `${window.location.origin}/api`;
         let currentContentUrl = '';
         let currentContentType = 'movie';
@@ -4458,6 +4629,7 @@
         // ============= END WATCHPARTY VARIABLES =============
 
         // Multiple watchlists support
+        // Initialize from localStorage only as fallback for non-authenticated users
         let watchlists = JSON.parse(localStorage.getItem('streamingSite_watchlists') || '{"My Watchlist": []}');
         let currentWatchlistName = localStorage.getItem('streamingSite_currentWatchlist') || 'My Watchlist';
 
@@ -4469,7 +4641,11 @@
             localStorage.removeItem('streamingSite_watchlist');
         }
 
+        // Initialize from localStorage only as fallback for non-authenticated users
         let watchHistory = JSON.parse(localStorage.getItem('streamingSite_watchHistory') || '[]');
+
+        // Flag to track if data is loaded from database
+        let isDataLoadedFromDB = false;
 
         // TMDB Genre mappings
         const movieGenres = {
@@ -4755,7 +4931,7 @@
             document.getElementById('loadingIndicator').style.display = 'none';
         }
 
-        async function searchContent() {
+        window.searchContent = async function() {
             const query = document.getElementById('searchInput').value.trim();
 
             if (!query) {
@@ -5299,8 +5475,24 @@
             }
 
             try {
+                // If comments section is open and we're switching content, restart polling
+                const commentsSection = document.getElementById('commentsSection');
+                const commentsWereVisible = commentsSection && commentsSection.style.display === 'block';
+
                 currentContentId = contentId;
                 currentContentType = contentType;
+
+                // Restart comments polling if comments were visible
+                if (commentsWereVisible && authToken) {
+                    if (commentsPollingInterval) {
+                        clearInterval(commentsPollingInterval);
+                    }
+                    commentsPollingInterval = setInterval(() => {
+                        displayComments(contentId);
+                    }, 3000);
+                    // Refresh comments immediately for new content
+                    displayComments(contentId);
+                }
 
                 let endpoint;
                 if (contentType === 'tv') {
@@ -5602,7 +5794,7 @@
             }
         }
 
-        function togglePlayerWatchlist() {
+        window.togglePlayerWatchlist = function() {
             if (!currentContentId || !currentContentType) return;
 
             const panel = document.getElementById('watchlistPanel');
@@ -5710,19 +5902,40 @@
             }
         }
 
-        function addToWatchlistPanel(listName) {
+        async function addToWatchlistPanel(listName) {
+            console.log('[addToWatchlistPanel] Called with listName:', listName);
             const item = window.pendingWatchlistPanelItem;
-            if (!item) return;
+            console.log('[addToWatchlistPanel] Item:', item);
+            console.log('[addToWatchlistPanel] authToken:', authToken ? 'exists' : 'null');
 
-            if (!watchlists[listName]) {
-                watchlists[listName] = [];
+            if (!item) {
+                console.log('[addToWatchlistPanel] No item, returning');
+                return;
             }
 
-            watchlists[listName].push(item);
-            localStorage.setItem('streamingSite_watchlists', JSON.stringify(watchlists));
+            // If user is logged in, use API
+            if (authToken) {
+                console.log('[addToWatchlistPanel] User authenticated, calling API with list:', listName);
+                try {
+                    await addToWatchlistAPI(item.id, item.type, item.title, item.posterUrl, listName);
+                    console.log('[addToWatchlistPanel] API call successful');
+                } catch (error) {
+                    console.error('[addToWatchlistPanel] API call failed:', error);
+                    showError('Failed to add to watchlist');
+                }
+            } else {
+                console.log('[addToWatchlistPanel] No auth, using localStorage');
+                // Fallback to localStorage for non-authenticated users
+                if (!watchlists[listName]) {
+                    watchlists[listName] = [];
+                }
 
-            showStatus(`Added to ${listName}`);
-            updateWatchlistButtons();
+                watchlists[listName].push(item);
+                localStorage.setItem('streamingSite_watchlists', JSON.stringify(watchlists));
+
+                showStatus(`Added to ${listName}`);
+                updateWatchlistButtons();
+            }
 
             // Close panel
             const panel = document.getElementById('watchlistPanel');
@@ -5731,15 +5944,25 @@
             window.pendingWatchlistPanelItem = null;
         }
 
-        function removeFromWatchlistPanel(listName) {
+        async function removeFromWatchlistPanel(listName) {
             const item = window.pendingWatchlistPanelItem;
             if (!item) return;
 
-            if (watchlists[listName]) {
-                watchlists[listName] = watchlists[listName].filter(i => !(i.id === item.id && i.type === item.type));
-                localStorage.setItem('streamingSite_watchlists', JSON.stringify(watchlists));
-                showStatus(`Removed from ${listName}`);
-                updateWatchlistButtons();
+            // If user is logged in, use API
+            if (authToken) {
+                try {
+                    await removeFromWatchlistAPI(item.id);
+                } catch (error) {
+                    showError('Failed to remove from watchlist');
+                }
+            } else {
+                // Fallback to localStorage for non-authenticated users
+                if (watchlists[listName]) {
+                    watchlists[listName] = watchlists[listName].filter(i => !(i.id === item.id && i.type === item.type));
+                    localStorage.setItem('streamingSite_watchlists', JSON.stringify(watchlists));
+                    showStatus(`Removed from ${listName}`);
+                    updateWatchlistButtons();
+                }
             }
 
             // Close panel
@@ -5794,7 +6017,7 @@
             }
         }
 
-        function toggleSeasonPanel() {
+        window.toggleSeasonPanel = function() {
             const panel = document.getElementById('seasonPanel');
             const episodePanel = document.getElementById('episodePanel');
 
@@ -5840,7 +6063,7 @@
             await updateEpisodeSelector(seasonNumber);
         }
 
-        function toggleEpisodePanel() {
+        window.toggleEpisodePanel = function() {
             const panel = document.getElementById('episodePanel');
             const seasonPanel = document.getElementById('seasonPanel');
 
@@ -6257,7 +6480,7 @@
             }
         }
 
-        function showSourceSelector() {
+        window.showSourceSelector = function() {
             const modal = document.getElementById('sourceSelectorModal');
             modal.style.display = 'flex';
 
@@ -6268,6 +6491,16 @@
                     check.style.display = source === videoSource ? 'inline' : 'none';
                 }
             });
+
+            // Update message based on watchparty status
+            const sourceMessage = modal.querySelector('p');
+            if (sourceMessage) {
+                if (watchpartyActive) {
+                    sourceMessage.innerHTML = 'Choose a streaming source. Different sources may have better quality or reliability.<br><br><span style="color: #ff00ff; font-weight: bold;">⚠ WATCHPARTY MODE:</span> Changing source only affects your view. Other users will keep their current source.';
+                } else {
+                    sourceMessage.textContent = 'Choose a streaming source. Different sources may have better quality or reliability.';
+                }
+            }
         }
 
         function closeSourceSelector() {
@@ -6282,12 +6515,20 @@
             // Close modal
             closeSourceSelector();
 
-            // Reload current content with new source
+            // Get current playback position before switching sources
+            let currentTime = 0;
+            const playerVideo = document.getElementById('playerVideo');
+            if (playerVideo && playerVideo.style.display !== 'none' && !isNaN(playerVideo.currentTime)) {
+                currentTime = Math.floor(playerVideo.currentTime);
+                console.log(`[Source Switch] Preserving playback position: ${currentTime}s`);
+            }
+
+            // Reload current content with new source, preserving playback position
             if (currentContentId) {
                 if (currentContentType === 'movie') {
-                    playMovie(currentContentId);
+                    playMovie(currentContentId, currentTime);
                 } else if (currentContentType === 'tv' && currentSelectedSeason && currentSelectedEpisode) {
-                    playTVEpisode(currentContentId, currentSelectedSeason, currentSelectedEpisode);
+                    playTVEpisode(currentContentId, currentSelectedSeason, currentSelectedEpisode, currentTime);
                 }
             }
 
@@ -6296,7 +6537,13 @@
                 'vidking': 'VidKing',
                 'superembed': 'SuperEmbed'
             };
-            showStatus(`Switched to ${sourceNames[source]}`);
+
+            // Show different message if in watchparty
+            if (watchpartyActive) {
+                showStatus(`Switched to ${sourceNames[source]} (only affects your view)`);
+            } else {
+                showStatus(`Switched to ${sourceNames[source]}`);
+            }
         }
 
         function updateVideoSourceButton() {
@@ -6339,7 +6586,7 @@
             }
         }
 
-        async function playNextEpisode() {
+        window.playNextEpisode = async function() {
             if (currentContentType !== 'tv' || !currentContentData) {
                 showError('Not playing a TV show');
                 return;
@@ -6415,9 +6662,11 @@
                 if (playerIframe) playerIframe.style.display = 'none';
                 if (placeholder) placeholder.style.display = 'none';
 
-                // Show video element
+                // Show video element and comments button
                 if (playerVideo) {
                     playerVideo.style.display = 'block';
+                    const commentsBtn = document.getElementById('commentsBtn');
+                    if (commentsBtn && authToken) commentsBtn.style.display = 'inline-block';
 
                     // Check if HLS.js is supported
                     if (Hls.isSupported()) {
@@ -6527,6 +6776,10 @@
                 playerIframe.src = url;
                 playerIframe.style.display = 'block';
                 placeholder.style.display = 'none';
+
+                // Show comments button
+                const commentsBtn = document.getElementById('commentsBtn');
+                if (commentsBtn && authToken) commentsBtn.style.display = 'inline-block';
 
                 console.log('Player iframe src set to:', playerIframe.src);
 
@@ -6667,7 +6920,7 @@
             saveCurrentProgress();
         }
 
-        function stopPlayback() {
+        window.stopPlayback = function() {
             const player = document.getElementById('contentPlayer');
             const playerVideo = document.getElementById('playerVideo');
             const placeholder = document.getElementById('playerPlaceholder');
@@ -6722,7 +6975,7 @@
             }
         }
 
-        function toggleFullscreen() {
+        window.toggleFullscreen = function() {
             const container = document.querySelector('.player-container');
 
             if (!container) {
@@ -6792,7 +7045,7 @@
             }
         }
 
-        function copyCurrentUrl() {
+        window.copyCurrentUrl = function() {
             if (currentContentUrl) {
                 navigator.clipboard.writeText(currentContentUrl).then(() => {
                     showStatus('Content URL copied to clipboard!');
@@ -6813,7 +7066,8 @@
             hideError();
         }
 
-        function showTab(tabName) {
+        window.showTab = function(tabName) {
+            console.log('[showTab] Called with:', tabName);
             currentTab = tabName;
             currentGenreId = null; // Reset genre filter
             currentPage = 1; // Reset page
@@ -7418,46 +7672,86 @@
             document.addEventListener('keydown', escapeHandler);
         }
 
-        function addToSpecificWatchlist(listName) {
+        async function addToSpecificWatchlist(listName) {
             if (!pendingWatchlistItem) return;
 
-            watchlists[listName].push(pendingWatchlistItem);
-            localStorage.setItem('streamingSite_watchlists', JSON.stringify(watchlists));
+            // If user is logged in, use API
+            if (authToken) {
+                try {
+                    await addToWatchlistAPI(
+                        pendingWatchlistItem.id,
+                        pendingWatchlistItem.type,
+                        pendingWatchlistItem.title,
+                        pendingWatchlistItem.posterUrl,
+                        listName
+                    );
+                    closeWatchlistModal();
+                    updateWatchlistButtons();
 
-            showStatus(`Added "${pendingWatchlistItem.title}" to ${listName}`);
-            closeWatchlistModal();
-            updateWatchlistButtons();
-
-            // Update player watchlist button if currently playing this content
-            if (currentContentId === pendingWatchlistItem.id && currentContentType === pendingWatchlistItem.type) {
-                updatePlayerWatchlistButton(currentContentId, currentContentType);
-            }
-
-            // If currently viewing this watchlist, refresh it
-            if (currentWatchlistName === listName) {
-                displayWatchlistInResults();
-            }
-        }
-
-        function removeFromSpecificWatchlist(listName, id, type) {
-            const index = watchlists[listName].findIndex(item => item.id === id && item.type === type);
-            if (index > -1) {
-                const item = watchlists[listName][index];
-                watchlists[listName].splice(index, 1);
+                    // Update player watchlist button if currently playing this content
+                    if (currentContentId === pendingWatchlistItem.id && currentContentType === pendingWatchlistItem.type) {
+                        updatePlayerWatchlistButton(currentContentId, currentContentType);
+                    }
+                } catch (error) {
+                    showError('Failed to add to watchlist');
+                }
+            } else {
+                // Fallback to localStorage for non-authenticated users
+                watchlists[listName].push(pendingWatchlistItem);
                 localStorage.setItem('streamingSite_watchlists', JSON.stringify(watchlists));
 
-                showStatus(`Removed "${item.title}" from ${listName}`);
+                showStatus(`Added "${pendingWatchlistItem.title}" to ${listName}`);
                 closeWatchlistModal();
                 updateWatchlistButtons();
 
                 // Update player watchlist button if currently playing this content
-                if (currentContentId === id && currentContentType === type) {
+                if (currentContentId === pendingWatchlistItem.id && currentContentType === pendingWatchlistItem.type) {
                     updatePlayerWatchlistButton(currentContentId, currentContentType);
                 }
 
                 // If currently viewing this watchlist, refresh it
                 if (currentWatchlistName === listName) {
                     displayWatchlistInResults();
+                }
+            }
+        }
+
+        async function removeFromSpecificWatchlist(listName, id, type) {
+            // If user is logged in, use API
+            if (authToken) {
+                try {
+                    await removeFromWatchlistAPI(id);
+                    closeWatchlistModal();
+                    updateWatchlistButtons();
+
+                    // Update player watchlist button if currently playing this content
+                    if (currentContentId === id && currentContentType === type) {
+                        updatePlayerWatchlistButton(currentContentId, currentContentType);
+                    }
+                } catch (error) {
+                    showError('Failed to remove from watchlist');
+                }
+            } else {
+                // Fallback to localStorage for non-authenticated users
+                const index = watchlists[listName].findIndex(item => item.id === id && item.type === type);
+                if (index > -1) {
+                    const item = watchlists[listName][index];
+                    watchlists[listName].splice(index, 1);
+                    localStorage.setItem('streamingSite_watchlists', JSON.stringify(watchlists));
+
+                    showStatus(`Removed "${item.title}" from ${listName}`);
+                    closeWatchlistModal();
+                    updateWatchlistButtons();
+
+                    // Update player watchlist button if currently playing this content
+                    if (currentContentId === id && currentContentType === type) {
+                        updatePlayerWatchlistButton(currentContentId, currentContentType);
+                    }
+
+                    // If currently viewing this watchlist, refresh it
+                    if (currentWatchlistName === listName) {
+                        displayWatchlistInResults();
+                    }
                 }
             }
         }
@@ -7868,8 +8162,8 @@
         }
 
         // Watch history functionality
-        function addToWatchHistory(id, title, type, data, season = null, episode = null) {
-            const existingIndex = watchHistory.findIndex(item => item.id === id && item.type === type);
+        async function addToWatchHistory(id, title, type, data, season = null, episode = null) {
+            console.log('[addToWatchHistory] Called:', { id, title, type, authToken: authToken ? 'exists' : 'null' });
 
             // For TV shows, get the current season/episode from selectors if not provided
             let currentSeason = season;
@@ -7887,33 +8181,52 @@
                 }
             }
 
-            const historyItem = {
-                id: id,
-                title: title,
-                type: type,
-                posterUrl: data.poster_url || 'https://via.placeholder.com/60x90/333/fff?text=No+Poster',
-                year: type === 'tv' ?
-                    (data.first_air_date ? data.first_air_date.substring(0, 4) : 'Unknown') :
-                    (data.release_date ? data.release_date.substring(0, 4) : 'Unknown'),
-                rating: data.vote_average ? data.vote_average.toFixed(1) : 'N/A',
-                lastWatched: new Date().toISOString(),
-                progress: 0,
-                timestamp: 0,
-                duration: 0,
-                season: type === 'tv' ? currentSeason : null,
-                episode: type === 'tv' ? currentEpisode : null
-            };
+            const posterUrl = data.poster_url || 'https://via.placeholder.com/60x90/333/fff?text=No+Poster';
 
-            if (existingIndex > -1) {
-                watchHistory[existingIndex] = historyItem;
+            // If user is logged in, use API
+            if (authToken) {
+                console.log('[addToWatchHistory] Calling API to save to DB');
+                try {
+                    await updateContinueWatchingAPI(id, type, title, posterUrl, 0, currentSeason, currentEpisode);
+                    console.log('[addToWatchHistory] Saved to DB successfully');
+                    // Reload from database to keep data in sync
+                    await loadContinueWatching();
+                } catch (error) {
+                    console.error('[addToWatchHistory] Failed to save to DB:', error);
+                }
             } else {
-                watchHistory.unshift(historyItem);
-                // Keep only last 20 items
-                watchHistory = watchHistory.slice(0, 20);
-            }
+                console.log('[addToWatchHistory] No auth, using localStorage');
+                // Fallback to localStorage for non-authenticated users
+                const existingIndex = watchHistory.findIndex(item => item.id === id && item.type === type);
 
-            localStorage.setItem('streamingSite_watchHistory', JSON.stringify(watchHistory));
-            updateContinueWatching();
+                const historyItem = {
+                    id: id,
+                    title: title,
+                    type: type,
+                    posterUrl: posterUrl,
+                    year: type === 'tv' ?
+                        (data.first_air_date ? data.first_air_date.substring(0, 4) : 'Unknown') :
+                        (data.release_date ? data.release_date.substring(0, 4) : 'Unknown'),
+                    rating: data.vote_average ? data.vote_average.toFixed(1) : 'N/A',
+                    lastWatched: new Date().toISOString(),
+                    progress: 0,
+                    timestamp: 0,
+                    duration: 0,
+                    season: type === 'tv' ? currentSeason : null,
+                    episode: type === 'tv' ? currentEpisode : null
+                };
+
+                if (existingIndex > -1) {
+                    watchHistory[existingIndex] = historyItem;
+                } else {
+                    watchHistory.unshift(historyItem);
+                    // Keep only last 20 items
+                    watchHistory = watchHistory.slice(0, 20);
+                }
+
+                localStorage.setItem('streamingSite_watchHistory', JSON.stringify(watchHistory));
+                updateContinueWatching();
+            }
         }
 
         function updateContinueWatching() {
@@ -8228,9 +8541,7 @@
             }
         }
 
-        function updateWatchHistoryItem(id, title, type, data, season, episode, progress) {
-            const existingIndex = watchHistory.findIndex(item => item.id === id && item.type === type);
-
+        async function updateWatchHistoryItem(id, title, type, data, season, episode, progress) {
             const historyItem = {
                 id: id,
                 title: title,
@@ -8246,15 +8557,35 @@
                 episode: episode || 1
             };
 
-            if (existingIndex > -1) {
-                watchHistory[existingIndex] = historyItem;
+            // If user is logged in, use API
+            if (authToken) {
+                try {
+                    await updateContinueWatchingAPI(
+                        id,
+                        type,
+                        title,
+                        historyItem.posterUrl,
+                        progress,
+                        season,
+                        episode
+                    );
+                    // Reload from database to keep data in sync
+                    await loadContinueWatching();
+                } catch (error) {
+                    console.error('Failed to update continue watching:', error);
+                }
             } else {
-                watchHistory.unshift(historyItem);
-                watchHistory = watchHistory.slice(0, 20);
+                // Fallback to localStorage for non-authenticated users
+                const existingIndex = watchHistory.findIndex(item => item.id === id && item.type === type);
+                if (existingIndex > -1) {
+                    watchHistory[existingIndex] = historyItem;
+                } else {
+                    watchHistory.unshift(historyItem);
+                    watchHistory = watchHistory.slice(0, 20);
+                }
+                localStorage.setItem('streamingSite_watchHistory', JSON.stringify(watchHistory));
+                updateContinueWatching();
             }
-
-            localStorage.setItem('streamingSite_watchHistory', JSON.stringify(watchHistory));
-            updateContinueWatching();
         }
 
         // Auto-hide status messages after 5 seconds
@@ -8854,7 +9185,7 @@
             document.getElementById('watchpartyMenuModal').style.display = 'flex';
         }
 
-        function closeWatchpartyMenu() {
+        window.closeWatchpartyMenu = function() {
             document.getElementById('watchpartyMenuModal').style.display = 'none';
             // Also close the watchparty panel
             const panel = document.getElementById('watchpartyPanel');
@@ -8863,7 +9194,7 @@
             }
         }
 
-        async function createWatchparty() {
+        window.createWatchparty = async function() {
             // Get username from input field
             const usernameInput = document.getElementById('usernameInput');
             if (usernameInput && usernameInput.value.trim()) {
@@ -8913,7 +9244,7 @@
             });
         }
 
-        async function joinWatchparty() {
+        window.joinWatchparty = async function() {
             // Get username from input field
             const usernameInput = document.getElementById('usernameInput');
             if (usernameInput && usernameInput.value.trim()) {
@@ -9562,7 +9893,7 @@
             'jspecial': { name: "J's Special", color: '#ff1493' }
         };
 
-        let currentTheme = localStorage.getItem('selectedTheme') || 'midnight';
+        let currentTheme = localStorage.getItem('selectedTheme') || 'jspecial';
 
         // Background effects state
         let activeEffects = JSON.parse(localStorage.getItem('bgEffects') || '{"matrix":false,"stars":true,"particles":true,"scanline":true}');
@@ -9589,22 +9920,22 @@
             });
         }
 
-        function toggleThemeSelector() {
+        window.toggleThemeSelector = function() {
             const panel = document.getElementById('themeSelectorPanel');
             panel.classList.toggle('active');
         }
 
-        function toggleEffectsPanel() {
+        window.toggleEffectsPanel = function() {
             const panel = document.getElementById('bgEffectsPanel');
             panel.classList.toggle('active');
         }
 
-        function toggleWatchpartyPanel() {
+        window.toggleWatchpartyPanel = function() {
             const panel = document.getElementById('watchpartyPanel');
             panel.classList.toggle('active');
         }
 
-        function toggleEffect(effectName) {
+        window.toggleEffect = function(effectName) {
             activeEffects[effectName] = !activeEffects[effectName];
             localStorage.setItem('bgEffects', JSON.stringify(activeEffects));
 
@@ -9620,14 +9951,14 @@
             updateBackgroundEffects();
         }
 
-        function enableAllEffects() {
+        window.enableAllEffects = function() {
             activeEffects = {matrix: true, stars: true, particles: true, scanline: true};
             localStorage.setItem('bgEffects', JSON.stringify(activeEffects));
             updateEffectsUI();
             updateBackgroundEffects();
         }
 
-        function disableAllEffects() {
+        window.disableAllEffects = function() {
             activeEffects = {matrix: false, stars: false, particles: false, scanline: false};
             localStorage.setItem('bgEffects', JSON.stringify(activeEffects));
             updateEffectsUI();
@@ -10348,7 +10679,7 @@
         }
 
         // Switch to the next available sports source
-        function switchSportsSource() {
+        window.switchSportsSource = function() {
             if (!currentSportsMatch || !currentSportsMatch.sources) {
                 showError('No match is currently playing');
                 return;
@@ -10746,39 +11077,69 @@
         }
 
         // Toggle channel favourite
-        function toggleChannelFavourite(channelIndex) {
+        async function toggleChannelFavourite(channelIndex) {
             const channel = currentDisplayedChannels[channelIndex];
             if (!channel) return;
 
-            let channelFavourites = JSON.parse(localStorage.getItem('channelFavourites') || '[]');
-            const existingIndex = channelFavourites.findIndex(fav => fav.name === channel.name && fav.url === channel.url);
+            // If user is logged in, use API
+            if (authToken) {
+                let channelFavourites = JSON.parse(localStorage.getItem('channelFavourites') || '[]');
+                const existingIndex = channelFavourites.findIndex(fav => fav.name === channel.name);
 
-            if (existingIndex > -1) {
-                // Remove from favourites
-                channelFavourites.splice(existingIndex, 1);
-                showStatus(`Removed ${channel.name} from favourites`);
+                try {
+                    if (existingIndex > -1) {
+                        // Remove from favourites
+                        await removeFromFavoritesAPI(channel.url || channel.name);
+                    } else {
+                        // Add to favourites
+                        await addToFavoritesAPI(channel.url || channel.name, channel.name);
+                    }
+
+                    // Reload favorites from database
+                    await loadFavorites();
+
+                    // Refresh the display - if on Favourites view, update currentDisplayedChannels
+                    if (selectedCountry === 'Favourites') {
+                        channelFavourites = JSON.parse(localStorage.getItem('channelFavourites') || '[]');
+                        currentDisplayedChannels = channelFavourites;
+                    }
+                    displayLiveChannels(currentDisplayedChannels);
+                } catch (error) {
+                    console.error('Failed to update favorites:', error);
+                    showError('Failed to update favorites');
+                }
             } else {
-                // Add to favourites
-                channelFavourites.push({
-                    name: channel.name,
-                    url: channel.url,
-                    category: channel.category,
-                    country: channel.country,
-                    countryCode: channel.countryCode,
-                    logo: channel.logo || null,
-                    addedAt: new Date().toISOString()
-                });
-                showStatus(`Added ${channel.name} to favourites`);
-            }
+                // Fallback to localStorage for non-authenticated users
+                let channelFavourites = JSON.parse(localStorage.getItem('channelFavourites') || '[]');
+                const existingIndex = channelFavourites.findIndex(fav => fav.name === channel.name && fav.url === channel.url);
 
-            // Save to localStorage
-            localStorage.setItem('channelFavourites', JSON.stringify(channelFavourites));
+                if (existingIndex > -1) {
+                    // Remove from favourites
+                    channelFavourites.splice(existingIndex, 1);
+                    showStatus(`Removed ${channel.name} from favourites`);
+                } else {
+                    // Add to favourites
+                    channelFavourites.push({
+                        name: channel.name,
+                        url: channel.url,
+                        category: channel.category,
+                        country: channel.country,
+                        countryCode: channel.countryCode,
+                        logo: channel.logo || null,
+                        addedAt: new Date().toISOString()
+                    });
+                    showStatus(`Added ${channel.name} to favourites`);
+                }
 
-            // Refresh the display - if on Favourites view, update currentDisplayedChannels
-            if (selectedCountry === 'Favourites') {
-                currentDisplayedChannels = channelFavourites;
+                // Save to localStorage
+                localStorage.setItem('channelFavourites', JSON.stringify(channelFavourites));
+
+                // Refresh the display - if on Favourites view, update currentDisplayedChannels
+                if (selectedCountry === 'Favourites') {
+                    currentDisplayedChannels = channelFavourites;
+                }
+                displayLiveChannels(currentDisplayedChannels);
             }
-            displayLiveChannels(currentDisplayedChannels);
         }
 
         // Play a channel
@@ -10932,6 +11293,875 @@
         }
 
         // ============= END LIVE CHANNELS SECTION =============
+
+        // ============= AUTHENTICATION & API SYSTEM =============
+
+        const AUTH_API_BASE_URL = 'http://localhost:5001/api';
+        let authToken = localStorage.getItem('authToken');
+        let currentUser = null;
+
+        // API Helper Function
+        async function apiRequest(endpoint, options = {}) {
+            const headers = {
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+
+            if (authToken) {
+                headers['Authorization'] = `Bearer ${authToken}`;
+            }
+
+            try {
+                const response = await fetch(`${AUTH_API_BASE_URL}${endpoint}`, {
+                    ...options,
+                    headers
+                });
+
+                if (response.status === 401) {
+                    // Token expired or invalid
+                    logout();
+                    throw new Error('Authentication required');
+                }
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'API request failed');
+                }
+
+                return data;
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
+            }
+        }
+
+        // Modal Functions - exposed to global scope for onclick handlers
+        window.showLoginModal = function() {
+            console.log('[showLoginModal] Opening login modal');
+            document.getElementById('loginModal').style.display = 'flex';
+            document.getElementById('loginError').style.display = 'none';
+        }
+
+        window.closeLoginModal = function() {
+            document.getElementById('loginModal').style.display = 'none';
+            document.getElementById('loginForm').reset();
+        }
+
+        window.showRegisterModal = function() {
+            document.getElementById('registerModal').style.display = 'flex';
+            document.getElementById('registerError').style.display = 'none';
+        }
+
+        window.closeRegisterModal = function() {
+            document.getElementById('registerModal').style.display = 'none';
+            document.getElementById('registerForm').reset();
+        }
+
+        window.showFriendsModal = function() {
+            document.getElementById('friendsModal').style.display = 'block';
+            loadFriends();
+            loadFriendRequests();
+        }
+
+        window.closeFriendsModal = function() {
+            document.getElementById('friendsModal').style.display = 'none';
+        }
+
+        // Close modals on outside click
+        document.getElementById('loginModal')?.addEventListener('click', function(e) {
+            if (e.target === this) closeLoginModal();
+        });
+        document.getElementById('registerModal')?.addEventListener('click', function(e) {
+            if (e.target === this) closeRegisterModal();
+        });
+
+        // Authentication Handlers
+        async function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorEl = document.getElementById('loginError');
+
+            try {
+                const data = await apiRequest('/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ username, password })
+                });
+
+                authToken = data.access_token;
+                localStorage.setItem('authToken', authToken);
+                currentUser = data.user;
+
+                closeLoginModal();
+                updateAuthUI();
+                await loadUserData();
+                showStatus('Logged in successfully!');
+            } catch (error) {
+                errorEl.textContent = error.message;
+                errorEl.style.display = 'block';
+            }
+        }
+
+        async function handleRegister(event) {
+            event.preventDefault();
+            const username = document.getElementById('registerUsername').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const errorEl = document.getElementById('registerError');
+
+            try {
+                const data = await apiRequest('/auth/register', {
+                    method: 'POST',
+                    body: JSON.stringify({ username, email, password })
+                });
+
+                authToken = data.access_token;
+                localStorage.setItem('authToken', authToken);
+                currentUser = data.user;
+
+                closeRegisterModal();
+                updateAuthUI();
+                await loadUserData();
+                showStatus('Account created successfully!');
+            } catch (error) {
+                errorEl.textContent = error.message;
+                errorEl.style.display = 'block';
+            }
+        }
+
+        window.logout = function() {
+            authToken = null;
+            currentUser = null;
+            localStorage.removeItem('authToken');
+
+            // Clear database-loaded data from memory
+            watchlists = JSON.parse(localStorage.getItem('streamingSite_watchlists') || '{"My Watchlist": []}');
+            watchHistory = JSON.parse(localStorage.getItem('streamingSite_watchHistory') || '[]');
+
+            // Stop comments polling
+            if (commentsPollingInterval) {
+                clearInterval(commentsPollingInterval);
+                commentsPollingInterval = null;
+            }
+
+            // Hide comments section
+            hideCommentsSection();
+
+            // Switch back to default tab
+            showTab('continue-watching');
+
+            updateAuthUI();
+            showStatus('Logged out successfully');
+        }
+
+        function updateAuthUI() {
+            const authButtons = document.getElementById('authButtons');
+            const userMenu = document.getElementById('userMenu');
+            const usernameDisplay = document.getElementById('usernameDisplay');
+
+            if (authToken && currentUser) {
+                authButtons.style.display = 'none';
+                userMenu.style.display = 'flex';
+                usernameDisplay.textContent = currentUser.username;
+            } else {
+                authButtons.style.display = 'flex';
+                userMenu.style.display = 'none';
+            }
+        }
+
+        // Load user data on page load
+        async function loadUserData() {
+            if (!authToken) {
+                console.log('[Auth] No auth token found, skipping user data load');
+                return;
+            }
+
+            console.log('[Auth] Loading user data...');
+            try {
+                currentUser = await apiRequest('/auth/me');
+                console.log('[Auth] User authenticated:', currentUser.username);
+                updateAuthUI();
+
+                await Promise.all([
+                    loadWatchlist(),
+                    loadContinueWatching(),
+                    loadFavorites()
+                ]);
+
+                console.log('[Auth] User data loaded successfully');
+                // Auto-switch to continue watching tab after loading data
+                showTab('continue-watching');
+            } catch (error) {
+                console.error('[Auth] Failed to load user data:', error);
+                if (error.message && error.message.includes('401')) {
+                    console.log('[Auth] Token expired or invalid, clearing auth');
+                    // Token is invalid, clear it
+                    authToken = null;
+                    localStorage.removeItem('authToken');
+                    updateAuthUI();
+                }
+            }
+        }
+
+        // Watchlist Functions
+        async function loadWatchlist() {
+            if (!authToken) return;
+
+            try {
+                const watchlist = await apiRequest('/watchlist');
+                console.log('[Watchlist] Loaded from database:', watchlist);
+                console.log('[Watchlist] Is array?', Array.isArray(watchlist), 'Length:', watchlist?.length);
+
+                // Only update if API call was successful (database is source of truth)
+                // Don't clear existing data until we have the DB response
+                if (watchlist && watchlist.length > 0) {
+                    // Organize items by list_name
+                    watchlists = {};
+                    watchlist.forEach(item => {
+                        const listName = item.list_name || 'My Watchlist';
+                        if (!watchlists[listName]) {
+                            watchlists[listName] = [];
+                        }
+                        watchlists[listName].push({
+                            id: item.content_id,
+                            type: item.content_type,
+                            title: item.title,
+                            posterUrl: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : 'https://via.placeholder.com/500x750/333/fff?text=No+Poster'
+                        });
+                    });
+                    console.log('[Watchlist] Updated with DB data, lists:', Object.keys(watchlists));
+                } else if (watchlist && watchlist.length === 0) {
+                    // API returned successfully but empty - user has no watchlist items
+                    watchlists = { 'My Watchlist': [] };
+                    console.log('[Watchlist] DB returned empty, cleared watchlist');
+                }
+                // If watchlist is null/undefined (API error), keep existing data
+
+                // Update UI if watchlist tab is active
+                const watchlistTab = document.querySelector('[onclick*="watchlist"]');
+                if (watchlistTab && watchlistTab.classList.contains('active')) {
+                    displayWatchlistInResults();
+                }
+            } catch (error) {
+                console.error('[Watchlist] Failed to load:', error);
+                // Don't clear existing data on error - keep localStorage data
+            }
+        }
+
+        async function addToWatchlistAPI(contentId, contentType, title, posterPath, listName = 'My Watchlist') {
+            if (!authToken) {
+                showLoginModal();
+                return;
+            }
+
+            try {
+                // Extract just the path if it's a full URL
+                let posterPathOnly = posterPath;
+                if (posterPath && posterPath.includes('image.tmdb.org')) {
+                    // Extract path from: https://image.tmdb.org/t/p/w500/abc.jpg -> /abc.jpg
+                    const match = posterPath.match(/\/t\/p\/w\d+(\/.+)/);
+                    if (match) posterPathOnly = match[1];
+                }
+
+                console.log('[Watchlist] Adding to DB:', {
+                    content_id: contentId,
+                    content_type: contentType,
+                    title: title,
+                    poster_path: posterPathOnly,
+                    list_name: listName
+                });
+
+                const result = await apiRequest('/watchlist', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        content_id: contentId,
+                        content_type: contentType,
+                        title: title,
+                        poster_path: posterPathOnly,
+                        list_name: listName
+                    })
+                });
+                console.log('[Watchlist] Added successfully:', result);
+                showStatus(`Added to ${listName}!`);
+                await loadWatchlist();
+            } catch (error) {
+                console.error('[Watchlist] Failed to add:', error);
+                showError(error.message);
+            }
+        }
+
+        async function removeFromWatchlistAPI(contentId) {
+            if (!authToken) return;
+
+            try {
+                await apiRequest(`/watchlist/${contentId}`, { method: 'DELETE' });
+                showStatus('Removed from watchlist');
+                await loadWatchlist();
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        // Continue Watching Functions
+        async function loadContinueWatching() {
+            if (!authToken) return;
+
+            try {
+                const items = await apiRequest('/continue-watching');
+                console.log('[Continue Watching] Loaded from database:', items);
+                console.log('[Continue Watching] Is array?', Array.isArray(items), 'Length:', items?.length);
+
+                // Only update if API call was successful (database is source of truth)
+                // Don't clear existing data until we have the DB response
+                if (items && items.length > 0) {
+                    watchHistory = items.map(item => ({
+                        id: item.content_id,
+                        type: item.content_type,
+                        title: item.title,
+                        posterUrl: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : 'https://via.placeholder.com/200x300/333/fff?text=No+Poster',
+                        progress: item.progress || 0,
+                        lastWatched: item.last_watched || new Date().toISOString(),
+                        year: item.year || new Date().getFullYear(),
+                        season: item.season || 1,
+                        episode: item.episode || 1
+                    }));
+                    console.log('[Continue Watching] Updated with DB data, now has', watchHistory.length, 'items');
+                } else if (items && items.length === 0) {
+                    // API returned successfully but empty - user has no continue watching items
+                    watchHistory = [];
+                    console.log('[Continue Watching] DB returned empty, cleared history');
+                }
+                // If items is null/undefined (API error), keep existing data
+
+                // Update UI if continue watching tab is active
+                displayContinueWatchingInResults();
+            } catch (error) {
+                console.error('[Continue Watching] Failed to load:', error);
+                // Don't clear existing data on error - keep localStorage data
+            }
+        }
+
+        async function updateContinueWatchingAPI(contentId, contentType, title, posterPath, progress, season, episode) {
+            if (!authToken) return;
+
+            try {
+                // Extract just the path if it's a full URL
+                let posterPathOnly = posterPath;
+                if (posterPath && posterPath.includes('image.tmdb.org')) {
+                    const match = posterPath.match(/\/t\/p\/w\d+(\/.+)/);
+                    if (match) posterPathOnly = match[1];
+                } else if (posterPath && posterPath.includes('placeholder')) {
+                    posterPathOnly = null; // Don't save placeholder URLs
+                }
+
+                console.log('[Continue Watching] Updating in DB:', {
+                    content_id: contentId,
+                    content_type: contentType,
+                    title: title,
+                    poster_path: posterPathOnly,
+                    progress: progress,
+                    season: season,
+                    episode: episode
+                });
+
+                const result = await apiRequest('/continue-watching', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        content_id: contentId,
+                        content_type: contentType,
+                        title: title,
+                        poster_path: posterPathOnly,
+                        progress: progress,
+                        season: season,
+                        episode: episode
+                    })
+                });
+                console.log('[Continue Watching] Updated successfully:', result);
+            } catch (error) {
+                console.error('[Continue Watching] Failed to update:', error);
+            }
+        }
+
+        // Favorites Functions
+        async function loadFavorites() {
+            if (!authToken) return;
+
+            try {
+                const favorites = await apiRequest('/favorites');
+                console.log('Favorites loaded from database:', favorites);
+
+                // Only update if API call was successful (database is source of truth)
+                // Don't clear existing data until we have the DB response
+                let channelFavourites = [];
+
+                if (favorites && favorites.length > 0) {
+                    favorites.forEach(fav => {
+                        channelFavourites.push({
+                            name: fav.channel_name,
+                            url: fav.channel_id,
+                            id: fav.channel_id
+                        });
+                    });
+                    // Store in localStorage temporarily for UI display functions
+                    localStorage.setItem('channelFavourites', JSON.stringify(channelFavourites));
+                } else if (favorites && favorites.length === 0) {
+                    // API returned successfully but empty - user has no favorites
+                    localStorage.setItem('channelFavourites', JSON.stringify([]));
+                }
+                // If favorites is null/undefined (API error), keep existing localStorage data
+
+                // Refresh live channels display if on that tab
+                const liveChannelsTab = document.querySelector('[onclick*="live-channels"]');
+                if (liveChannelsTab && liveChannelsTab.classList.contains('active')) {
+                    // Redisplay current channels to show updated favorites
+                    if (typeof currentDisplayedChannels !== 'undefined' && currentDisplayedChannels) {
+                        displayLiveChannels(currentDisplayedChannels);
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to load favorites:', error);
+                // Don't clear existing data on error - keep localStorage data
+            }
+        }
+
+        async function addToFavoritesAPI(channelId, channelName) {
+            if (!authToken) {
+                showLoginModal();
+                return;
+            }
+
+            try {
+                await apiRequest('/favorites', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        channel_id: channelId,
+                        channel_name: channelName
+                    })
+                });
+                showStatus('Added to favorites!');
+                await loadFavorites();
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        async function removeFromFavoritesAPI(channelId) {
+            if (!authToken) return;
+
+            try {
+                await apiRequest(`/favorites/${channelId}`, { method: 'DELETE' });
+                showStatus('Removed from favorites');
+                await loadFavorites();
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        // Friends Functions
+        // Store friends list globally for checking status
+        let currentFriendsList = [];
+
+        async function loadFriends() {
+            if (!authToken) return;
+
+            try {
+                const friends = await apiRequest('/friends');
+                currentFriendsList = friends; // Store for checking status
+                const friendsList = document.getElementById('friendsList');
+
+                if (friends.length === 0) {
+                    friendsList.innerHTML = '<p style="color: #666; padding: 20px; text-align: center;">No friends yet</p>';
+                    return;
+                }
+
+                // Clear existing content
+                friendsList.innerHTML = '';
+
+                // Create elements programmatically
+                friends.forEach(friend => {
+                    const container = document.createElement('div');
+                    container.style.cssText = 'background: rgba(15, 15, 30, 0.6); border: 2px solid var(--primary-color); padding: 16px; margin-bottom: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;';
+
+                    const username = document.createElement('span');
+                    username.style.cssText = 'color: #e0e0e0; font-family: "VT323", monospace; font-size: 18px;';
+                    username.textContent = friend.username;
+
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'btn';
+                    removeBtn.style.cssText = 'padding: 8px 16px; background: #ff6b6b;';
+                    removeBtn.textContent = 'Remove';
+                    removeBtn.onclick = () => removeFriend(friend.id);
+
+                    container.appendChild(username);
+                    container.appendChild(removeBtn);
+                    friendsList.appendChild(container);
+                });
+            } catch (error) {
+                console.error('Failed to load friends:', error);
+            }
+        }
+
+        async function loadFriendRequests() {
+            if (!authToken) return;
+
+            try {
+                const requests = await apiRequest('/friends/requests');
+                const requestsList = document.getElementById('friendRequestsList');
+
+                if (requests.length === 0) {
+                    requestsList.innerHTML = '<p style="color: #666; padding: 20px; text-align: center;">No pending requests</p>';
+                    return;
+                }
+
+                // Clear existing content
+                requestsList.innerHTML = '';
+
+                // Create elements programmatically to avoid string escaping issues
+                requests.forEach(req => {
+                    const container = document.createElement('div');
+                    container.style.cssText = 'background: rgba(15, 15, 30, 0.6); border: 2px solid #00d9ff; padding: 16px; margin-bottom: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;';
+
+                    const username = document.createElement('span');
+                    username.style.cssText = 'color: #e0e0e0; font-family: "VT323", monospace; font-size: 18px;';
+                    username.textContent = req.from_user.username;
+
+                    const buttonContainer = document.createElement('div');
+                    buttonContainer.style.cssText = 'display: flex; gap: 8px;';
+
+                    const acceptBtn = document.createElement('button');
+                    acceptBtn.className = 'btn';
+                    acceptBtn.style.cssText = 'padding: 8px 16px; background: #00ff9f;';
+                    acceptBtn.textContent = 'Accept';
+                    acceptBtn.onclick = () => acceptFriendRequest(req.id);
+
+                    const rejectBtn = document.createElement('button');
+                    rejectBtn.className = 'btn';
+                    rejectBtn.style.cssText = 'padding: 8px 16px; background: #ff6b6b;';
+                    rejectBtn.textContent = 'Reject';
+                    rejectBtn.onclick = () => rejectFriendRequest(req.id);
+
+                    buttonContainer.appendChild(acceptBtn);
+                    buttonContainer.appendChild(rejectBtn);
+
+                    container.appendChild(username);
+                    container.appendChild(buttonContainer);
+
+                    requestsList.appendChild(container);
+                });
+            } catch (error) {
+                console.error('Failed to load friend requests:', error);
+            }
+        }
+
+        let searchFriendsTimeout;
+        async function searchFriends() {
+            const query = document.getElementById('friendSearchInput').value.trim();
+            const resultsDiv = document.getElementById('friendSearchResults');
+
+            if (query.length < 2) {
+                resultsDiv.innerHTML = '';
+                return;
+            }
+
+            clearTimeout(searchFriendsTimeout);
+            searchFriendsTimeout = setTimeout(async () => {
+                try {
+                    const results = await apiRequest(`/friends/search?q=${encodeURIComponent(query)}`);
+
+                    if (results.length === 0) {
+                        resultsDiv.innerHTML = '<p style="color: #666; padding: 12px;">No users found</p>';
+                        return;
+                    }
+
+                    // Clear existing content
+                    resultsDiv.innerHTML = '';
+
+                    // Create elements programmatically
+                    results.forEach(user => {
+                        const container = document.createElement('div');
+                        container.style.cssText = 'background: rgba(15, 15, 30, 0.6); border: 2px solid var(--accent-color); padding: 12px; margin-bottom: 8px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;';
+
+                        const username = document.createElement('span');
+                        username.style.cssText = 'color: #e0e0e0; font-family: "VT323", monospace; font-size: 18px;';
+                        username.textContent = user.username;
+
+                        // Check if already friends
+                        const isFriend = currentFriendsList.some(f => f.id === user.id || f.username === user.username);
+
+                        const addBtn = document.createElement('button');
+                        addBtn.className = 'btn';
+                        if (isFriend) {
+                            addBtn.style.cssText = 'padding: 8px 16px; background: #00ff9f; cursor: default;';
+                            addBtn.textContent = '✓ Friends';
+                            addBtn.disabled = true;
+                        } else {
+                            addBtn.style.cssText = 'padding: 8px 16px;';
+                            addBtn.textContent = 'Add Friend';
+                            addBtn.onclick = () => sendFriendRequest(user.username);
+                        }
+
+                        container.appendChild(username);
+                        container.appendChild(addBtn);
+                        resultsDiv.appendChild(container);
+                    });
+                } catch (error) {
+                    resultsDiv.innerHTML = '<p style="color: #ff6b6b; padding: 12px;">Error searching users</p>';
+                }
+            }, 300);
+        }
+
+        async function sendFriendRequest(username) {
+            try {
+                await apiRequest('/friends/request', {
+                    method: 'POST',
+                    body: JSON.stringify({ username })
+                });
+                showStatus('Friend request sent!');
+                document.getElementById('friendSearchInput').value = '';
+                document.getElementById('friendSearchResults').innerHTML = '';
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        async function acceptFriendRequest(requestId) {
+            try {
+                await apiRequest(`/friends/requests/${requestId}/accept`, { method: 'POST' });
+                showStatus('Friend request accepted!');
+                await loadFriends();
+                await loadFriendRequests();
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        async function rejectFriendRequest(requestId) {
+            try {
+                await apiRequest(`/friends/requests/${requestId}/reject`, { method: 'POST' });
+                showStatus('Friend request rejected');
+                await loadFriendRequests();
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        async function removeFriend(friendId) {
+            if (!confirm('Are you sure you want to remove this friend?')) return;
+
+            try {
+                await apiRequest(`/friends/${friendId}`, { method: 'DELETE' });
+                showStatus('Friend removed');
+                await loadFriends();
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        // Comments Functions
+        let currentContentComments = [];
+        let commentsPollingInterval = null;
+
+        async function loadComments(contentId) {
+            if (!authToken) return [];
+
+            try {
+                const comments = await apiRequest(`/comments/${contentId}`);
+                currentContentComments = comments;
+                return comments;
+            } catch (error) {
+                console.error('Failed to load comments:', error);
+                return [];
+            }
+        }
+
+        async function addComment(contentId, contentType, commentText) {
+            if (!authToken) {
+                showLoginModal();
+                return;
+            }
+
+            try {
+                await apiRequest('/comments', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        content_id: contentId,
+                        content_type: contentType,
+                        comment_text: commentText
+                    })
+                });
+                showStatus('Comment added!');
+                return await loadComments(contentId);
+            } catch (error) {
+                showError(error.message);
+                return [];
+            }
+        }
+
+        async function deleteComment(commentId, contentId) {
+            try {
+                await apiRequest(`/comments/${commentId}`, { method: 'DELETE' });
+                showStatus('Comment deleted');
+                return await loadComments(contentId);
+            } catch (error) {
+                showError(error.message);
+                return [];
+            }
+        }
+
+        // Comments UI Functions
+
+        window.toggleComments = function() {
+            const commentsSection = document.getElementById('commentsSection');
+            const isVisible = commentsSection.style.display === 'block';
+
+            if (isVisible) {
+                hideCommentsSection();
+            } else if (currentContentId && currentContentType) {
+                showCommentsSection(currentContentId, currentContentType);
+            } else {
+                showError('No content is currently playing');
+            }
+        }
+
+        function showCommentsSection(contentId, contentType) {
+            if (!authToken) {
+                showError('Please login to view and post comments');
+                return;
+            }
+
+            currentContentId = contentId;
+            currentContentType = contentType;
+            document.getElementById('commentsSection').style.display = 'block';
+            displayComments(contentId);
+
+            // Start polling for new comments every 3 seconds
+            if (commentsPollingInterval) {
+                clearInterval(commentsPollingInterval);
+            }
+            commentsPollingInterval = setInterval(() => {
+                displayComments(contentId);
+            }, 3000);
+        }
+
+        function hideCommentsSection() {
+            document.getElementById('commentsSection').style.display = 'none';
+
+            // Stop polling when comments section is hidden
+            if (commentsPollingInterval) {
+                clearInterval(commentsPollingInterval);
+                commentsPollingInterval = null;
+            }
+        }
+
+        async function displayComments(contentId) {
+            const comments = await loadComments(contentId);
+            const commentsList = document.getElementById('commentsList');
+
+            // Preserve scroll position
+            const scrollPos = commentsList.scrollTop;
+
+            if (comments.length === 0) {
+                commentsList.innerHTML = '<p style="color: #666; text-align: center; padding: 20px; font-family: \'VT323\', monospace; font-size: 18px;">No comments yet. Be the first to share your thoughts!</p>';
+                return;
+            }
+
+            // Generate new comments HTML
+            const newCommentsHTML = comments.map(comment => {
+                const date = new Date(comment.created_at);
+                const isOwnComment = currentUser && comment.user_id === currentUser.id;
+
+                return `
+                    <div style="background: rgba(15, 15, 30, 0.6); border-left: 4px solid ${isOwnComment ? 'var(--primary-color, #00ff9f)' : 'var(--accent-color, #00d9ff)'}; padding: 16px; margin-bottom: 12px; border-radius: 4px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="color: ${isOwnComment ? 'var(--primary-color, #00ff9f)' : 'var(--accent-color, #00d9ff)'}; font-family: 'VT323', monospace; font-size: 20px; font-weight: bold;">
+                                ${comment.username}${isOwnComment ? ' (You)' : ''}
+                            </span>
+                            <div style="display: flex; gap: 12px; align-items: center;">
+                                <span style="color: #888; font-family: 'VT323', monospace; font-size: 14px;">
+                                    ${date.toLocaleDateString()} ${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                </span>
+                                ${isOwnComment ? `<button onclick="deleteCommentUI('${comment._id}')" style="background: #ff6b6b; border: none; color: #fff; padding: 4px 12px; cursor: pointer; border-radius: 4px; font-family: 'VT323', monospace;">Delete</button>` : ''}
+                            </div>
+                        </div>
+                        <p style="color: #e0e0e0; font-family: 'VT323', monospace; font-size: 18px; line-height: 1.5; margin: 0; white-space: pre-wrap;">
+                            ${escapeHtml(comment.comment_text)}
+                        </p>
+                    </div>
+                `;
+            }).join('');
+
+            // Only update if content changed to avoid flashing
+            if (commentsList.innerHTML !== newCommentsHTML) {
+                commentsList.innerHTML = newCommentsHTML;
+                // Restore scroll position
+                commentsList.scrollTop = scrollPos;
+            }
+        }
+
+        window.submitComment = async function() {
+            const textarea = document.getElementById('commentTextarea');
+            const commentText = textarea.value.trim();
+
+            if (!commentText) {
+                showError('Please enter a comment');
+                return;
+            }
+
+            if (!currentContentId || !currentContentType) {
+                showError('No content selected');
+                return;
+            }
+
+            await addComment(currentContentId, currentContentType, commentText);
+            textarea.value = '';
+            updateCharCount();
+            await displayComments(currentContentId);
+        }
+
+        async function deleteCommentUI(commentId) {
+            if (!confirm('Delete this comment?')) return;
+            await deleteComment(commentId, currentContentId);
+            await displayComments(currentContentId);
+        }
+
+        function updateCharCount() {
+            const textarea = document.getElementById('commentTextarea');
+            const charCount = document.getElementById('commentCharCount');
+            if (textarea && charCount) {
+                charCount.textContent = `${textarea.value.length}/500`;
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Add event listener for character count
+        document.addEventListener('DOMContentLoaded', function() {
+            const textarea = document.getElementById('commentTextarea');
+            if (textarea) {
+                textarea.addEventListener('input', updateCharCount);
+            }
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateAuthUI();
+            loadUserData();
+        });
+
+        // ============= END AUTHENTICATION & API SYSTEM =============
+
+        // Log that all functions are loaded
+        console.log('[INIT] Script fully loaded. Functions available:', {
+            showTab: typeof window.showTab,
+            showLoginModal: typeof window.showLoginModal,
+            showRegisterModal: typeof window.showRegisterModal,
+            logout: typeof window.logout
+        });
 
         // ============= END THEME & ANIMATION SYSTEM =============
     </script>
