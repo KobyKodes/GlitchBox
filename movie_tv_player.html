@@ -5083,7 +5083,6 @@
                 searchResults = data.results;
                 displayContent(searchResults, 'Search Results');
                 showTab('search-results');
-                showStatus(`Found ${searchResults.length} results`);
 
             } catch (error) {
                 console.error('Search error:', error);
@@ -5126,7 +5125,6 @@
                 } else {
                     displayContent(data.results || [], 'Popular Movies');
                 }
-                showStatus(`Loaded ${data.results?.length || 0} popular movies`);
 
             } catch (error) {
                 console.error('Popular movies error:', error);
@@ -5169,7 +5167,6 @@
                 } else {
                     displayContent(data.results || [], 'Popular TV Shows');
                 }
-                showStatus(`Loaded ${data.results?.length || 0} popular TV shows`);
 
             } catch (error) {
                 console.error('Popular TV shows error:', error);
@@ -5212,7 +5209,6 @@
                 } else {
                     displayContent(data.results || [], 'Trending Movies');
                 }
-                showStatus(`Loaded ${data.results?.length || 0} trending movies`);
 
             } catch (error) {
                 console.error('Trending movies error:', error);
@@ -5255,7 +5251,6 @@
                 } else {
                     displayContent(data.results || [], 'Trending TV Shows');
                 }
-                showStatus(`Loaded ${data.results?.length || 0} trending TV shows`);
 
             } catch (error) {
                 console.error('Trending TV shows error:', error);
@@ -5298,7 +5293,6 @@
                 } else {
                     displayContent(data.results || [], 'Now Playing Movies');
                 }
-                showStatus(`Loaded ${data.results?.length || 0} now playing movies`);
 
             } catch (error) {
                 console.error('Now playing movies error:', error);
@@ -5341,7 +5335,6 @@
                 } else {
                     displayContent(data.results || [], 'Now Playing TV Shows');
                 }
-                showStatus(`Loaded ${data.results?.length || 0} now playing TV shows`);
 
             } catch (error) {
                 console.error('Now playing TV shows error:', error);
@@ -5384,7 +5377,6 @@
                 } else {
                     displayContent(data.results || [], 'Upcoming Movies');
                 }
-                showStatus(`Loaded ${data.results?.length || 0} upcoming movies`);
 
             } catch (error) {
                 console.error('Upcoming movies error:', error);
@@ -6921,7 +6913,6 @@
                     console.warn('[Watchparty] ⚠ For best watchparty experience, use VidSrc source (direct stream)');
                     showStatus('⚠ Limited sync with this source - Switch to VidSrc for full sync', 'warning');
                 } else {
-                    showStatus('Loaded embed player');
                 }
             }
 
