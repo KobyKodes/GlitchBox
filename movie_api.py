@@ -2974,14 +2974,32 @@ def get_comments(content_id):
 
         # Get current user's friends
         user = users_collection.find_one({'_id': ObjectId(user_id)})
-        friend_ids = user.get('friends', [])
-        friend_ids.append(ObjectId(user_id))  # Include own comments
 
-        # Get comments from friends only
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+
+        # Get friend IDs - ensure it's a list
+        friend_ids = user.get('friends', [])
+        if friend_ids is None:
+            friend_ids = []
+
+        # Ensure all friends are ObjectIds
+        friend_ids = [ObjectId(fid) if not isinstance(fid, ObjectId) else fid for fid in friend_ids]
+
+        # Always include own comments
+        friend_ids.append(ObjectId(user_id))
+
+        print(f"[Comments] Getting comments for content_id: {content_id}")
+        print(f"[Comments] User ID: {user_id}")
+        print(f"[Comments] Friend IDs: {friend_ids}")
+
+        # Get comments from user and their friends
         comments = list(comments_collection.find({
             'content_id': content_id,
             'user_id': {'$in': friend_ids}
         }).sort('created_at', -1))
+
+        print(f"[Comments] Found {len(comments)} comments")
 
         for comment in comments:
             comment['_id'] = str(comment['_id'])
@@ -2991,6 +3009,7 @@ def get_comments(content_id):
         return jsonify(comments), 200
 
     except Exception as e:
+        print(f"[Comments] Error: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 
@@ -3012,10 +3031,14 @@ def add_comment():
             'created_at': datetime.utcnow()
         }
 
+        print(f"[Comments] Adding comment: user_id={comment['user_id']}, content_id={comment['content_id']}, text={comment['comment_text'][:50]}...")
+
         result = comments_collection.insert_one(comment)
         comment['_id'] = str(result.inserted_id)
         comment['user_id'] = str(comment['user_id'])
         comment['created_at'] = comment['created_at'].isoformat()
+
+        print(f"[Comments] Comment saved with ID: {comment['_id']}")
 
         return jsonify(comment), 201
 

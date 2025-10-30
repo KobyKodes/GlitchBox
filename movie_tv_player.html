@@ -12100,12 +12100,14 @@
         async function loadComments(contentId) {
             if (!authToken) return [];
 
+            console.log('[Comments] Loading comments for content:', contentId);
             try {
                 const comments = await apiRequest(`/comments/${contentId}`);
+                console.log('[Comments] Loaded', comments.length, 'comments from API');
                 currentContentComments = comments;
                 return comments;
             } catch (error) {
-                console.error('Failed to load comments:', error);
+                console.error('[Comments] Failed to load comments:', error);
                 return [];
             }
         }
@@ -12116,8 +12118,9 @@
                 return;
             }
 
+            console.log('[Comments] Adding comment to content:', contentId);
             try {
-                await apiRequest('/comments', {
+                const newComment = await apiRequest('/comments', {
                     method: 'POST',
                     body: JSON.stringify({
                         content_id: contentId,
@@ -12125,9 +12128,13 @@
                         comment_text: commentText
                     })
                 });
+                console.log('[Comments] Comment added successfully:', newComment);
                 showStatus('Comment added!');
-                return await loadComments(contentId);
+                const updatedComments = await loadComments(contentId);
+                console.log('[Comments] Reloaded comments after add:', updatedComments.length);
+                return updatedComments;
             } catch (error) {
+                console.error('[Comments] Failed to add comment:', error);
                 showError(error.message);
                 return [];
             }
@@ -12193,6 +12200,10 @@
             const comments = await loadComments(contentId);
             const commentsList = document.getElementById('commentsList');
 
+            console.log('[Comments] Displaying comments:', comments.length, 'comments');
+            console.log('[Comments] Current user:', currentUser);
+            console.log('[Comments] Comments data:', comments);
+
             // Preserve scroll position
             const scrollPos = commentsList.scrollTop;
 
@@ -12205,6 +12216,7 @@
             const newCommentsHTML = comments.map(comment => {
                 const date = new Date(comment.created_at);
                 const isOwnComment = currentUser && comment.user_id === currentUser.id;
+                console.log('[Comments] Comment user_id:', comment.user_id, 'Current user id:', currentUser?.id, 'Is own:', isOwnComment);
 
                 return `
                     <div style="background: rgba(15, 15, 30, 0.6); border-left: 4px solid ${isOwnComment ? 'var(--primary-color, #00ff9f)' : 'var(--accent-color, #00d9ff)'}; padding: 16px; margin-bottom: 12px; border-radius: 4px;">
