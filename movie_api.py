@@ -2972,6 +2972,12 @@ def get_comments(content_id):
     try:
         user_id = get_jwt_identity()
 
+        # Convert content_id to int (it's stored as integer in DB)
+        try:
+            content_id_int = int(content_id)
+        except ValueError:
+            content_id_int = content_id  # Fallback to string if not a number
+
         # Get current user's friends
         user = users_collection.find_one({'_id': ObjectId(user_id)})
 
@@ -2989,13 +2995,13 @@ def get_comments(content_id):
         # Always include own comments
         friend_ids.append(ObjectId(user_id))
 
-        print(f"[Comments] Getting comments for content_id: {content_id}")
+        print(f"[Comments] Getting comments for content_id: {content_id} (converted to {content_id_int})")
         print(f"[Comments] User ID: {user_id}")
         print(f"[Comments] Friend IDs: {friend_ids}")
 
-        # Get comments from user and their friends
+        # Get comments from user and their friends - use integer content_id
         comments = list(comments_collection.find({
-            'content_id': content_id,
+            'content_id': content_id_int,
             'user_id': {'$in': friend_ids}
         }).sort('created_at', -1))
 

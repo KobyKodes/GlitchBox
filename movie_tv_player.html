@@ -4984,7 +4984,6 @@
             const imdbWindow = window.open('about:blank', '_blank');
 
             try {
-                showStatus('Fetching IMDb link...');
 
                 // Fetch full details from TMDB which includes external IDs
                 const endpoint = type === 'tv' ? `${API_BASE_URL}/tv/${id}` : `${API_BASE_URL}/movie/${id}`;
@@ -5001,14 +5000,11 @@
                 if (imdbId) {
                     // Direct link to IMDb title page
                     imdbWindow.location.href = `https://www.imdb.com/title/${imdbId}/`;
-                    showStatus('Opened IMDb page');
                 } else {
                     // Fallback to search if IMDb ID not available
                     imdbWindow.location.href = `https://www.imdb.com/find/?q=${encodeURIComponent(title)}&s=tt`;
-                    showStatus('Opened IMDb search');
                 }
 
-                setTimeout(() => hideStatus(), 2000);
             } catch (error) {
                 console.error('IMDb link error:', error);
                 // Fallback to search on error
@@ -5016,27 +5012,6 @@
                 showError('Could not fetch IMDb ID, opened search instead');
                 setTimeout(() => hideError(), 3000);
             }
-        }
-
-        function showStatus(message, type = 'info') {
-            const statusBar = document.getElementById('statusBar');
-            statusBar.textContent = message;
-            statusBar.style.display = 'block';
-
-            // Handle different types
-            if (type === 'warning') {
-                statusBar.style.background = 'rgba(255, 149, 0, 0.2)';
-                statusBar.style.borderColor = 'rgba(255, 149, 0, 0.6)';
-                statusBar.style.color = '#fff';
-            } else {
-                statusBar.style.background = 'rgba(0, 122, 255, 0.2)';
-                statusBar.style.borderColor = 'rgba(0, 122, 255, 0.6)';
-                statusBar.style.color = '#fff';
-            }
-        }
-
-        function hideStatus() {
-            document.getElementById('statusBar').style.display = 'none';
         }
 
         function showError(message) {
@@ -5067,7 +5042,6 @@
 
             hideError();
             showLoading();
-            showStatus(`Searching for "${query}"...`);
 
             try {
                 const params = new URLSearchParams({ query });
@@ -5106,7 +5080,6 @@
                 hasMorePages = true;
             }
             currentCategory = 'popular-movies';
-            showStatus('Loading popular movies...');
 
             try {
                 let url = `${API_BASE_URL}/popular?page=${page}`;
@@ -5148,7 +5121,6 @@
                 hasMorePages = true;
             }
             currentCategory = 'popular-tv';
-            showStatus('Loading popular TV shows...');
 
             try {
                 let url = `${API_BASE_URL}/tv/popular?page=${page}`;
@@ -5190,7 +5162,6 @@
                 hasMorePages = true;
             }
             currentCategory = 'trending-movies';
-            showStatus('Loading trending movies...');
 
             try {
                 let url = `${API_BASE_URL}/trending?page=${page || 1}`;
@@ -5232,7 +5203,6 @@
                 hasMorePages = true;
             }
             currentCategory = 'trending-tv';
-            showStatus('Loading trending TV shows...');
 
             try {
                 let url = `${API_BASE_URL}/tv/trending?page=${page || 1}`;
@@ -5274,7 +5244,6 @@
                 hasMorePages = true;
             }
             currentCategory = 'now-playing-movies';
-            showStatus('Loading now playing movies...');
 
             try {
                 let url = `${API_BASE_URL}/movies/now-playing?page=${page || 1}`;
@@ -5316,7 +5285,6 @@
                 hasMorePages = true;
             }
             currentCategory = 'now-playing-tv';
-            showStatus('Loading now playing TV shows...');
 
             try {
                 let url = `${API_BASE_URL}/tv/now-playing?page=${page || 1}`;
@@ -5358,7 +5326,6 @@
                 hasMorePages = true;
             }
             currentCategory = 'upcoming-movies';
-            showStatus('Loading upcoming movies...');
 
             try {
                 let url = `${API_BASE_URL}/movies/upcoming?page=${page || 1}`;
@@ -5583,7 +5550,6 @@
         }
 
         async function playContent(contentId, contentTitle, contentType) {
-            showStatus(`Loading ${contentTitle}...`);
             hideError();
 
             // Scroll to player section immediately
@@ -5853,7 +5819,6 @@
                         const resumeSeason = existingProgress.season || 1;
                         const resumeEpisode = existingProgress.episode || 1;
 
-                        showStatus(`Resuming from S${resumeSeason}E${resumeEpisode} (${Math.round(existingProgress.progress)}% watched)`, 'info');
 
                         // Set current season and episode to resume position
                         currentSelectedSeason = resumeSeason;
@@ -5871,7 +5836,6 @@
                     tvControls.style.display = 'none';
 
                     if (existingProgress && existingProgress.progress > 5 && existingProgress.progress < 95) {
-                        showStatus(`Resuming playback (${Math.round(existingProgress.progress)}% watched)`, 'info');
                     }
 
                     playMovie(contentId);
@@ -6109,7 +6073,6 @@
             watchlists[listName] = [];
             input.value = '';
 
-            showStatus(`Created watchlist: ${listName}`);
 
             // Add current item to the new list
             if (window.pendingWatchlistPanelItem) {
@@ -6501,7 +6464,6 @@
 
                 // Load with appropriate player (video element for direct, iframe for embed)
                 loadPlayerContent(streamUrl, startTime, streamType);
-                showStatus(`Now playing: ${data.title}`);
 
                 // Broadcast content change to watchparty if host
                 if (watchpartyActive && isHost && socket) {
@@ -6569,7 +6531,6 @@
 
                 // Load with appropriate player (video element for direct, iframe for embed)
                 loadPlayerContent(streamUrl, startTime, streamType);
-                showStatus(`Now playing: ${data.title} S${season}E${episode}`);
 
                 // Show next episode button and check if there's a next episode
                 updateNextEpisodeButton();
@@ -6659,9 +6620,7 @@
 
             // Show different message if in watchparty
             if (watchpartyActive) {
-                showStatus(`Switched to ${sourceNames[source]} (only affects your view)`);
             } else {
-                showStatus(`Switched to ${sourceNames[source]}`);
             }
         }
 
@@ -6732,7 +6691,6 @@
                 currentSelectedEpisode = 1;
                 document.getElementById('episodeButtonText').textContent = getEpisodeButtonText(1, currentSelectedSeason);
             } else {
-                showStatus('No more episodes available');
                 return;
             }
 
@@ -6868,7 +6826,6 @@
                     }
                 }
 
-                showStatus('Loading direct stream with full sync support...');
 
             } else {
                 console.log('Using IFRAME for embed');
@@ -6891,7 +6848,6 @@
 
                 if (isSafari) {
                     // Show Safari subtitle info
-                    showStatus('Safari: Subtitles may not work in embed mode.', 'warning');
                 }
 
                 playerIframe.src = url;
@@ -6911,7 +6867,6 @@
                 if (watchpartyActive) {
                     console.log('[Watchparty] Iframe loaded - can receive sync but cannot auto-send');
                     console.warn('[Watchparty] ⚠ For best watchparty experience, use VidSrc source (direct stream)');
-                    showStatus('⚠ Limited sync with this source - Switch to VidSrc for full sync', 'warning');
                 } else {
                 }
             }
@@ -7089,7 +7044,6 @@
             currentContentUrl = '';
             currentContentId = null;
             currentContentData = null;
-            showStatus('Playback stopped');
 
             // Hide stop button
             const stopBtn = document.getElementById('stopBtn');
@@ -7117,11 +7071,9 @@
                     container.requestFullscreen()
                         .then(() => {
                             console.log('Fullscreen entered successfully');
-                            showStatus('Entered fullscreen mode');
                         })
                         .catch(err => {
                             console.error('Fullscreen request failed:', err);
-                            showStatus('Fullscreen blocked - try clicking the player first');
                         });
                 } else if (container.webkitRequestFullscreen) {
                     try {
@@ -7145,7 +7097,6 @@
                         console.error('MS fullscreen failed:', err);
                     }
                 } else {
-                    showStatus('Fullscreen not supported on this browser');
                 }
             } else {
                 console.log('Attempting to exit fullscreen...');
@@ -7154,7 +7105,6 @@
                     document.exitFullscreen()
                         .then(() => {
                             console.log('Exited fullscreen successfully');
-                            showStatus('Exited fullscreen mode');
                         })
                         .catch(err => {
                             console.error('Exit fullscreen failed:', err);
@@ -7174,7 +7124,6 @@
         window.copyCurrentUrl = function() {
             if (currentContentUrl) {
                 navigator.clipboard.writeText(currentContentUrl).then(() => {
-                    showStatus('Content URL copied to clipboard!');
                 }).catch(() => {
                     showError('Failed to copy URL');
                 });
@@ -7188,7 +7137,6 @@
             document.getElementById('contentResults').innerHTML = '';
             document.getElementById('searchInput').value = '';
             document.getElementById('yearInput').value = '';
-            hideStatus();
             hideError();
         }
 
@@ -7826,7 +7774,6 @@
                 watchlists[listName].push(pendingWatchlistItem);
                 localStorage.setItem('streamingSite_watchlists', JSON.stringify(watchlists));
 
-                showStatus(`Added "${pendingWatchlistItem.title}" to ${listName}`);
                 closeWatchlistModal();
                 updateWatchlistButtons();
 
@@ -7865,7 +7812,6 @@
                     watchlists[listName].splice(index, 1);
                     localStorage.setItem('streamingSite_watchlists', JSON.stringify(watchlists));
 
-                    showStatus(`Removed "${item.title}" from ${listName}`);
                     closeWatchlistModal();
                     updateWatchlistButtons();
 
@@ -7899,7 +7845,6 @@
             watchlists[name] = [];
             localStorage.setItem('streamingSite_watchlists', JSON.stringify(watchlists));
 
-            showStatus(`Created new watchlist: ${name}`);
             input.value = '';
 
             // If we have a pending item, add it to the new list
@@ -8110,7 +8055,6 @@
                     switchWatchlist(remaining[0]);
                 }
 
-                showStatus(`Deleted watchlist: ${listName}`);
                 closeWatchlistModal();
                 displayWatchlistInResults();
             }
@@ -8127,7 +8071,6 @@
             if (confirm('Are you sure you want to reset all viewing statistics? This will clear your watch history but keep your watchlists. This action cannot be undone.')) {
                 watchHistory = [];
                 localStorage.setItem('streamingSite_watchHistory', JSON.stringify(watchHistory));
-                showStatus('All viewing statistics have been reset');
                 displayStatistics();
             }
         }
@@ -8283,7 +8226,6 @@
                 watchlist.splice(index, 1);
                 localStorage.setItem('streamingSite_watchlist', JSON.stringify(watchlist));
                 displayWatchlistInResults();
-                showStatus(`Removed "${item.title}" from watchlist`);
             }
         }
 
@@ -8387,7 +8329,6 @@
 
                 // Reload from database
                 await loadContinueWatching();
-                showStatus('Removed from Continue Watching');
             } catch (error) {
                 console.error('Failed to remove from continue watching:', error);
                 showError('Failed to remove from continue watching');
@@ -8395,7 +8336,6 @@
         }
 
         async function resumeContent(id, title, type, season, episode, progress) {
-            showStatus(`Resuming ${title}...`);
             hideError();
 
             // Scroll to player section immediately
@@ -8701,7 +8641,6 @@
         setInterval(() => {
             const statusBar = document.getElementById('statusBar');
             if (statusBar.style.display === 'block') {
-                setTimeout(() => hideStatus(), 5000);
             }
         }, 1000);
 
@@ -8736,7 +8675,6 @@
             }
 
             try {
-                showStatus('Searching for subtitles...');
 
                 const response = await fetch(`${API_BASE_URL}/subtitles/search?${params}`);
                 const data = await response.json();
@@ -8750,10 +8688,8 @@
                             <p>Try a different language or paste a custom subtitle URL below</p>
                         </div>
                     `;
-                    showStatus('No subtitles found');
                 } else {
                     displaySubtitleList(currentSubtitles);
-                    showStatus(`Found ${currentSubtitles.length} subtitles`);
                 }
 
             } catch (error) {
@@ -8807,12 +8743,10 @@
         function openSubtitleSearch(url, source) {
             // Open the search page in a new tab
             window.open(url, '_blank');
-            showStatus(`Opened ${source} search page. Download subtitle and paste URL below.`);
         }
 
         async function selectSubtitle(downloadUrl) {
             try {
-                showStatus('Processing subtitle...');
 
                 // Use our proxy endpoint to handle CORS and format conversion
                 const proxyUrl = `${API_BASE_URL}/subtitles/proxy?url=${encodeURIComponent(downloadUrl)}`;
@@ -8855,7 +8789,7 @@
                             <input type="text" value="${proxyUrl}" readonly
                                    style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-family: monospace; font-size: 12px; margin-bottom: 12px;"
                                    onclick="this.select()">
-                            <button onclick="navigator.clipboard.writeText('${proxyUrl}'); showStatus('Copied to clipboard!');" class="btn btn-secondary">
+                            <button onclick="navigator.clipboard.writeText('${proxyUrl}');" class="btn btn-secondary">
                                 Copy URL
                             </button>
                             <p style="color: #666; font-size: 12px; margin-top: 8px;">Paste in VLC, MPV, or HTML5 video player</p>
@@ -8878,7 +8812,6 @@
                     </div>
                 `;
 
-                showStatus('✓ Subtitle processed and ready!');
                 console.log('Subtitle VTT URL:', proxyUrl);
 
             } catch (error) {
@@ -8927,7 +8860,6 @@
 
             const subtitlePlayerUrl = `/video_player_with_subtitles.html?video=${encodeURIComponent(currentContentUrl)}`;
             window.open(subtitlePlayerUrl, '_blank', 'width=1280,height=720');
-            showStatus('✓ Opened subtitle player! Click "📝 Get Subtitles" to find subtitles, then paste the URL in the new window.');
         }
 
         // ============= WATCHPARTY FUNCTIONS =============
@@ -8987,7 +8919,6 @@
                 showWatchpartySidebar();
                 updateWatchpartyUI(data);
                 closeWatchpartyMenu();
-                showStatus(`Watchparty created! Room code: ${data.room_code}`);
 
                 // Re-setup video sync listeners for already-playing content
                 const playerVideo = document.getElementById('playerVideo');
@@ -9010,7 +8941,6 @@
                 showWatchpartySidebar();
                 updateWatchpartyUI(data);
                 closeWatchpartyMenu();
-                showStatus(`Joined watchparty: ${data.room_code}`);
 
                 // Re-setup video sync listeners if joining as host
                 if (isHost) {
@@ -9053,7 +8983,6 @@
             socket.on('new_host', (data) => {
                 isHost = (username === data.username);
                 addSystemMessage(`${data.username} is now the host`);
-                showStatus(`${data.username} is now controlling playback`);
 
                 // Update UI to show/hide host indicators
                 const hostBadge = document.getElementById('hostBadge');
@@ -9071,7 +9000,6 @@
                     } else {
                         console.log('[New Host] No active video to attach sync listeners');
                     }
-                    showStatus('You are now the host! You control playback for all guests.');
                 }
             });
 
@@ -9195,7 +9123,6 @@
                     }
                 }
 
-                showStatus(`▶ ${data.username} played`);
                 setTimeout(() => { isSyncing = false; }, 500);
             });
 
@@ -9222,7 +9149,6 @@
                     }
                 }
 
-                showStatus(`⏸ ${data.username} paused`);
                 setTimeout(() => { isSyncing = false; }, 500);
             });
 
@@ -9248,7 +9174,6 @@
                     }
                 }
 
-                showStatus(`⏩ ${data.username} seeked`);
                 setTimeout(() => { isSyncing = false; }, 500);
             });
 
@@ -9448,7 +9373,6 @@
             // Stop drift correction
             stopDriftCorrection();
 
-            showStatus('Left watchparty');
         }
 
         function showWatchpartySidebar() {
@@ -9528,7 +9452,6 @@
                 roomCodeElement.style.color = '#00ff9f';
             }, 1500);
 
-            showStatus('Room code copied to clipboard!');
         }
 
         let replyingToMessage = null;
@@ -9586,7 +9509,6 @@
             const { id, title, type, season, episode } = content;
 
             console.log(`[Content Sync] Syncing ${type}: ${title}`, { id, season, episode });
-            showStatus(`Syncing content: ${title}`);
 
             try {
                 // Load the same content as the host
@@ -9824,7 +9746,6 @@
 
             console.log('Reloading player with timestamp:', timestamp, 'seconds');
             console.log('New URL:', newUrl);
-            showStatus(`Syncing to ${formatTime(timestamp)}...`);
         }
 
         // Initialize socket on page load
@@ -10761,7 +10682,6 @@
                 currentContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
 
-            showStatus(`Loading ${match.sport || 'Sports'} stream...`);
         }
 
         // Update sports source button display
@@ -10796,7 +10716,6 @@
 
             const sources = currentSportsMatch.sources;
             if (sources.length <= 1) {
-                showStatus('Only one source available for this match');
                 return;
             }
 
@@ -10811,7 +10730,6 @@
                 playSportsStream(matchIndex, currentSportsSourceIndex);
 
                 const sourceName = sources[currentSportsSourceIndex].source.toUpperCase();
-                showStatus(`Switched to ${sourceName} (${currentSportsSourceIndex + 1}/${sources.length})`);
             } else {
                 showError('Unable to switch source');
             }
@@ -11294,7 +11212,6 @@
                 currentContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
 
-            showStatus(`Loading ${channel.name}...`);
         }
 
         // Load channel stream using HLS.js
@@ -11482,7 +11399,6 @@
                 closeLoginModal();
                 updateAuthUI();
                 await loadUserData();
-                showStatus('Logged in successfully!');
             } catch (error) {
                 errorEl.textContent = error.message;
                 errorEl.style.display = 'block';
@@ -11509,7 +11425,6 @@
                 closeRegisterModal();
                 updateAuthUI();
                 await loadUserData();
-                showStatus('Account created successfully!');
             } catch (error) {
                 errorEl.textContent = error.message;
                 errorEl.style.display = 'block';
@@ -11538,7 +11453,6 @@
             showTab('continue-watching');
 
             updateAuthUI();
-            showStatus('Logged out successfully');
         }
 
         function updateAuthUI() {
@@ -11726,7 +11640,6 @@
                     })
                 });
                 console.log('[Watchlist] Added successfully:', result);
-                showStatus(`Added to ${listName}!`);
                 await loadWatchlist();
             } catch (error) {
                 console.error('[Watchlist] Failed to add:', error);
@@ -11739,7 +11652,6 @@
 
             try {
                 await apiRequest(`/watchlist/${contentId}`, { method: 'DELETE' });
-                showStatus('Removed from watchlist');
                 await loadWatchlist();
             } catch (error) {
                 showError(error.message);
@@ -11874,7 +11786,6 @@
                         channel_name: channelName
                     })
                 });
-                showStatus('Added to favorites!');
                 await loadFavorites();
             } catch (error) {
                 showError(error.message);
@@ -11886,7 +11797,6 @@
 
             try {
                 await apiRequest(`/favorites/${channelId}`, { method: 'DELETE' });
-                showStatus('Removed from favorites');
                 await loadFavorites();
             } catch (error) {
                 showError(error.message);
@@ -12052,7 +11962,6 @@
                     method: 'POST',
                     body: JSON.stringify({ username })
                 });
-                showStatus('Friend request sent!');
                 document.getElementById('friendSearchInput').value = '';
                 document.getElementById('friendSearchResults').innerHTML = '';
             } catch (error) {
@@ -12063,7 +11972,6 @@
         async function acceptFriendRequest(requestId) {
             try {
                 await apiRequest(`/friends/requests/${requestId}/accept`, { method: 'POST' });
-                showStatus('Friend request accepted!');
                 await loadFriends();
                 await loadFriendRequests();
             } catch (error) {
@@ -12074,7 +11982,6 @@
         async function rejectFriendRequest(requestId) {
             try {
                 await apiRequest(`/friends/requests/${requestId}/reject`, { method: 'POST' });
-                showStatus('Friend request rejected');
                 await loadFriendRequests();
             } catch (error) {
                 showError(error.message);
@@ -12086,7 +11993,6 @@
 
             try {
                 await apiRequest(`/friends/${friendId}`, { method: 'DELETE' });
-                showStatus('Friend removed');
                 await loadFriends();
             } catch (error) {
                 showError(error.message);
@@ -12129,7 +12035,6 @@
                     })
                 });
                 console.log('[Comments] Comment added successfully:', newComment);
-                showStatus('Comment added!');
                 const updatedComments = await loadComments(contentId);
                 console.log('[Comments] Reloaded comments after add:', updatedComments.length);
                 return updatedComments;
@@ -12143,7 +12048,6 @@
         async function deleteComment(commentId, contentId) {
             try {
                 await apiRequest(`/comments/${commentId}`, { method: 'DELETE' });
-                showStatus('Comment deleted');
                 return await loadComments(contentId);
             } catch (error) {
                 showError(error.message);
