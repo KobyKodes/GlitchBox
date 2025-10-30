@@ -11296,7 +11296,11 @@
 
         // ============= AUTHENTICATION & API SYSTEM =============
 
-        const AUTH_API_BASE_URL = 'http://localhost:5001/api';
+        // Automatically detect API base URL based on environment
+        const AUTH_API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+            ? 'http://localhost:5001/api'  // Local development
+            : `${window.location.origin}/api`;  // Production (same origin)
+
         let authToken = localStorage.getItem('authToken');
         let currentUser = null;
 
