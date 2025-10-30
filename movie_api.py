@@ -58,7 +58,9 @@ watchlists_collection = db['watchlists']
 continue_watching_collection = db['continue_watching']
 favorites_collection = db['favorites']
 comments_collection = db['comments']
+comment_likes_collection = db['comment_likes']
 friend_requests_collection = db['friend_requests']
+ratings_collection = db['ratings']
 
 # Create indexes
 try:
@@ -68,6 +70,9 @@ try:
     continue_watching_collection.create_index([('user_id', 1), ('content_id', 1)])
     favorites_collection.create_index([('user_id', 1), ('channel_id', 1)])
     comments_collection.create_index([('content_id', 1), ('user_id', 1)])
+    comment_likes_collection.create_index([('comment_id', 1), ('user_id', 1)], unique=True)
+    ratings_collection.create_index([('content_key', 1), ('user_id', 1)], unique=True)
+    ratings_collection.create_index([('content_key', 1)])
 except Exception as e:
     print(f"Note: Some indexes may already exist: {e}")
 
@@ -994,6 +999,204 @@ def get_omdb_data(imdb_id):
     save_cache(OMDB_CACHE_FILE, omdb_cache)  # Save immediately
     return {}
 
+@app.route('/api/omdb/<imdb_id>', methods=['GET'])
+def api_omdb_lookup(imdb_id):
+    data = get_omdb_data(imdb_id)
+    return jsonify(data), 200
+
+# ---- Friends list (user's accepted friends) ----
+@app.route('/api/friends', methods=['GET'])
+@jwt_required(optional=True)
+def api_friends():
+    identity = get_jwt_identity()
+    if not identity:
+        return jsonify({'friends': []}), 200
+    u = _identity_to_user(identity)
+    if not u or not u.get('username'):
+        return jsonify({'friends': []}), 200
+    # ensure we have _id
+    user_doc = users_collection.find_one({'username': u['username']}, {'_id': 1, 'username': 1})
+    if not user_doc:
+        return jsonify({'friends': []}), 200
+    usernames = list(_get_friends_usernames_for(user_doc['_id']) or [])
+    return jsonify({'friends': usernames}), 200
+
+# ---- Ratings (get & post) ----
+@app.route('/api/ratings/<content_type>/<int:tmdb_id>', methods=['GET'])
+@jwt_required(optional=True)
+def api_get_ratings(content_type, tmdb_id):
+    key = _content_key(content_type, tmdb_id)
+    cur = ratings_collection.find({'content_key': key}, {'_id': 0, 'username': 1, 'rating': 1})
+    ratings_by_user = {}
+    for d in cur:
+        try:
+            u = d.get('username')
+            v = float(d.get('rating')) if d.get('rating') is not None else None
+            if u and v is not None:
+                ratings_by_user[u] = v
+        except Exception:
+            continue
+    return jsonify({'content_key': key, 'ratings_by_user': ratings_by_user}), 200
+
+@app.route('/api/ratings/<content_type>/<int:tmdb_id>', methods=['POST'])
+@jwt_required()
+def api_post_rating(content_type, tmdb_id):
+    identity = get_jwt_identity()
+    u = _identity_to_user(identity)
+    if not u or not u.get('username'):
+        return jsonify({'error': 'Unauthorized'}), 401
+    user_doc = users_collection.find_one({'username': u['username']}, {'_id': 1, 'username': 1})
+    if not user_doc:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    payload = request.get_json(silent=True) or {}
+    try:
+        rating = float(payload.get('rating'))
+    except Exception:
+        return jsonify({'error': 'Invalid rating'}), 400
+    if not (1.0 <= rating <= 10.0):
+        return jsonify({'error': 'Rating must be between 1 and 10'}), 400
+
+    key = _content_key(content_type, tmdb_id)
+    ratings_collection.update_one(
+        {'content_key': key, 'user_id': user_doc['_id']},
+        {'$set': {
+            'username': user_doc['username'],
+            'rating': rating,
+            'updated_at': datetime.utcnow()
+        }},
+        upsert=True
+    )
+
+    doc = ratings_collection.find_one(
+        {'content_key': key, 'user_id': user_doc['_id']},
+        {'_id': 0, 'username': 1, 'rating': 1}
+    )
+    return jsonify({'ok': True, 'rating': doc}), 200
+
+# ==== Ratings & Friends (MongoDB) =============================================
+
+def _content_key(content_type, tmdb_id):
+    return f"{'tv' if content_type == 'tv' else 'movie'}:{int(tmdb_id)}"
+
+def _identity_to_user(identity):
+    """
+    Resolve a user doc from JWT identity. Handles:
+    - identity as string ObjectId
+    - identity as plain username string
+    - identity as dict with 'id'|'_id'|'user_id' or 'username'
+    """
+    try:
+        if isinstance(identity, dict):
+            uid = identity.get('id') or identity.get('_id') or identity.get('user_id')
+            uname = identity.get('username') or identity.get('name')
+            if uid:
+                try:
+                    udoc = users_collection.find_one({"_id": ObjectId(str(uid))}, {"username": 1})
+                    if udoc:
+                        return udoc
+                except Exception:
+                    pass
+            if uname:
+                udoc = users_collection.find_one({"username": uname}, {"username": 1})
+                if udoc:
+                    return udoc
+        elif isinstance(identity, str):
+            # Try ObjectId then fallback to username
+            try:
+                udoc = users_collection.find_one({"_id": ObjectId(identity)}, {"username": 1})
+                if udoc:
+                    return udoc
+            except Exception:
+                pass
+            udoc = users_collection.find_one({"username": identity}, {"username": 1})
+            if udoc:
+                return udoc
+    except Exception:
+        pass
+    return None
+
+def _get_friends_usernames_for(user_id: ObjectId):
+    """
+    Build friend list from friend_requests_collection with status 'accepted'.
+    Returns a list of usernames (strings).
+    """
+    friends = set()
+    try:
+        accepted = friend_requests_collection.find(
+            {
+                "status": "accepted",
+                "$or": [{"requester_id": user_id}, {"receiver_id": user_id}]
+            },
+            {"requester_id": 1, "receiver_id": 1}
+        )
+        for fr in accepted:
+            other_id = fr["receiver_id"] if fr.get("requester_id") == user_id else fr.get("requester_id")
+            if other_id:
+                u = users_collection.find_one({"_id": other_id}, {"username": 1})
+                if u and u.get("username"):
+                    friends.add(u["username"])
+    except Exception as e:
+        print(f"friends lookup error: {e}")
+    return list(friends)
+
+# ---------- Ratings ----------
+@app.route('/api/ratings/<content_type>/<int:tmdb_id>', methods=['GET'])
+def get_ratings(content_type, tmdb_id):
+    key = _content_key(content_type, tmdb_id)
+    cursor = ratings_collection.find({"content_key": key}, {"username": 1, "rating": 1})
+    ratings_by_user = {doc["username"]: float(doc["rating"]) for doc in cursor if "username" in doc and "rating" in doc}
+    values = list(ratings_by_user.values())
+    avg = round(sum(values) / len(values), 2) if values else None
+    return jsonify({
+        "ratings_by_user": ratings_by_user,
+        "average": avg,
+        "count": len(values)
+    })
+
+from flask_jwt_extended import jwt_required, get_jwt_identity
+
+@app.route('/api/ratings/<content_type>/<int:tmdb_id>', methods=['POST'])
+@jwt_required()
+def post_rating(content_type, tmdb_id):
+    identity = get_jwt_identity()
+    udoc = _identity_to_user(identity)
+    if not udoc:
+        return jsonify({"error": "User not found"}), 401
+
+    data = request.get_json(silent=True) or {}
+    try:
+        rating = float(data.get('rating'))
+    except Exception:
+        return jsonify({"error": "Invalid rating"}), 400
+    if not (1.0 <= rating <= 10.0):
+        return jsonify({"error": "Rating must be between 1 and 10"}), 400
+
+    key = _content_key(content_type, tmdb_id)
+    now = datetime.utcnow().isoformat()
+
+    ratings_collection.update_one(
+        {"content_key": key, "user_id": udoc["_id"]},
+        {"$set": {"username": udoc["username"], "rating": round(rating, 1), "updated_at": now}},
+        upsert=True
+    )
+
+    # Return fresh aggregate
+    return get_ratings(content_type, tmdb_id)
+
+# ---------- Friends ----------
+@app.route('/api/friends', methods=['GET'])
+@jwt_required()
+def get_friends_me():
+    identity = get_jwt_identity()
+    udoc = _identity_to_user(identity)
+    if not udoc:
+        return jsonify({"error": "User not found"}), 401
+    friends = _get_friends_usernames_for(udoc["_id"])
+    return jsonify({"friends": [{"username": u} for u in friends]})
+
+
+
 @app.route('/api/movie/<int:movie_id>')
 def get_movie_details(movie_id):
     """Get detailed movie information with OMDB enhancement and cast"""
@@ -1016,6 +1219,8 @@ def get_movie_details(movie_id):
         movie['tmdb_crew'] = credits['crew']
 
     return jsonify(movie)
+
+
 
 @app.route('/api/popular')
 def get_popular_movies():
@@ -3000,14 +3205,54 @@ def get_comments(content_id):
         print(f"[Comments] Friend IDs: {friend_ids}")
 
         # Get comments from user and their friends - use integer content_id
+        # Only get top-level comments (no parent_comment_id)
         comments = list(comments_collection.find({
             'content_id': content_id_int,
-            'user_id': {'$in': friend_ids}
+            'user_id': {'$in': friend_ids},
+            'parent_comment_id': {'$exists': False}
         }).sort('created_at', -1))
 
-        print(f"[Comments] Found {len(comments)} comments")
+        print(f"[Comments] Found {len(comments)} top-level comments")
 
+        # For each comment, add like count, user's like status, and replies
         for comment in comments:
+            comment_id = comment['_id']
+
+            # Get like count
+            like_count = comment_likes_collection.count_documents({'comment_id': comment_id})
+            comment['like_count'] = like_count
+
+            # Check if current user liked this comment
+            user_liked = comment_likes_collection.find_one({
+                'comment_id': comment_id,
+                'user_id': ObjectId(user_id)
+            }) is not None
+            comment['liked_by_user'] = user_liked
+
+            # Get replies
+            replies = list(comments_collection.find({
+                'parent_comment_id': comment_id,
+                'user_id': {'$in': friend_ids}
+            }).sort('created_at', 1))
+
+            # Process replies
+            for reply in replies:
+                reply_id = reply['_id']
+                reply_like_count = comment_likes_collection.count_documents({'comment_id': reply_id})
+                reply['like_count'] = reply_like_count
+
+                reply_user_liked = comment_likes_collection.find_one({
+                    'comment_id': reply_id,
+                    'user_id': ObjectId(user_id)
+                }) is not None
+                reply['liked_by_user'] = reply_user_liked
+
+                reply['_id'] = str(reply['_id'])
+                reply['user_id'] = str(reply['user_id'])
+                reply['parent_comment_id'] = str(reply['parent_comment_id'])
+                reply['created_at'] = reply['created_at'].isoformat()
+
+            comment['replies'] = replies
             comment['_id'] = str(comment['_id'])
             comment['user_id'] = str(comment['user_id'])
             comment['created_at'] = comment['created_at'].isoformat()
@@ -3037,11 +3282,18 @@ def add_comment():
             'created_at': datetime.utcnow()
         }
 
+        # If this is a reply, add parent_comment_id
+        if data.get('parent_comment_id'):
+            comment['parent_comment_id'] = ObjectId(data['parent_comment_id'])
+            print(f"[Comments] Adding reply to comment {data['parent_comment_id']}")
+
         print(f"[Comments] Adding comment: user_id={comment['user_id']}, content_id={comment['content_id']}, text={comment['comment_text'][:50]}...")
 
         result = comments_collection.insert_one(comment)
         comment['_id'] = str(result.inserted_id)
         comment['user_id'] = str(comment['user_id'])
+        if comment.get('parent_comment_id'):
+            comment['parent_comment_id'] = str(comment['parent_comment_id'])
         comment['created_at'] = comment['created_at'].isoformat()
 
         print(f"[Comments] Comment saved with ID: {comment['_id']}")
@@ -3066,7 +3318,68 @@ def delete_comment(comment_id):
         if result.deleted_count == 0:
             return jsonify({'error': 'Comment not found or unauthorized'}), 404
 
+        # Also delete all likes for this comment
+        comment_likes_collection.delete_many({'comment_id': ObjectId(comment_id)})
+
+        # Also delete all replies to this comment
+        comments_collection.delete_many({'parent_comment_id': ObjectId(comment_id)})
+
         return jsonify({'message': 'Comment deleted'}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/comments/<comment_id>/like', methods=['POST'])
+@jwt_required()
+def like_comment(comment_id):
+    try:
+        user_id = get_jwt_identity()
+
+        # Check if already liked
+        existing_like = comment_likes_collection.find_one({
+            'comment_id': ObjectId(comment_id),
+            'user_id': ObjectId(user_id)
+        })
+
+        if existing_like:
+            return jsonify({'error': 'Already liked'}), 400
+
+        # Add like
+        comment_likes_collection.insert_one({
+            'comment_id': ObjectId(comment_id),
+            'user_id': ObjectId(user_id),
+            'created_at': datetime.utcnow()
+        })
+
+        # Get new like count
+        like_count = comment_likes_collection.count_documents({'comment_id': ObjectId(comment_id)})
+
+        return jsonify({'like_count': like_count}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/comments/<comment_id>/like', methods=['DELETE'])
+@jwt_required()
+def unlike_comment(comment_id):
+    try:
+        user_id = get_jwt_identity()
+
+        # Remove like
+        result = comment_likes_collection.delete_one({
+            'comment_id': ObjectId(comment_id),
+            'user_id': ObjectId(user_id)
+        })
+
+        if result.deleted_count == 0:
+            return jsonify({'error': 'Like not found'}), 404
+
+        # Get new like count
+        like_count = comment_likes_collection.count_documents({'comment_id': ObjectId(comment_id)})
+
+        return jsonify({'like_count': like_count}), 200
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500

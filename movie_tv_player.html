@@ -7,43 +7,7 @@
     <title>RetroFlix - Stream Movies & TV Shows</title>
 
     <!-- IMPORTANT: Define all onclick handler functions FIRST before any HTML is parsed -->
-    <script>
-        console.log('[HEAD] Defining global functions for onclick handlers...');
-
-        // These functions will be properly implemented later in the body script
-        // For now, they're just placeholders to prevent "not defined" errors
-        window.showTab = window.showTab || function() {};
-        window.showLoginModal = window.showLoginModal || function() {};
-        window.showRegisterModal = window.showRegisterModal || function() {};
-        window.logout = window.logout || function() {};
-        window.searchContent = window.searchContent || function() {};
-        window.showFriendsModal = window.showFriendsModal || function() {};
-        window.closeFriendsModal = window.closeFriendsModal || function() {};
-        window.closeLoginModal = window.closeLoginModal || function() {};
-        window.closeRegisterModal = window.closeRegisterModal || function() {};
-        window.toggleFullscreen = window.toggleFullscreen || function() {};
-        window.toggleThemeSelector = window.toggleThemeSelector || function() {};
-        window.toggleEffectsPanel = window.toggleEffectsPanel || function() {};
-        window.toggleWatchpartyPanel = window.toggleWatchpartyPanel || function() {};
-        window.togglePlayerWatchlist = window.togglePlayerWatchlist || function() {};
-        window.toggleSeasonPanel = window.toggleSeasonPanel || function() {};
-        window.toggleEpisodePanel = window.toggleEpisodePanel || function() {};
-        window.stopPlayback = window.stopPlayback || function() {};
-        window.playNextEpisode = window.playNextEpisode || function() {};
-        window.showSourceSelector = window.showSourceSelector || function() {};
-        window.copyCurrentUrl = window.copyCurrentUrl || function() {};
-        window.createWatchparty = window.createWatchparty || function() {};
-        window.joinWatchparty = window.joinWatchparty || function() {};
-        window.closeWatchpartyMenu = window.closeWatchpartyMenu || function() {};
-        window.toggleEffect = window.toggleEffect || function() {};
-        window.enableAllEffects = window.enableAllEffects || function() {};
-        window.disableAllEffects = window.disableAllEffects || function() {};
-        window.switchSportsSource = window.switchSportsSource || function() {};
-        window.toggleComments = window.toggleComments || function() {};
-        window.submitComment = window.submitComment || function() {};
-
-        console.log('[HEAD] Global functions defined successfully');
-    </script>
+    
 
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
@@ -853,6 +817,41 @@
             margin: 0;
         }
 
+        /* --- User & friends ratings (UI) --- */
+.rating-item.user-pill {
+  display:flex; align-items:center; gap:8px; padding:8px 12px;
+  border-radius:8px; background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.12);
+}
+.rating-item.user-pill input[type="number"]{
+  width:84px; padding:6px 8px; border-radius:6px;
+  border:1px solid rgba(255,255,255,0.25); background:transparent; color:inherit;
+}
+.rating-item.user-pill .post-btn{
+  padding:6px 10px; border-radius:6px;
+  border:1px solid rgba(255,255,255,0.25);
+  background:rgba(255,255,255,0.08); cursor:pointer;
+  font-family:'VT323', monospace; font-size:18px;
+  color:var(--primary-color, #00ff9f);
+  transition:all 0.2s;
+  box-shadow:0 0 10px rgba(255,255,255,0.15);
+  margin-left:8px;
+  margin-right:8px;
+}
+.rating-item.user-pill .post-btn:hover{
+  background:rgba(255,255,255,0.12);
+  box-shadow:0 0 15px rgba(255,255,255,0.25);
+}
+.rating-item.user-pill .post-btn:active{
+  transform:scale(0.98);
+}
+.friends-ratings{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+.friend-pill{
+  padding:4px 8px; border-radius:999px; border:1px solid rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.04); font-size:14px; opacity:0.9;
+}
+.friend-pill b{ margin-left:4px; }
+
         /* OMDB Ratings Styles */
         .omdb-ratings {
             margin: 0;
@@ -1625,90 +1624,6 @@
 
             .tv-controls {
                 padding: 16px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .current-content {
-                padding: 10px;
-                gap: 10px;
-            }
-
-            .current-content-poster {
-                width: 110px;
-                height: 165px;
-            }
-
-            .current-content-info {
-                gap: 10px;
-                width: 100%;
-            }
-
-            .omdb-details,
-            .cast-section,
-            .episode-description,
-            .tv-controls {
-                width: 100%;
-                box-sizing: border-box;
-            }
-
-            .omdb-details,
-            .cast-section,
-            .episode-description {
-                padding: 10px;
-            }
-
-            .cast-grid {
-                grid-template-columns: repeat(auto-fit, minmax(85px, 1fr));
-                gap: 12px;
-            }
-
-            .cast-member {
-                padding: 4px;
-            }
-
-            .cast-member-image {
-                width: 60px;
-                height: 60px;
-            }
-
-            .cast-member-name {
-                font-size: 16px;
-            }
-
-            .cast-member-character {
-                font-size: 14px;
-            }
-
-            .ratings-container {
-                flex-direction: column;
-                gap: 8px;
-            }
-
-            .rating-item {
-                width: 100%;
-                padding: 8px 16px;
-            }
-
-            .rating-source {
-                font-size: 14px;
-            }
-
-            .rating-value {
-                font-size: 22px;
-            }
-
-            .current-content-info h3 {
-                font-size: 1.6rem;
-            }
-
-            .current-content-info p {
-                font-size: 20px;
-            }
-
-            #currentOverview,
-            #episodeDescriptionText {
-                font-size: 20px;
             }
 
             .detail-item {
@@ -4246,8 +4161,10 @@
 
                 <div id="addCommentSection" style="border-top: 2px solid rgba(0, 217, 255, 0.3); padding-top: 16px;">
                     <textarea id="commentTextarea" placeholder="Share your thoughts with friends..."
-                              style="width: 100%; padding: 12px; background: #1a1a2e; border: 2px solid var(--secondary-color, #ff00ff); color: #e0e0e0; font-family: 'VT323', monospace; font-size: 18px; resize: vertical; min-height: 80px; border-radius: 4px;"
-                              maxlength="500"></textarea>
+                              style="width: 100%; padding: 12px; background: #1a1a2e; border: 2px solid var(--secondary-color, #ff00ff); color: #e0e0e0; font-family: 'VT323', monospace; font-size: 18px; resize: none; overflow: hidden; min-height: 40px; max-height: 200px; border-radius: 4px;"
+                              maxlength="500"
+                              rows="1"
+                              oninput="autoResizeTextarea(this); updateCharCount();"></textarea>
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
                         <span id="commentCharCount" style="color: #666; font-family: 'VT323', monospace; font-size: 14px;">0/500</span>
                         <button onclick="submitComment()" class="btn" style="padding: 10px 24px;">Post Comment</button>
@@ -4795,6 +4712,171 @@
 
         let autocompleteTimeout;
 
+        /* ---------- Ratings (You + Friends) helpers ---------- */
+
+        function ensureOmdbDom(){
+          // Return the existing ratings grid used by IMDb/RT/Metacritic (do not create new wrappers here)
+          return document.querySelector('#omdbRatings .ratings-container')
+              || document.querySelector('.omdb-ratings .ratings-container')
+              || document.querySelector('.ratings-container')
+              || null;
+        }
+
+        function hostRatingsBox(){
+          return ensureOmdbDom();
+        }
+
+        function getAuthToken(){
+          return (window.authToken)
+              || localStorage.getItem('jwt')
+              || localStorage.getItem('token')
+              || localStorage.getItem('access_token');
+        }
+
+        async function baseRequest(path, opt = {}){
+          const headers = Object.assign({'Content-Type':'application/json'}, opt.headers || {});
+          const token = getAuthToken();
+          if (token) headers['Authorization'] = 'Bearer ' + token;
+          const url = path.startsWith('/api') ? path : `${API_BASE_URL}${path.startsWith('/') ? '' : '/'}${path}`;
+          const res = await fetch(url, Object.assign({ headers, credentials: 'include' }, opt));
+          if (!res.ok) {
+            const text = await res.text().catch(()=> '');
+            const err = new Error(text || ('HTTP ' + res.status));
+            err.status = res.status;
+            throw err;
+          }
+          return res.status === 204 ? null : res.json();
+        }
+
+        function ensurePill(container){
+          if (!container) return null;
+          let pill = document.getElementById('userRatingPill');
+          if (pill && pill.parentElement !== container) {
+            pill.remove();
+            pill = null;
+          }
+          if (pill) return pill;
+
+          pill = document.createElement('div');
+          pill.className = 'rating-item user-pill';
+          pill.id = 'userRatingPill';
+          pill.innerHTML = `
+            <div class="rating-source">You</div>
+            <div class="rating-value" id="userRatingValue">—</div>
+            <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
+              <input id="userRatingInput" type="number" min="1" max="10" step="0.1" placeholder="1–10" />
+              <button class="post-btn" id="postUserRatingBtn">Post</button>
+            </div>
+          `;
+          container.appendChild(pill);
+          const btn = pill.querySelector('#postUserRatingBtn');
+          btn.addEventListener('click', postUserRating);
+          return pill;
+        }
+
+        async function getFriendUsernames(){
+          try {
+            const r = await baseRequest('/friends', { method: 'GET' });
+            return (r && Array.isArray(r.friends)) ? r.friends.map(f => (f.username || f)) : [];
+          } catch(_) {
+            return [];
+          }
+        }
+
+        async function postUserRating(){
+          if (!currentContentId || !currentContentType) { showError('Select a title first'); return; }
+
+          const input = document.getElementById('userRatingInput');
+          const val = parseFloat(input && input.value);
+          if (isNaN(val) || val < 1 || val > 10) { showError('Please enter a value from 1 to 10'); return; }
+
+          try {
+            await baseRequest(`/ratings/${currentContentType}/${currentContentId}`, {
+              method: 'POST',
+              body: JSON.stringify({ rating: val })
+            });
+            await refreshRatingsUI();
+          } catch(e) {
+            if (e && (e.status === 401 || /401/.test(String(e.message||'')))) {
+              if (window.showLoginModal) showLoginModal(); else alert('Please log in');
+            } else {
+              console.error(e); showError('Failed to save rating');
+            }
+          }
+        }
+
+        async function refreshRatingsUI(){
+          const container = hostRatingsBox();
+          if (!container || !currentContentId || !currentContentType) return;
+
+          // Ensure "You" tile exists
+          ensurePill(container);
+
+          let data = { ratings_by_user: {} };
+          try {
+            data = await baseRequest(`/ratings/${currentContentType}/${currentContentId}`, { method: 'GET' });
+          } catch(e) {
+            console.warn('ratings fetch failed', e);
+          }
+
+          const cu = (window.currentUser) || ( () => { try { return JSON.parse(localStorage.getItem('currentUser')||'null'); } catch(_) { return null; } })();
+          const me = (cu && (cu.username || cu.name)) || null;
+
+          // Update "You" tile UI
+          const input = document.getElementById('userRatingInput');
+          const btn = document.getElementById('postUserRatingBtn');
+          const youValEl = document.getElementById('userRatingValue');
+          const yourVal = me ? data.ratings_by_user?.[me] : null;
+
+          if (input) input.value = (yourVal || '');
+          if (btn) btn.textContent = yourVal ? 'Update' : 'Post';
+          if (youValEl) youValEl.textContent = (yourVal ? `${yourVal}/10` : '—');
+
+          // Remove any previously rendered friend tiles to avoid duplication
+          container.querySelectorAll('.friend-rating-item').forEach(n => n.remove());
+
+          // Render friend ratings as tiles
+          try {
+            const friends = await getFriendUsernames();
+            const friendEntries = Object.entries(data.ratings_by_user || {})
+              .filter(([u,_]) => (!me || u !== me) && friends.includes(u));
+
+            if (friendEntries.length) {
+              for (const [u, v] of friendEntries) {
+                const tile = document.createElement('div');
+                tile.className = 'rating-item friend-rating-item';
+                tile.innerHTML = `
+                  <div class="rating-source">@${u}</div>
+                  <div class="rating-value">${v}/10</div>
+                `;
+                container.appendChild(tile);
+              }
+            } else {
+              // Optional placeholder to indicate friend area
+              const placeholder = document.createElement('div');
+              placeholder.className = 'rating-item friend-rating-item';
+              placeholder.style.opacity = '0.7';
+              placeholder.innerHTML = `
+                <div class="rating-source">Friends</div>
+                <div class="rating-value">—</div>
+              `;
+              container.appendChild(placeholder);
+            }
+          } catch(e) {
+            console.warn('friends fetch failed', e);
+          }
+        }
+
+        /* ---------- end Ratings (You + Friends) helpers ---------- */
+
+        function setupUserRatingsPill(){
+            const box = ensureOmdbDom() || hostRatingsBox();
+            console.debug('[ratings] setupUserRatingsPill: container?', !!box, { currentContentType, currentContentId });
+            if (!box) return;
+            ensurePill(box);
+            try { refreshRatingsUI(); } catch(e){ console.error(e); } 
+        }
+
         // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
             // Load Continue Watching by default
@@ -4984,6 +5066,7 @@
             const imdbWindow = window.open('about:blank', '_blank');
 
             try {
+                showStatus('Fetching IMDb link...');
 
                 // Fetch full details from TMDB which includes external IDs
                 const endpoint = type === 'tv' ? `${API_BASE_URL}/tv/${id}` : `${API_BASE_URL}/movie/${id}`;
@@ -5000,11 +5083,14 @@
                 if (imdbId) {
                     // Direct link to IMDb title page
                     imdbWindow.location.href = `https://www.imdb.com/title/${imdbId}/`;
+                    showStatus('Opened IMDb page');
                 } else {
                     // Fallback to search if IMDb ID not available
                     imdbWindow.location.href = `https://www.imdb.com/find/?q=${encodeURIComponent(title)}&s=tt`;
+                    showStatus('Opened IMDb search');
                 }
 
+                setTimeout(() => hideStatus(), 2000);
             } catch (error) {
                 console.error('IMDb link error:', error);
                 // Fallback to search on error
@@ -5012,6 +5098,27 @@
                 showError('Could not fetch IMDb ID, opened search instead');
                 setTimeout(() => hideError(), 3000);
             }
+        }
+
+        function showStatus(message, type = 'info') {
+            const statusBar = document.getElementById('statusBar');
+            statusBar.textContent = message;
+            statusBar.style.display = 'block';
+
+            // Handle different types
+            if (type === 'warning') {
+                statusBar.style.background = 'rgba(255, 149, 0, 0.2)';
+                statusBar.style.borderColor = 'rgba(255, 149, 0, 0.6)';
+                statusBar.style.color = '#fff';
+            } else {
+                statusBar.style.background = 'rgba(0, 122, 255, 0.2)';
+                statusBar.style.borderColor = 'rgba(0, 122, 255, 0.6)';
+                statusBar.style.color = '#fff';
+            }
+        }
+
+        function hideStatus() {
+            document.getElementById('statusBar').style.display = 'none';
         }
 
         function showError(message) {
@@ -5042,6 +5149,7 @@
 
             hideError();
             showLoading();
+            showStatus(`Searching for "${query}"...`);
 
             try {
                 const params = new URLSearchParams({ query });
@@ -5080,6 +5188,7 @@
                 hasMorePages = true;
             }
             currentCategory = 'popular-movies';
+           
 
             try {
                 let url = `${API_BASE_URL}/popular?page=${page}`;
@@ -5162,6 +5271,9 @@
                 hasMorePages = true;
             }
             currentCategory = 'trending-movies';
+           
+    
+    
 
             try {
                 let url = `${API_BASE_URL}/trending?page=${page || 1}`;
@@ -5203,6 +5315,7 @@
                 hasMorePages = true;
             }
             currentCategory = 'trending-tv';
+           
 
             try {
                 let url = `${API_BASE_URL}/tv/trending?page=${page || 1}`;
@@ -5244,6 +5357,7 @@
                 hasMorePages = true;
             }
             currentCategory = 'now-playing-movies';
+      
 
             try {
                 let url = `${API_BASE_URL}/movies/now-playing?page=${page || 1}`;
@@ -5285,6 +5399,7 @@
                 hasMorePages = true;
             }
             currentCategory = 'now-playing-tv';
+           
 
             try {
                 let url = `${API_BASE_URL}/tv/now-playing?page=${page || 1}`;
@@ -5326,6 +5441,7 @@
                 hasMorePages = true;
             }
             currentCategory = 'upcoming-movies';
+        
 
             try {
                 let url = `${API_BASE_URL}/movies/upcoming?page=${page || 1}`;
@@ -5550,6 +5666,7 @@
         }
 
         async function playContent(contentId, contentTitle, contentType) {
+         
             hideError();
 
             // Scroll to player section immediately
@@ -6620,7 +6737,9 @@
 
             // Show different message if in watchparty
             if (watchpartyActive) {
+                // showStatus(`Switched to ${sourceNames[source]} (only affects your view)`);
             } else {
+                // showStatus(`Switched to ${sourceNames[source]}`);
             }
         }
 
@@ -6691,6 +6810,7 @@
                 currentSelectedEpisode = 1;
                 document.getElementById('episodeButtonText').textContent = getEpisodeButtonText(1, currentSelectedSeason);
             } else {
+                // showStatus('No more episodes available');
                 return;
             }
 
@@ -6826,6 +6946,7 @@
                     }
                 }
 
+                // showStatus('Loading direct stream with full sync support...');
 
             } else {
                 console.log('Using IFRAME for embed');
@@ -6867,6 +6988,7 @@
                 if (watchpartyActive) {
                     console.log('[Watchparty] Iframe loaded - can receive sync but cannot auto-send');
                     console.warn('[Watchparty] ⚠ For best watchparty experience, use VidSrc source (direct stream)');
+                    showStatus('⚠ Limited sync with this source - Switch to VidSrc for full sync', 'warning');
                 } else {
                 }
             }
@@ -7137,6 +7259,7 @@
             document.getElementById('contentResults').innerHTML = '';
             document.getElementById('searchInput').value = '';
             document.getElementById('yearInput').value = '';
+            hideStatus();
             hideError();
         }
 
@@ -7812,6 +7935,7 @@
                     watchlists[listName].splice(index, 1);
                     localStorage.setItem('streamingSite_watchlists', JSON.stringify(watchlists));
 
+                    // showStatus(`Removed "${item.title}" from ${listName}`);
                     closeWatchlistModal();
                     updateWatchlistButtons();
 
@@ -7845,6 +7969,7 @@
             watchlists[name] = [];
             localStorage.setItem('streamingSite_watchlists', JSON.stringify(watchlists));
 
+            // showStatus(`Created new watchlist: ${name}`);
             input.value = '';
 
             // If we have a pending item, add it to the new list
@@ -8055,6 +8180,7 @@
                     switchWatchlist(remaining[0]);
                 }
 
+                // showStatus(`Deleted watchlist: ${listName}`);
                 closeWatchlistModal();
                 displayWatchlistInResults();
             }
@@ -8071,6 +8197,7 @@
             if (confirm('Are you sure you want to reset all viewing statistics? This will clear your watch history but keep your watchlists. This action cannot be undone.')) {
                 watchHistory = [];
                 localStorage.setItem('streamingSite_watchHistory', JSON.stringify(watchHistory));
+                // showStatus('All viewing statistics have been reset');
                 displayStatistics();
             }
         }
@@ -8641,6 +8768,7 @@
         setInterval(() => {
             const statusBar = document.getElementById('statusBar');
             if (statusBar.style.display === 'block') {
+                setTimeout(() => hideStatus(), 5000);
             }
         }, 1000);
 
@@ -8690,6 +8818,7 @@
                     `;
                 } else {
                     displaySubtitleList(currentSubtitles);
+                    // showStatus(`Found ${currentSubtitles.length} subtitles`);
                 }
 
             } catch (error) {
@@ -8743,10 +8872,12 @@
         function openSubtitleSearch(url, source) {
             // Open the search page in a new tab
             window.open(url, '_blank');
+            showStatus(`Opened ${source} search page. Download subtitle and paste URL below.`);
         }
 
         async function selectSubtitle(downloadUrl) {
             try {
+                showStatus('Processing subtitle...');
 
                 // Use our proxy endpoint to handle CORS and format conversion
                 const proxyUrl = `${API_BASE_URL}/subtitles/proxy?url=${encodeURIComponent(downloadUrl)}`;
@@ -8789,7 +8920,7 @@
                             <input type="text" value="${proxyUrl}" readonly
                                    style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-family: monospace; font-size: 12px; margin-bottom: 12px;"
                                    onclick="this.select()">
-                            <button onclick="navigator.clipboard.writeText('${proxyUrl}');" class="btn btn-secondary">
+                            <button onclick="navigator.clipboard.writeText('${proxyUrl}'); showStatus('Copied to clipboard!');" class="btn btn-secondary">
                                 Copy URL
                             </button>
                             <p style="color: #666; font-size: 12px; margin-top: 8px;">Paste in VLC, MPV, or HTML5 video player</p>
@@ -8812,6 +8943,7 @@
                     </div>
                 `;
 
+                showStatus('✓ Subtitle processed and ready!');
                 console.log('Subtitle VTT URL:', proxyUrl);
 
             } catch (error) {
@@ -8860,6 +8992,7 @@
 
             const subtitlePlayerUrl = `/video_player_with_subtitles.html?video=${encodeURIComponent(currentContentUrl)}`;
             window.open(subtitlePlayerUrl, '_blank', 'width=1280,height=720');
+            showStatus('✓ Opened subtitle player! Click "📝 Get Subtitles" to find subtitles, then paste the URL in the new window.');
         }
 
         // ============= WATCHPARTY FUNCTIONS =============
@@ -8919,6 +9052,7 @@
                 showWatchpartySidebar();
                 updateWatchpartyUI(data);
                 closeWatchpartyMenu();
+                // showStatus(`Watchparty created! Room code: ${data.room_code}`);
 
                 // Re-setup video sync listeners for already-playing content
                 const playerVideo = document.getElementById('playerVideo');
@@ -8941,6 +9075,7 @@
                 showWatchpartySidebar();
                 updateWatchpartyUI(data);
                 closeWatchpartyMenu();
+                // showStatus(`Joined watchparty: ${data.room_code}`);
 
                 // Re-setup video sync listeners if joining as host
                 if (isHost) {
@@ -8983,6 +9118,7 @@
             socket.on('new_host', (data) => {
                 isHost = (username === data.username);
                 addSystemMessage(`${data.username} is now the host`);
+                // showStatus(`${data.username} is now controlling playback`);
 
                 // Update UI to show/hide host indicators
                 const hostBadge = document.getElementById('hostBadge');
@@ -9000,6 +9136,7 @@
                     } else {
                         console.log('[New Host] No active video to attach sync listeners');
                     }
+                    showStatus('You are now the host! You control playback for all guests.');
                 }
             });
 
@@ -9123,6 +9260,7 @@
                     }
                 }
 
+                showStatus(`▶ ${data.username} played`);
                 setTimeout(() => { isSyncing = false; }, 500);
             });
 
@@ -9149,6 +9287,7 @@
                     }
                 }
 
+                showStatus(`⏸ ${data.username} paused`);
                 setTimeout(() => { isSyncing = false; }, 500);
             });
 
@@ -9174,6 +9313,7 @@
                     }
                 }
 
+                showStatus(`⏩ ${data.username} seeked`);
                 setTimeout(() => { isSyncing = false; }, 500);
             });
 
@@ -9373,6 +9513,7 @@
             // Stop drift correction
             stopDriftCorrection();
 
+            showStatus('Left watchparty');
         }
 
         function showWatchpartySidebar() {
@@ -9452,6 +9593,7 @@
                 roomCodeElement.style.color = '#00ff9f';
             }, 1500);
 
+            showStatus('Room code copied to clipboard!');
         }
 
         let replyingToMessage = null;
@@ -9509,6 +9651,7 @@
             const { id, title, type, season, episode } = content;
 
             console.log(`[Content Sync] Syncing ${type}: ${title}`, { id, season, episode });
+            showStatus(`Syncing content: ${title}`);
 
             try {
                 // Load the same content as the host
@@ -9746,6 +9889,7 @@
 
             console.log('Reloading player with timestamp:', timestamp, 'seconds');
             console.log('New URL:', newUrl);
+            showStatus(`Syncing to ${formatTime(timestamp)}...`);
         }
 
         // Initialize socket on page load
@@ -10682,6 +10826,7 @@
                 currentContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
 
+            showStatus(`Loading ${match.sport || 'Sports'} stream...`);
         }
 
         // Update sports source button display
@@ -10716,6 +10861,7 @@
 
             const sources = currentSportsMatch.sources;
             if (sources.length <= 1) {
+                showStatus('Only one source available for this match');
                 return;
             }
 
@@ -10730,6 +10876,7 @@
                 playSportsStream(matchIndex, currentSportsSourceIndex);
 
                 const sourceName = sources[currentSportsSourceIndex].source.toUpperCase();
+                showStatus(`Switched to ${sourceName} (${currentSportsSourceIndex + 1}/${sources.length})`);
             } else {
                 showError('Unable to switch source');
             }
@@ -11212,6 +11359,7 @@
                 currentContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
 
+            showStatus(`Loading ${channel.name}...`);
         }
 
         // Load channel stream using HLS.js
@@ -11399,6 +11547,7 @@
                 closeLoginModal();
                 updateAuthUI();
                 await loadUserData();
+                showStatus('Logged in successfully!');
             } catch (error) {
                 errorEl.textContent = error.message;
                 errorEl.style.display = 'block';
@@ -11425,6 +11574,7 @@
                 closeRegisterModal();
                 updateAuthUI();
                 await loadUserData();
+                showStatus('Account created successfully!');
             } catch (error) {
                 errorEl.textContent = error.message;
                 errorEl.style.display = 'block';
@@ -11453,6 +11603,7 @@
             showTab('continue-watching');
 
             updateAuthUI();
+            showStatus('Logged out successfully');
         }
 
         function updateAuthUI() {
@@ -11640,6 +11791,7 @@
                     })
                 });
                 console.log('[Watchlist] Added successfully:', result);
+                showStatus(`Added to ${listName}!`);
                 await loadWatchlist();
             } catch (error) {
                 console.error('[Watchlist] Failed to add:', error);
@@ -11652,6 +11804,7 @@
 
             try {
                 await apiRequest(`/watchlist/${contentId}`, { method: 'DELETE' });
+                showStatus('Removed from watchlist');
                 await loadWatchlist();
             } catch (error) {
                 showError(error.message);
@@ -11786,6 +11939,7 @@
                         channel_name: channelName
                     })
                 });
+                showStatus('Added to favorites!');
                 await loadFavorites();
             } catch (error) {
                 showError(error.message);
@@ -11797,6 +11951,7 @@
 
             try {
                 await apiRequest(`/favorites/${channelId}`, { method: 'DELETE' });
+                showStatus('Removed from favorites');
                 await loadFavorites();
             } catch (error) {
                 showError(error.message);
@@ -11962,6 +12117,7 @@
                     method: 'POST',
                     body: JSON.stringify({ username })
                 });
+                showStatus('Friend request sent!');
                 document.getElementById('friendSearchInput').value = '';
                 document.getElementById('friendSearchResults').innerHTML = '';
             } catch (error) {
@@ -11972,6 +12128,7 @@
         async function acceptFriendRequest(requestId) {
             try {
                 await apiRequest(`/friends/requests/${requestId}/accept`, { method: 'POST' });
+                showStatus('Friend request accepted!');
                 await loadFriends();
                 await loadFriendRequests();
             } catch (error) {
@@ -11982,6 +12139,7 @@
         async function rejectFriendRequest(requestId) {
             try {
                 await apiRequest(`/friends/requests/${requestId}/reject`, { method: 'POST' });
+                showStatus('Friend request rejected');
                 await loadFriendRequests();
             } catch (error) {
                 showError(error.message);
@@ -11993,6 +12151,7 @@
 
             try {
                 await apiRequest(`/friends/${friendId}`, { method: 'DELETE' });
+                showStatus('Friend removed');
                 await loadFriends();
             } catch (error) {
                 showError(error.message);
@@ -12006,14 +12165,12 @@
         async function loadComments(contentId) {
             if (!authToken) return [];
 
-            console.log('[Comments] Loading comments for content:', contentId);
             try {
                 const comments = await apiRequest(`/comments/${contentId}`);
-                console.log('[Comments] Loaded', comments.length, 'comments from API');
                 currentContentComments = comments;
                 return comments;
             } catch (error) {
-                console.error('[Comments] Failed to load comments:', error);
+                console.error('Failed to load comments:', error);
                 return [];
             }
         }
@@ -12024,9 +12181,8 @@
                 return;
             }
 
-            console.log('[Comments] Adding comment to content:', contentId);
             try {
-                const newComment = await apiRequest('/comments', {
+                await apiRequest('/comments', {
                     method: 'POST',
                     body: JSON.stringify({
                         content_id: contentId,
@@ -12034,12 +12190,9 @@
                         comment_text: commentText
                     })
                 });
-                console.log('[Comments] Comment added successfully:', newComment);
-                const updatedComments = await loadComments(contentId);
-                console.log('[Comments] Reloaded comments after add:', updatedComments.length);
-                return updatedComments;
+                showStatus('Comment added!');
+                return await loadComments(contentId);
             } catch (error) {
-                console.error('[Comments] Failed to add comment:', error);
                 showError(error.message);
                 return [];
             }
@@ -12048,6 +12201,7 @@
         async function deleteComment(commentId, contentId) {
             try {
                 await apiRequest(`/comments/${commentId}`, { method: 'DELETE' });
+                showStatus('Comment deleted');
                 return await loadComments(contentId);
             } catch (error) {
                 showError(error.message);
@@ -12104,10 +12258,6 @@
             const comments = await loadComments(contentId);
             const commentsList = document.getElementById('commentsList');
 
-            console.log('[Comments] Displaying comments:', comments.length, 'comments');
-            console.log('[Comments] Current user:', currentUser);
-            console.log('[Comments] Comments data:', comments);
-
             // Preserve scroll position
             const scrollPos = commentsList.scrollTop;
 
@@ -12116,13 +12266,46 @@
                 return;
             }
 
-            // Generate new comments HTML
+            // Generate new comments HTML with likes and replies
             const newCommentsHTML = comments.map(comment => {
                 const date = new Date(comment.created_at);
                 const isOwnComment = currentUser && comment.user_id === currentUser.id;
-                console.log('[Comments] Comment user_id:', comment.user_id, 'Current user id:', currentUser?.id, 'Is own:', isOwnComment);
 
-                return `
+                // Generate replies HTML
+                const repliesHTML = (comment.replies || []).map(reply => {
+                    const replyDate = new Date(reply.created_at);
+                    const isOwnReply = currentUser && reply.user_id === currentUser.id;
+                    const likeIconReply = reply.liked_by_user ? '❤️' : '🤍';
+
+                    return `
+                        <div style="background: rgba(15, 15, 30, 0.4); border-left: 4px solid ${isOwnReply ? 'var(--primary-color, #00ff9f)' : 'var(--accent-color, #00d9ff)'}; padding: 12px; margin: 8px 0 8px 24px; border-radius: 4px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                <span style="color: ${isOwnReply ? 'var(--primary-color, #00ff9f)' : 'var(--accent-color, #00d9ff)'}; font-family: 'VT323', monospace; font-size: 18px; font-weight: bold;">
+                                    ${reply.username}${isOwnReply ? ' (You)' : ''}
+                                </span>
+                                <div style="display: flex; gap: 8px; align-items: center;">
+                                    <span style="color: #888; font-family: 'VT323', monospace; font-size: 12px;">
+                                        ${replyDate.toLocaleDateString()} ${replyDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                    </span>
+                                    ${isOwnReply ? `<button onclick="event.stopPropagation(); deleteCommentUI('${reply._id}')" style="background: #ff6b6b; border: none; color: #fff; padding: 2px 8px; cursor: pointer; border-radius: 3px; font-family: 'VT323', monospace; font-size: 14px;">Delete</button>` : ''}
+                                </div>
+                            </div>
+                            <p style="color: #e0e0e0; font-family: 'VT323', monospace; font-size: 16px; line-height: 1.4; margin: 0 0 8px 0; white-space: pre-wrap;">
+                                ${escapeHtml(reply.comment_text)}
+                            </p>
+                            <div style="display: flex; gap: 12px; align-items: center;">
+                                <button onclick="event.stopPropagation(); toggleLike('${reply._id}')" style="background: none; border: none; color: #ccc; cursor: pointer; font-family: 'VT323', monospace; font-size: 16px; display: flex; align-items: center; gap: 4px; padding: 4px 8px;">
+                                    <span>${likeIconReply}</span>
+                                    <span id="like-count-${reply._id}">${reply.like_count || 0}</span>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                const likeIcon = comment.liked_by_user ? '❤️' : '🤍';
+
+                return`
                     <div style="background: rgba(15, 15, 30, 0.6); border-left: 4px solid ${isOwnComment ? 'var(--primary-color, #00ff9f)' : 'var(--accent-color, #00d9ff)'}; padding: 16px; margin-bottom: 12px; border-radius: 4px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                             <span style="color: ${isOwnComment ? 'var(--primary-color, #00ff9f)' : 'var(--accent-color, #00d9ff)'}; font-family: 'VT323', monospace; font-size: 20px; font-weight: bold;">
@@ -12132,12 +12315,33 @@
                                 <span style="color: #888; font-family: 'VT323', monospace; font-size: 14px;">
                                     ${date.toLocaleDateString()} ${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                                 </span>
-                                ${isOwnComment ? `<button onclick="deleteCommentUI('${comment._id}')" style="background: #ff6b6b; border: none; color: #fff; padding: 4px 12px; cursor: pointer; border-radius: 4px; font-family: 'VT323', monospace;">Delete</button>` : ''}
+                                ${isOwnComment ? `<button onclick="event.stopPropagation(); deleteCommentUI('${comment._id}')" style="background: #ff6b6b; border: none; color: #fff; padding: 4px 12px; cursor: pointer; border-radius: 4px; font-family: 'VT323', monospace;">Delete</button>` : ''}
                             </div>
                         </div>
-                        <p style="color: #e0e0e0; font-family: 'VT323', monospace; font-size: 18px; line-height: 1.5; margin: 0; white-space: pre-wrap;">
+                        <p style="color: #e0e0e0; font-family: 'VT323', monospace; font-size: 18px; line-height: 1.5; margin: 0 0 12px 0; white-space: pre-wrap;">
                             ${escapeHtml(comment.comment_text)}
                         </p>
+                        <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 8px;">
+                            <button onclick="event.stopPropagation(); toggleLike('${comment._id}')" style="background: none; border: none; color: #ccc; cursor: pointer; font-family: 'VT323', monospace; font-size: 18px; display: flex; align-items: center; gap: 6px; padding: 6px 12px;">
+                                <span>${likeIcon}</span>
+                                <span id="like-count-${comment._id}">${comment.like_count || 0}</span>
+                            </button>
+                            <button onclick="event.stopPropagation(); showReplyBox('${comment._id}')" style="background: none; border: none; color: var(--accent-color, #00d9ff); cursor: pointer; font-family: 'VT323', monospace; font-size: 16px; padding: 6px 12px;">
+                                💬 Reply
+                            </button>
+                        </div>
+                        <div id="reply-box-${comment._id}" style="display: none; margin-top: 12px; padding: 12px; background: rgba(0, 0, 0, 0.3); border-radius: 4px;">
+                            <textarea id="reply-textarea-${comment._id}" placeholder="Write a reply..."
+                                      style="width: 100%; padding: 8px; background: #1a1a2e; border: 2px solid var(--secondary-color, #ff00ff); color: #e0e0e0; font-family: 'VT323', monospace; font-size: 16px; resize: none; overflow: hidden; min-height: 30px; max-height: 150px; border-radius: 4px; margin-bottom: 8px;"
+                                      maxlength="500"
+                                      rows="1"
+                                      oninput="autoResizeTextarea(this)"></textarea>
+                            <div style="display: flex; gap: 8px;">
+                                <button onclick="submitReply('${comment._id}')" class="btn" style="padding: 6px 16px; font-size: 16px;">Post Reply</button>
+                                <button onclick="hideReplyBox('${comment._id}')" class="btn btn-secondary" style="padding: 6px 16px; font-size: 16px;">Cancel</button>
+                            </div>
+                        </div>
+                        ${repliesHTML}
                     </div>
                 `;
             }).join('');
@@ -12166,6 +12370,7 @@
 
             await addComment(currentContentId, currentContentType, commentText);
             textarea.value = '';
+            textarea.style.height = 'auto';
             updateCharCount();
             await displayComments(currentContentId);
         }
@@ -12188,6 +12393,98 @@
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
+        }
+
+        // Auto-resize textarea
+        function autoResizeTextarea(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, parseInt(textarea.style.maxHeight)) + 'px';
+        }
+
+        // Toggle like on a comment
+        async function toggleLike(commentId) {
+            if (!authToken) {
+                showError('Please login to like comments');
+                return;
+            }
+
+            try {
+                const likeCountEl = document.getElementById(`like-count-${commentId}`);
+                if (!likeCountEl) return;
+
+                // Check if already liked by finding the heart icon
+                const likeBtn = likeCountEl.closest('button');
+                const heartIcon = likeBtn.querySelector('span:first-child');
+                const isLiked = heartIcon.textContent === '❤️';
+
+                if (isLiked) {
+                    // Unlike
+                    const response = await apiRequest(`/comments/${commentId}/like`, { method: 'DELETE' });
+                    likeCountEl.textContent = response.like_count;
+                    heartIcon.textContent = '🤍';
+                } else {
+                    // Like
+                    const response = await apiRequest(`/comments/${commentId}/like`, { method: 'POST' });
+                    likeCountEl.textContent = response.like_count;
+                    heartIcon.textContent = '❤️';
+                }
+            } catch (error) {
+                console.error('Failed to toggle like:', error);
+            }
+        }
+
+        // Show reply box
+        function showReplyBox(commentId) {
+            const replyBox = document.getElementById(`reply-box-${commentId}`);
+            if (replyBox) {
+                replyBox.style.display = 'block';
+                const textarea = document.getElementById(`reply-textarea-${commentId}`);
+                if (textarea) textarea.focus();
+            }
+        }
+
+        // Hide reply box
+        function hideReplyBox(commentId) {
+            const replyBox = document.getElementById(`reply-box-${commentId}`);
+            if (replyBox) {
+                replyBox.style.display = 'none';
+                const textarea = document.getElementById(`reply-textarea-${commentId}`);
+                if (textarea) textarea.value = '';
+            }
+        }
+
+        // Submit reply
+        async function submitReply(parentCommentId) {
+            const textarea = document.getElementById(`reply-textarea-${parentCommentId}`);
+            const replyText = textarea.value.trim();
+
+            if (!replyText) {
+                showError('Please enter a reply');
+                return;
+            }
+
+            if (!currentContentId || !currentContentType) {
+                showError('No content selected');
+                return;
+            }
+
+            try {
+                await apiRequest('/comments', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        content_id: currentContentId,
+                        content_type: currentContentType,
+                        comment_text: replyText,
+                        parent_comment_id: parentCommentId
+                    })
+                });
+
+                textarea.value = '';
+                hideReplyBox(parentCommentId);
+                await displayComments(currentContentId);
+            } catch (error) {
+                showError(error.message);
+            }
         }
 
         // Add event listener for character count
@@ -12216,5 +12513,250 @@
 
         // ============= END THEME & ANIMATION SYSTEM =============
     </script>
+    <script>
+        /* ===================== User Ratings Injection (You + Friends) ===================== */
+        (function(){
+          if (window.__userRatingsInjected) return; 
+          window.__userRatingsInjected = true;
+        
+          // --- small helpers ---
+          function getToken(){
+            return (window.authToken) ||
+                   localStorage.getItem('jwt') ||
+                   localStorage.getItem('token') ||
+                   localStorage.getItem('access_token');
+          }
+          function getCurrentUser(){
+            if (window.currentUser) return window.currentUser;
+            try { return JSON.parse(localStorage.getItem('currentUser') || 'null'); } catch(_) { return null; }
+          }
+          function showToast(msg){
+            try { (window.showError || window.showToast || console.log)(msg); } catch(_) {}
+          }
+        
+          // Prefer site-wide API helper if present (cookie/session), else add Authorization header
+          const API_BASE = '/api';
+          const baseFetch = window.apiRequest
+            ? (path, opt={}) => window.apiRequest(path.startsWith('/api') ? path : (API_BASE + (path.startsWith('/') ? '' : '/') + path), opt)
+            : async (path, opt={}) => {
+                const url = path.startsWith('/api') ? path : (API_BASE + (path.startsWith('/') ? '' : '/') + path);
+                const token = getToken();
+                const headers = Object.assign({'Content-Type':'application/json'}, opt.headers || {});
+                if (token) headers['Authorization'] = 'Bearer ' + token;
+                const res = await fetch(url, Object.assign({ headers, credentials: 'include' }, opt));
+                if (!res.ok) {
+                  const text = await res.text().catch(()=> '');
+                  const err = new Error(text || ('HTTP ' + res.status));
+                  err.status = res.status;
+                  throw err;
+                }
+                return res.status === 204 ? null : res.json();
+              };
+        
+          // Track current title identity (movie/tv + TMDB id)
+          let currentContentType = window.currentContentType || null;
+          let currentContentId   = window.currentContentId   || null;
+        
+          // ---- DOM location helpers ----
+          function closestContainerFromKnownIds(){
+            const ids = ['imdbRating','rtRating','metacriticRating'];
+            const els = ids.map(id => document.getElementById(id)).filter(Boolean);
+            if (!els.length) return null;
+            for (const el of els) {
+              const grid = el.closest('.ratings-container');
+              if (grid) return grid;
+            }
+            // Fallback: common parent of value nodes
+            let parent = els[0].parentElement;
+            for (let i=1;i<els.length;i++){
+              const set = new Set();
+              let n = els[i].parentElement;
+              while (n){ set.add(n); n = n.parentElement; }
+              while (parent && !set.has(parent)) parent = parent.parentElement;
+              if (!parent) break;
+            }
+            return parent || null;
+          }
+        
+          function hostRatingsBox(){
+            let container =
+              document.querySelector('#omdbRatings .ratings-container') ||
+              document.querySelector('.omdb-ratings .ratings-container') ||
+              document.querySelector('.ratings-container');
+        
+            if (!container){
+              container = closestContainerFromKnownIds();
+            }
+        
+            if (!container){
+              // Last resort: create a minimal grid under the info column
+              const info = document.querySelector('.current-content-info') || document.querySelector('.player-section') || document.body;
+              if (!info) return null;
+              let outer = document.getElementById('omdbRatings') || document.createElement('div');
+              if (!outer.id) outer.id = 'omdbRatings';
+              outer.classList.add('omdb-ratings');
+              container = document.createElement('div');
+              container.className = 'ratings-container';
+              outer.appendChild(container);
+              info.prepend(outer);
+            }
+            return container;
+          }
+        
+          // ---- UI creation ----
+          function ensurePill(container){
+            if (!container) return null;
+            let pill = document.getElementById('userRatingPill');
+            if (pill && pill.parentElement !== container){
+              pill.remove(); pill = null;
+            }
+            if (pill) return pill;
+        
+            pill = document.createElement('div');
+            pill.className = 'rating-item user-pill';
+            pill.id = 'userRatingPill';
+            pill.innerHTML = `
+              <div class="rating-source">You</div>
+              <div class="rating-value" id="userRatingValue">—</div>
+              <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
+                <input id="userRatingInput" type="number" min="1" max="10" step="0.1" placeholder="1–10" />
+                <button class="post-btn" id="postUserRatingBtn">Post</button>
+              </div>
+            `;
+            container.appendChild(pill);
+            const btn = pill.querySelector('#postUserRatingBtn');
+            btn.addEventListener('click', postUserRating);
+            return pill;
+          }
+        
+          async function getFriendUsernames(){
+            try {
+              const r = await baseFetch('/friends', { method: 'GET' });
+              return (r && Array.isArray(r.friends)) ? r.friends.map(f => (f.username || f)) : [];
+            } catch(_){
+              return [];
+            }
+          }
+        
+          async function postUserRating(){
+            if (!currentContentId || !currentContentType){ showToast('Select a title first'); return; }
+            const input = document.getElementById('userRatingInput');
+            const val = parseFloat(input && input.value);
+            if (isNaN(val) || val < 1 || val > 10){ showToast('Enter a rating from 1 to 10'); return; }
+            try{
+              await baseFetch(`/ratings/${currentContentType}/${currentContentId}`, {
+                method: 'POST',
+                body: JSON.stringify({ rating: val })
+              });
+              await refreshRatingsUI();
+              showToast('Saved');
+            }catch(e){
+              if (e && (e.status === 401 || /401/.test(String(e.message||'')))){
+                if (window.showLoginModal) showLoginModal(); else alert('Please log in');
+              } else {
+                console.error(e); showToast('Failed to save');
+              }
+            }
+          }
+        
+          async function refreshRatingsUI(){
+            const container = hostRatingsBox();
+            if (!container || !currentContentId || !currentContentType) return;
+        
+            // Ensure "You" tile
+            ensurePill(container);
+        
+            // Fetch aggregated ratings
+            let data = { ratings_by_user: {} };
+            try {
+              data = await baseFetch(`/ratings/${currentContentType}/${currentContentId}`, { method: 'GET' });
+            } catch(e){
+              console.warn('ratings fetch failed', e);
+            }
+        
+            const cu = getCurrentUser();
+            const me = (cu && (cu.username || cu.name)) || null;
+        
+            // Update "You" tile UI
+            const input = document.getElementById('userRatingInput');
+            const btn = document.getElementById('postUserRatingBtn');
+            const youValEl = document.getElementById('userRatingValue');
+            const yourVal = me ? data.ratings_by_user?.[me] : null;
+        
+            if (input) input.value = (yourVal || '');
+            if (btn) btn.textContent = yourVal ? 'Update' : 'Post';
+            if (youValEl) youValEl.textContent = yourVal ? `${yourVal}/10` : '—';
+        
+            // Remove prior friend tiles
+            container.querySelectorAll('.friend-rating-item').forEach(n => n.remove());
+        
+            // Render friend ratings as tiles like others
+            try{
+              const friends = await getFriendUsernames();
+              const friendEntries = Object.entries(data.ratings_by_user || {})
+                .filter(([u,_]) => (!me || u !== me) && friends.includes(u));
+        
+              for (const [u, v] of friendEntries){
+                const tile = document.createElement('div');
+                tile.className = 'rating-item friend-rating-item';
+                tile.innerHTML = `
+                  <div class="rating-source">@${u}</div>
+                  <div class="rating-value">${v}/10</div>
+                `;
+                container.appendChild(tile);
+              }
+            }catch(e){
+              console.warn('friends fetch failed', e);
+            }
+          }
+        
+          // --- Wire-up: when details are loaded, set ids and refresh ---
+          if (!window.fetch.__rfRatingsWrap){
+            const _orig = window.fetch;
+            const wrapped = async function(url, options){
+              const res = await _orig.apply(this, arguments);
+              try{
+                let href = typeof url === 'string' ? url : (url && url.url) || '';
+                const m = href && href.match(/\/api\/(movie|tv)\/(\d+)/);
+                if (m){
+                  currentContentType = m[1];
+                  currentContentId = parseInt(m[2], 10);
+                  // after response resolves and DOM updates, seed the pill
+                  setTimeout(setupUserRatingsPill, 150);
+                }
+              }catch(_){}
+              return res;
+            };
+            Object.defineProperty(wrapped, '__rfRatingsWrap', { value: true });
+            window.fetch = wrapped;
+          }
+        
+          // Keep pill present if grid re-renders
+          let __gridObserver = null;
+          function observeGrid(container){
+            try{
+              if (!container) return;
+              if (__gridObserver) __gridObserver.disconnect();
+              __gridObserver = new MutationObserver(() => {
+                if (!document.getElementById('userRatingPill')) ensurePill(container);
+              });
+              __gridObserver.observe(container, { childList: true });
+            }catch(_){}
+          }
+        
+          function setupUserRatingsPill(){
+            const box = hostRatingsBox();
+            console.debug('[ratings] setupUserRatingsPill: container?', !!box, { currentContentType, currentContentId });
+            if (!box) return;
+            ensurePill(box);
+            observeGrid(box);
+            try { refreshRatingsUI(); } catch(e){ console.error(e); }
+          }
+        
+          document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(setupUserRatingsPill, 300);
+          });
+        })();
+        </script>
 </body>
 </html>
