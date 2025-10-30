@@ -3976,7 +3976,7 @@
     </script>
     <script type="text/javascript" src="//www.highperformanceformat.com/8af468976c973602ab1d62e5e750e8e3/invoke.js"></script>
 -->
-    
+No items in Continue Watching
 
     
     <div id="bgAnimation"></div>
@@ -4755,7 +4755,7 @@
 
         // Multiple watchlists support
         // Initialize from localStorage only as fallback for non-authenticated users
-        let watchlists = JSON.parse(localStorage.getItem('streamingSite_watchlists') || '{"My Watchlist": []}');
+        let watchlists = { 'My Watchlist': [] }; // No localStorage - loaded from DB when authenticated
         let currentWatchlistName = localStorage.getItem('streamingSite_currentWatchlist') || 'My Watchlist';
 
         // Legacy support - migrate old single watchlist to new format
@@ -4767,7 +4767,8 @@
         }
 
         // Initialize from localStorage only as fallback for non-authenticated users
-        let watchHistory = JSON.parse(localStorage.getItem('streamingSite_watchHistory') || '[]');
+        let watchHistory = []; // No localStorage - loaded from DB when authenticated
+        let channelFavourites = []; // No localStorage - loaded from DB when authenticated
 
         // Flag to track if data is loaded from database
         let isDataLoadedFromDB = false;
@@ -6038,34 +6039,29 @@
                 return;
             }
 
-            // If user is logged in, use API
-            if (authToken) {
-                console.log('[addToWatchlistPanel] User authenticated, calling API with list:', listName);
-                try {
-                    await addToWatchlistAPI(item.id, item.type, item.title, item.posterUrl, listName);
-                    console.log('[addToWatchlistPanel] API call successful');
-                } catch (error) {
-                    console.error('[addToWatchlistPanel] API call failed:', error);
-                    showError('Failed to add to watchlist');
-                }
-            } else {
-                console.log('[addToWatchlistPanel] No auth, using localStorage');
-                // Fallback to localStorage for non-authenticated users
-                if (!watchlists[listName]) {
-                    watchlists[listName] = [];
-                }
+            // Require authentication - no localStorage fallback
+            if (!authToken) {
+                showError('Please login to use watchlist');
+                showLoginModal();
+                const panel = document.getElementById('watchlistPanel');
+                if (panel) panel.style.display = 'none';
+                window.pendingWatchlistPanelItem = null;
+                return;
+            }
 
-                watchlists[listName].push(item);
-                localStorage.setItem('streamingSite_watchlists', JSON.stringify(watchlists));
-
-                showStatus(`Added to ${listName}`);
-                updateWatchlistButtons();
+            // Save to database only
+            console.log('[addToWatchlistPanel] User authenticated, calling API with list:', listName);
+            try {
+                await addToWatchlistAPI(item.id, item.type, item.title, item.posterUrl, listName);
+                console.log('[addToWatchlistPanel] API call successful');
+            } catch (error) {
+                console.error('[addToWatchlistPanel] API call failed:', error);
+                showError('Failed to add to watchlist');
             }
 
             // Close panel
             const panel = document.getElementById('watchlistPanel');
             if (panel) panel.style.display = 'none';
-
             window.pendingWatchlistPanelItem = null;
         }
 
@@ -6073,27 +6069,26 @@
             const item = window.pendingWatchlistPanelItem;
             if (!item) return;
 
-            // If user is logged in, use API
-            if (authToken) {
-                try {
-                    await removeFromWatchlistAPI(item.id);
-                } catch (error) {
-                    showError('Failed to remove from watchlist');
-                }
-            } else {
-                // Fallback to localStorage for non-authenticated users
-                if (watchlists[listName]) {
-                    watchlists[listName] = watchlists[listName].filter(i => !(i.id === item.id && i.type === item.type));
-                    localStorage.setItem('streamingSite_watchlists', JSON.stringify(watchlists));
-                    showStatus(`Removed from ${listName}`);
-                    updateWatchlistButtons();
-                }
+            // Require authentication - no localStorage fallback
+            if (!authToken) {
+                showError('Please login to use watchlist');
+                showLoginModal();
+                const panel = document.getElementById('watchlistPanel');
+                if (panel) panel.style.display = 'none';
+                window.pendingWatchlistPanelItem = null;
+                return;
+            }
+
+            // Remove from database only
+            try {
+                await removeFromWatchlistAPI(item.id);
+            } catch (error) {
+                showError('Failed to remove from watchlist');
             }
 
             // Close panel
             const panel = document.getElementById('watchlistPanel');
             if (panel) panel.style.display = 'none';
-
             window.pendingWatchlistPanelItem = null;
         }
 
@@ -6106,13 +6101,20 @@
                 return;
             }
 
+            // Require authentication
+            if (!authToken) {
+                showError('Please login to create watchlists');
+                showLoginModal();
+                return;
+            }
+
             if (watchlists[listName]) {
                 showError('Watchlist already exists');
                 return;
             }
 
+            // Create list in memory (will be saved to DB when first item is added)
             watchlists[listName] = [];
-            localStorage.setItem('streamingSite_watchlists', JSON.stringify(watchlists));
             input.value = '';
 
             showStatus(`Created watchlist: ${listName}`);
@@ -8316,49 +8318,21 @@
 
             const posterUrl = data.poster_url || 'https://via.placeholder.com/60x90/333/fff?text=No+Poster';
 
-            // If user is logged in, use API
-            if (authToken) {
-                console.log('[addToWatchHistory] Calling API to save to DB');
-                try {
-                    await updateContinueWatchingAPI(id, type, title, posterUrl, 0, currentSeason, currentEpisode);
-                    console.log('[addToWatchHistory] Saved to DB successfully');
-                    // Reload from database to keep data in sync
-                    await loadContinueWatching();
-                } catch (error) {
-                    console.error('[addToWatchHistory] Failed to save to DB:', error);
-                }
-            } else {
-                console.log('[addToWatchHistory] No auth, using localStorage');
-                // Fallback to localStorage for non-authenticated users
-                const existingIndex = watchHistory.findIndex(item => item.id === id && item.type === type);
+            // Require authentication - no localStorage fallback
+            if (!authToken) {
+                console.log('[addToWatchHistory] No auth, continue watching disabled');
+                return;
+            }
 
-                const historyItem = {
-                    id: id,
-                    title: title,
-                    type: type,
-                    posterUrl: posterUrl,
-                    year: type === 'tv' ?
-                        (data.first_air_date ? data.first_air_date.substring(0, 4) : 'Unknown') :
-                        (data.release_date ? data.release_date.substring(0, 4) : 'Unknown'),
-                    rating: data.vote_average ? data.vote_average.toFixed(1) : 'N/A',
-                    lastWatched: new Date().toISOString(),
-                    progress: 0,
-                    timestamp: 0,
-                    duration: 0,
-                    season: type === 'tv' ? currentSeason : null,
-                    episode: type === 'tv' ? currentEpisode : null
-                };
-
-                if (existingIndex > -1) {
-                    watchHistory[existingIndex] = historyItem;
-                } else {
-                    watchHistory.unshift(historyItem);
-                    // Keep only last 20 items
-                    watchHistory = watchHistory.slice(0, 20);
-                }
-
-                localStorage.setItem('streamingSite_watchHistory', JSON.stringify(watchHistory));
-                updateContinueWatching();
+            // Save to database only
+            console.log('[addToWatchHistory] Calling API to save to DB');
+            try {
+                await updateContinueWatchingAPI(id, type, title, posterUrl, 0, currentSeason, currentEpisode);
+                console.log('[addToWatchHistory] Saved to DB successfully');
+                // Reload from database to keep data in sync
+                await loadContinueWatching();
+            } catch (error) {
+                console.error('[addToWatchHistory] Failed to save to DB:', error);
             }
         }
 
@@ -8378,7 +8352,7 @@
                 continueWatchingDisplay.innerHTML = `
                     <div style="text-align: center; color: #666; padding: 40px; grid-column: 1 / -1;">
                         <h3>No items in Continue Watching</h3>
-                        <p>Start watching movies and TV shows to see them here</p>
+                        <p>Login & Start watching movies and TV shows to see them here</p>
                     </div>
                 `;
                 return;
@@ -8407,14 +8381,25 @@
             }).join('');
         }
 
-        function removeFromHistory(id, type) {
-            const index = watchHistory.findIndex(item => item.id === id && item.type === type);
-            if (index > -1) {
-                const item = watchHistory[index];
-                watchHistory.splice(index, 1);
-                localStorage.setItem('streamingSite_watchHistory', JSON.stringify(watchHistory));
-                displayContinueWatchingInResults();
-                showStatus(`Removed "${item.title}" from Continue Watching`);
+        async function removeFromHistory(id, type) {
+            // Require authentication
+            if (!authToken) {
+                showError('Please login to manage watch history');
+                return;
+            }
+
+            try {
+                // Remove from database
+                await apiRequest(`/continue-watching/${id}`, {
+                    method: 'DELETE'
+                });
+
+                // Reload from database
+                await loadContinueWatching();
+                showStatus('Removed from Continue Watching');
+            } catch (error) {
+                console.error('Failed to remove from continue watching:', error);
+                showError('Failed to remove from continue watching');
             }
         }
 
@@ -11033,7 +11018,6 @@
 
             // Filter channels
             if (country === 'Favourites') {
-                const channelFavourites = JSON.parse(localStorage.getItem('channelFavourites') || '[]');
                 currentDisplayedChannels = channelFavourites;
             } else if (country === 'All') {
                 currentDisplayedChannels = [...allChannels];
@@ -11099,7 +11083,6 @@
             const flag = countryFlags[channel.countryCode] || '🌍';
 
             // Check if channel is in favourites
-            const channelFavourites = JSON.parse(localStorage.getItem('channelFavourites') || '[]');
             const isFavourited = channelFavourites.some(fav => fav.name === channel.name && fav.url === channel.url);
 
             return `
@@ -11214,64 +11197,37 @@
             const channel = currentDisplayedChannels[channelIndex];
             if (!channel) return;
 
-            // If user is logged in, use API
-            if (authToken) {
-                let channelFavourites = JSON.parse(localStorage.getItem('channelFavourites') || '[]');
-                const existingIndex = channelFavourites.findIndex(fav => fav.name === channel.name);
+            // Require authentication - no localStorage fallback
+            if (!authToken) {
+                showError('Please login to save favorites');
+                showLoginModal();
+                return;
+            }
 
-                try {
-                    if (existingIndex > -1) {
-                        // Remove from favourites
-                        await removeFromFavoritesAPI(channel.url || channel.name);
-                    } else {
-                        // Add to favourites
-                        await addToFavoritesAPI(channel.url || channel.name, channel.name);
-                    }
+            // Use database only
+            const channelFavourites = channelFavourites || [];
+            const existingIndex = channelFavourites.findIndex(fav => fav.name === channel.name);
 
-                    // Reload favorites from database
-                    await loadFavorites();
-
-                    // Refresh the display - if on Favourites view, update currentDisplayedChannels
-                    if (selectedCountry === 'Favourites') {
-                        channelFavourites = JSON.parse(localStorage.getItem('channelFavourites') || '[]');
-                        currentDisplayedChannels = channelFavourites;
-                    }
-                    displayLiveChannels(currentDisplayedChannels);
-                } catch (error) {
-                    console.error('Failed to update favorites:', error);
-                    showError('Failed to update favorites');
-                }
-            } else {
-                // Fallback to localStorage for non-authenticated users
-                let channelFavourites = JSON.parse(localStorage.getItem('channelFavourites') || '[]');
-                const existingIndex = channelFavourites.findIndex(fav => fav.name === channel.name && fav.url === channel.url);
-
+            try {
                 if (existingIndex > -1) {
                     // Remove from favourites
-                    channelFavourites.splice(existingIndex, 1);
-                    showStatus(`Removed ${channel.name} from favourites`);
+                    await removeFromFavoritesAPI(channel.url || channel.name);
                 } else {
                     // Add to favourites
-                    channelFavourites.push({
-                        name: channel.name,
-                        url: channel.url,
-                        category: channel.category,
-                        country: channel.country,
-                        countryCode: channel.countryCode,
-                        logo: channel.logo || null,
-                        addedAt: new Date().toISOString()
-                    });
-                    showStatus(`Added ${channel.name} to favourites`);
+                    await addToFavoritesAPI(channel.url || channel.name, channel.name);
                 }
 
-                // Save to localStorage
-                localStorage.setItem('channelFavourites', JSON.stringify(channelFavourites));
+                // Reload favorites from database
+                await loadFavorites();
 
                 // Refresh the display - if on Favourites view, update currentDisplayedChannels
                 if (selectedCountry === 'Favourites') {
                     currentDisplayedChannels = channelFavourites;
                 }
                 displayLiveChannels(currentDisplayedChannels);
+            } catch (error) {
+                console.error('Failed to update favorites:', error);
+                showError('Failed to update favorites');
             }
         }
 
@@ -11887,9 +11843,8 @@
                 const favorites = await apiRequest('/favorites');
                 console.log('Favorites loaded from database:', favorites);
 
-                // Only update if API call was successful (database is source of truth)
-                // Don't clear existing data until we have the DB response
-                let channelFavourites = [];
+                // Update global variable - database is source of truth
+                channelFavourites = [];
 
                 if (favorites && favorites.length > 0) {
                     favorites.forEach(fav => {
@@ -11899,13 +11854,7 @@
                             id: fav.channel_id
                         });
                     });
-                    // Store in localStorage temporarily for UI display functions
-                    localStorage.setItem('channelFavourites', JSON.stringify(channelFavourites));
-                } else if (favorites && favorites.length === 0) {
-                    // API returned successfully but empty - user has no favorites
-                    localStorage.setItem('channelFavourites', JSON.stringify([]));
                 }
-                // If favorites is null/undefined (API error), keep existing localStorage data
 
                 // Refresh live channels display if on that tab
                 const liveChannelsTab = document.querySelector('[onclick*="live-channels"]');
@@ -11917,7 +11866,6 @@
                 }
             } catch (error) {
                 console.error('Failed to load favorites:', error);
-                // Don't clear existing data on error - keep localStorage data
             }
         }
 
