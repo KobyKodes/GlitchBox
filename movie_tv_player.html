@@ -11908,17 +11908,23 @@
         let currentFriendsList = [];
 
         async function loadFriends() {
+            console.log('[Friends] loadFriends called, authToken:', !!authToken);
             if (!authToken) return;
 
             try {
+                console.log('[Friends] Fetching friends list...');
                 const friends = await apiRequest('/friends');
+                console.log('[Friends] Received friends:', friends);
                 currentFriendsList = friends; // Store for checking status
                 const friendsList = document.getElementById('friendsList');
 
                 if (friends.length === 0) {
+                    console.log('[Friends] No friends found');
                     friendsList.innerHTML = '<p style="color: #666; padding: 20px; text-align: center;">No friends yet</p>';
                     return;
                 }
+
+                console.log('[Friends] Rendering', friends.length, 'friends');
 
                 // Clear existing content
                 friendsList.innerHTML = '';
@@ -12003,6 +12009,7 @@
         async function searchFriends() {
             const query = document.getElementById('friendSearchInput').value.trim();
             const resultsDiv = document.getElementById('friendSearchResults');
+            console.log('[Friends] Search query:', query);
 
             if (query.length < 2) {
                 resultsDiv.innerHTML = '';
@@ -12012,7 +12019,9 @@
             clearTimeout(searchFriendsTimeout);
             searchFriendsTimeout = setTimeout(async () => {
                 try {
+                    console.log('[Friends] Searching for:', query);
                     const results = await apiRequest(`/friends/search?q=${encodeURIComponent(query)}`);
+                    console.log('[Friends] Search results:', results);
 
                     if (results.length === 0) {
                         resultsDiv.innerHTML = '<p style="color: #666; padding: 12px;">No users found</p>';

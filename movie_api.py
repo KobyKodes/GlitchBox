@@ -3039,22 +3039,28 @@ def remove_from_favorites(channel_id):
 def get_friends():
     try:
         user_id = get_jwt_identity()
+        print(f"[Friends] get_friends called for user_id: {user_id}")
         user = users_collection.find_one({'_id': ObjectId(user_id)})
 
         if not user:
+            print(f"[Friends] User not found: {user_id}")
             return jsonify({'error': 'User not found'}), 404
 
         friend_ids = user.get('friends', [])
+        print(f"[Friends] User {user.get('username')} has friend_ids: {friend_ids}")
         friends = list(users_collection.find({'_id': {'$in': friend_ids}}))
+        print(f"[Friends] Found {len(friends)} friend documents")
 
         friends_list = [{
             'id': str(friend['_id']),
             'username': friend['username']
         } for friend in friends]
 
+        print(f"[Friends] Returning friends: {[f['username'] for f in friends_list]}")
         return jsonify(friends_list), 200
 
     except Exception as e:
+        print(f"[Friends] Error in get_friends: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 
@@ -3065,22 +3071,34 @@ def search_users():
         query = request.args.get('q', '')
         user_id = get_jwt_identity()
 
+        print(f"[Friends] Search request - Query: '{query}', User ID: {user_id}")
+
         if not query:
+            print("[Friends] Empty query, returning empty array")
             return jsonify([]), 200
+
+        # Get total user count for debugging
+        total_users = users_collection.count_documents({})
+        print(f"[Friends] Total users in database: {total_users}")
 
         users = list(users_collection.find({
             'username': {'$regex': query, '$options': 'i'},
             '_id': {'$ne': ObjectId(user_id)}
         }).limit(10))
 
+        print(f"[Friends] Found {len(users)} users matching '{query}'")
+
         results = [{
             'id': str(user['_id']),
             'username': user['username']
         } for user in users]
 
+        print(f"[Friends] Returning results: {[u['username'] for u in results]}")
+
         return jsonify(results), 200
 
     except Exception as e:
+        print(f"[Friends] Error in search_users: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 
@@ -3328,11 +3346,15 @@ def get_comments(content_id):
             return replies
 
         # Get comments from user and their friends - use integer content_id
-        # Only get top-level comments (no parent_comment_id)
+        # Only get top-level comments (no parent_comment_id, or parent_comment_id is None/null)
         comments = list(comments_collection.find({
             'content_id': content_id_int,
             'user_id': {'$in': friend_ids},
-            'parent_comment_id': {'$exists': False}
+            '$or': [
+                {'parent_comment_id': {'$exists': False}},
+                {'parent_comment_id': None},
+                {'parent_comment_id': 'None'}  # Handle string "None" from old data
+            ]
         }).sort('created_at', -1))
 
         print(f"[Comments] Found {len(comments)} top-level comments")
@@ -3354,6 +3376,9 @@ def get_comments(content_id):
 
             # Get all nested replies recursively
             comment['replies'] = get_nested_replies(comment_id, friend_ids, user_id)
+            print(f"[Comments] Top-level comment '{comment['comment_text'][:30]}' has {len(comment['replies'])} direct replies")
+            for i, reply in enumerate(comment['replies']):
+                print(f"[Comments]   Reply {i}: '{reply['comment_text'][:30]}' has {len(reply.get('replies', []))} nested replies")
 
             comment['_id'] = str(comment['_id'])
             comment['user_id'] = str(comment['user_id'])
