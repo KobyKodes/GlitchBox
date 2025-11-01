@@ -3505,52 +3505,66 @@ def migrate_to_user_attributes():
         for user in users:
             user_id = user['_id']
 
-            # Check if already migrated (has these arrays)
-            if 'watchlist' in user and 'continue_watching' in user and 'favorites' in user:
+            # Initialize arrays (use existing if present, otherwise empty)
+            watchlist = user.get('watchlist', [])
+            continue_watching = user.get('continue_watching', [])
+            favorites = user.get('favorites', [])
+
+            # Track if we need to update this user
+            needs_update = False
+
+            # Only migrate from old collections if arrays don't exist yet
+            if 'watchlist' not in user:
+                needs_update = True
+            if 'continue_watching' not in user:
+                needs_update = True
+            if 'favorites' not in user:
+                needs_update = True
+
+            # Skip if user already has all arrays
+            if not needs_update:
                 continue
 
-            # Initialize arrays
-            watchlist = []
-            continue_watching = []
-            favorites = []
+            # Migrate watchlist items only if array didn't exist
+            if 'watchlist' not in user:
+                watchlist_items = list(watchlists_collection.find({'user_id': user_id}))
+                for item in watchlist_items:
+                    watchlist.append({
+                        'content_id': item['content_id'],
+                        'content_type': item['content_type'],
+                        'title': item['title'],
+                        'poster_path': item.get('poster_path'),
+                        'list_name': item.get('list_name', 'My Watchlist'),
+                        'added_at': item.get('added_at', datetime.utcnow())
+                    })
+                total_watchlist_items += len(watchlist_items)
 
-            # Migrate watchlist items
-            watchlist_items = list(watchlists_collection.find({'user_id': user_id}))
-            for item in watchlist_items:
-                watchlist.append({
-                    'content_id': item['content_id'],
-                    'content_type': item['content_type'],
-                    'title': item['title'],
-                    'poster_path': item.get('poster_path'),
-                    'list_name': item.get('list_name', 'My Watchlist'),
-                    'added_at': item.get('added_at', datetime.utcnow())
-                })
-            total_watchlist_items += len(watchlist_items)
+            # Migrate continue watching items only if array didn't exist
+            if 'continue_watching' not in user:
+                continue_watching_items = list(continue_watching_collection.find({'user_id': user_id}))
+                for item in continue_watching_items:
+                    continue_watching.append({
+                        'content_id': item['content_id'],
+                        'content_type': item['content_type'],
+                        'title': item['title'],
+                        'poster_path': item.get('poster_path'),
+                        'progress': item.get('progress', 0),
+                        'season': item.get('season'),
+                        'episode': item.get('episode'),
+                        'last_watched': item.get('last_watched', datetime.utcnow())
+                    })
+                total_continue_watching_items += len(continue_watching_items)
 
-            # Migrate continue watching items
-            continue_watching_items = list(continue_watching_collection.find({'user_id': user_id}))
-            for item in continue_watching_items:
-                continue_watching.append({
-                    'content_id': item['content_id'],
-                    'content_type': item['content_type'],
-                    'title': item['title'],
-                    'poster_path': item.get('poster_path'),
-                    'progress': item.get('progress', 0),
-                    'season': item.get('season'),
-                    'episode': item.get('episode'),
-                    'last_watched': item.get('last_watched', datetime.utcnow())
-                })
-            total_continue_watching_items += len(continue_watching_items)
-
-            # Migrate favorites items
-            favorite_items = list(favorites_collection.find({'user_id': user_id}))
-            for item in favorite_items:
-                favorites.append({
-                    'channel_id': item['channel_id'],
-                    'channel_name': item['channel_name'],
-                    'added_at': item.get('added_at', datetime.utcnow())
-                })
-            total_favorite_items += len(favorite_items)
+            # Migrate favorites items only if array didn't exist
+            if 'favorites' not in user:
+                favorite_items = list(favorites_collection.find({'user_id': user_id}))
+                for item in favorite_items:
+                    favorites.append({
+                        'channel_id': item['channel_id'],
+                        'channel_name': item['channel_name'],
+                        'added_at': item.get('added_at', datetime.utcnow())
+                    })
+                total_favorite_items += len(favorite_items)
 
             # Update user document
             users_collection.update_one(
