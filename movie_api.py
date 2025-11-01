@@ -3049,9 +3049,28 @@ def get_friends():
             return jsonify({'error': 'User not found'}), 404
 
         friend_ids = user.get('friends', [])
+        if friend_ids is None:
+            friend_ids = []
         print(f"[Friends] User {user.get('username')} has friend_ids: {friend_ids}")
+        print(f"[Friends] Type of friend_ids: {type(friend_ids)}")
+        print(f"[Friends] Is list: {isinstance(friend_ids, list)}")
+        print(f"[Friends] Length: {len(friend_ids)}")
+
+        if friend_ids:
+            print(f"[Friends] First friend_id: {friend_ids[0]}")
+            print(f"[Friends] First friend_id type: {type(friend_ids[0])}")
+
+            # Ensure all friend_ids are ObjectIds
+            if not isinstance(friend_ids[0], ObjectId):
+                print(f"[Friends] Converting friend_ids to ObjectIds")
+                friend_ids = [ObjectId(fid) if not isinstance(fid, ObjectId) else fid for fid in friend_ids]
+                print(f"[Friends] After conversion: {friend_ids}")
+
+        print(f"[Friends] Querying for friends with _id in: {friend_ids}")
         friends = list(users_collection.find({'_id': {'$in': friend_ids}}))
         print(f"[Friends] Found {len(friends)} friend documents")
+        if friends:
+            print(f"[Friends] Friend usernames: {[f.get('username') for f in friends]}")
 
         friends_list = [{
             'id': str(friend['_id']),
