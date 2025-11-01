@@ -11377,6 +11377,15 @@
         let authToken = localStorage.getItem('authToken');
         window.authToken = authToken;  // Set globally for rating system
         let currentUser = null;
+        try {
+            const storedUser = localStorage.getItem('currentUser');
+            if (storedUser) {
+                currentUser = JSON.parse(storedUser);
+                window.currentUser = currentUser;  // Set globally for rating system
+            }
+        } catch(e) {
+            console.error('Failed to load currentUser from localStorage:', e);
+        }
 
         // API Helper Function
         async function apiRequest(endpoint, options = {}) {
@@ -11471,6 +11480,8 @@
                 window.authToken = authToken;  // Set globally for rating system
                 localStorage.setItem('authToken', authToken);
                 currentUser = data.user;
+                window.currentUser = currentUser;  // Set globally for rating system
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
 
                 closeLoginModal();
                 updateAuthUI();
@@ -11499,6 +11510,8 @@
                 window.authToken = authToken;  // Set globally for rating system
                 localStorage.setItem('authToken', authToken);
                 currentUser = data.user;
+                window.currentUser = currentUser;  // Set globally for rating system
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
 
                 closeRegisterModal();
                 updateAuthUI();
@@ -11514,7 +11527,9 @@
             authToken = null;
             window.authToken = null;  // Clear global token
             currentUser = null;
+            window.currentUser = null;  // Clear global user
             localStorage.removeItem('authToken');
+            localStorage.removeItem('currentUser');
 
             // Clear database-loaded data from memory
             watchlists = JSON.parse(localStorage.getItem('streamingSite_watchlists') || '{"My Watchlist": []}');
