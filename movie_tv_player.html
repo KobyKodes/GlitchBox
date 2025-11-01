@@ -12749,21 +12749,8 @@
                 console.log('[Ratings] youValEl not found!');
             }
 
-            // Remove prior user and friend tiles
-            container.querySelectorAll('.user-rating-item, .friend-rating-item').forEach(n => n.remove());
-
-            // Render user's own rating as a tile if it exists
-            if (yourVal && me) {
-              console.log(`[Ratings] Creating tile for own rating: ${yourVal}`);
-              const userTile = document.createElement('div');
-              userTile.className = 'rating-item user-rating-item';
-              userTile.innerHTML = `
-                <div class="rating-source">You</div>
-                <div class="rating-value">${yourVal}/10</div>
-              `;
-              container.appendChild(userTile);
-              console.log('[Ratings] User rating tile appended');
-            }
+            // Remove prior friend tiles
+            container.querySelectorAll('.friend-rating-item').forEach(n => n.remove());
 
             // Render friend ratings as tiles like others
             try{
