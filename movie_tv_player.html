@@ -12723,20 +12723,31 @@
             }
 
             const cu = getCurrentUser();
+            console.log('[Ratings] getCurrentUser() returned:', cu);
             const me = (cu && (cu.username || cu.name)) || null;
-            console.log('[Ratings] Current user:', me);
+            console.log('[Ratings] Current user (me):', me);
+            console.log('[Ratings] window.currentUser:', window.currentUser);
+            console.log('[Ratings] localStorage currentUser:', localStorage.getItem('currentUser'));
             console.log('[Ratings] Ratings by user:', data.ratings_by_user);
+            console.log('[Ratings] All usernames in ratings:', Object.keys(data.ratings_by_user || {}));
 
             // Update "You" tile UI
             const input = document.getElementById('userRatingInput');
             const btn = document.getElementById('postUserRatingBtn');
             const youValEl = document.getElementById('userRatingValue');
             const yourVal = me ? data.ratings_by_user?.[me] : null;
-            console.log('[Ratings] Your rating value:', yourVal);
+            console.log('[Ratings] Checking for rating: data.ratings_by_user[' + me + '] =', data.ratings_by_user?.[me]);
+            console.log('[Ratings] Your rating value (yourVal):', yourVal);
 
             if (input) input.value = (yourVal || '');
             if (btn) btn.textContent = yourVal ? 'Update' : 'Post';
-            if (youValEl) youValEl.textContent = yourVal ? `${yourVal}/10` : '—';
+            if (youValEl) {
+                const displayValue = yourVal ? `${yourVal}/10` : '—';
+                console.log('[Ratings] Setting youValEl.textContent to:', displayValue);
+                youValEl.textContent = displayValue;
+            } else {
+                console.log('[Ratings] youValEl not found!');
+            }
 
             // Remove prior user and friend tiles
             container.querySelectorAll('.user-rating-item, .friend-rating-item').forEach(n => n.remove());
