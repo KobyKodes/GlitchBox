@@ -11375,6 +11375,7 @@
             : `${window.location.origin}/api`;  // Production (same origin)
 
         let authToken = localStorage.getItem('authToken');
+        window.authToken = authToken;  // Set globally for rating system
         let currentUser = null;
 
         // API Helper Function
@@ -11467,6 +11468,7 @@
                 });
 
                 authToken = data.access_token;
+                window.authToken = authToken;  // Set globally for rating system
                 localStorage.setItem('authToken', authToken);
                 currentUser = data.user;
 
@@ -11494,6 +11496,7 @@
                 });
 
                 authToken = data.access_token;
+                window.authToken = authToken;  // Set globally for rating system
                 localStorage.setItem('authToken', authToken);
                 currentUser = data.user;
 
@@ -11509,6 +11512,7 @@
 
         window.logout = function() {
             authToken = null;
+            window.authToken = null;  // Clear global token
             currentUser = null;
             localStorage.removeItem('authToken');
 
@@ -12528,6 +12532,7 @@
           // --- small helpers ---
           function getToken(){
             return (window.authToken) ||
+                   localStorage.getItem('authToken') ||
                    localStorage.getItem('jwt') ||
                    localStorage.getItem('token') ||
                    localStorage.getItem('access_token');
