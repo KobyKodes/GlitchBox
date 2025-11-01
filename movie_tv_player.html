@@ -11260,8 +11260,7 @@
                 return;
             }
 
-            // Use database only
-            const channelFavourites = channelFavourites || [];
+            // Use database only - don't redeclare, use the global variable
             const existingIndex = channelFavourites.findIndex(fav => fav.name === channel.name);
 
             try {
@@ -12536,10 +12535,12 @@
         
           // Prefer site-wide API helper if present (cookie/session), else add Authorization header
           const API_BASE = '/api';
-          const baseFetch = window.apiRequest
-            ? (path, opt={}) => window.apiRequest(path.startsWith('/api') ? path : (API_BASE + (path.startsWith('/') ? '' : '/') + path), opt)
-            : async (path, opt={}) => {
-                const url = path.startsWith('/api') ? path : (API_BASE + (path.startsWith('/') ? '' : '/') + path);
+          const baseFetch = async (path, opt={}) => {
+                // Always ensure path starts with /api but don't double it
+                let url = path;
+                if (!path.startsWith('/api')) {
+                  url = API_BASE + (path.startsWith('/') ? '' : '/') + path;
+                }
                 const token = getToken();
                 const headers = Object.assign({'Content-Type':'application/json'}, opt.headers || {});
                 if (token) headers['Authorization'] = 'Bearer ' + token;
