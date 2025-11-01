@@ -12647,18 +12647,31 @@
           }
         
           async function postUserRating(){
-            if (!currentContentId || !currentContentType){ showToast('Select a title first'); return; }
+            console.log('[Ratings] postUserRating called');
+            if (!currentContentId || !currentContentType){
+              console.log('[Ratings] Missing content info', { currentContentId, currentContentType });
+              showToast('Select a title first');
+              return;
+            }
             const input = document.getElementById('userRatingInput');
             const val = parseFloat(input && input.value);
-            if (isNaN(val) || val < 1 || val > 10){ showToast('Enter a rating from 1 to 10'); return; }
+            console.log('[Ratings] Rating value:', val);
+            if (isNaN(val) || val < 1 || val > 10){
+              showToast('Enter a rating from 1 to 10');
+              return;
+            }
             try{
-              await baseFetch(`/ratings/${currentContentType}/${currentContentId}`, {
+              const url = `/ratings/${currentContentType}/${currentContentId}`;
+              console.log('[Ratings] Posting to:', url, 'with rating:', val);
+              const result = await baseFetch(url, {
                 method: 'POST',
                 body: JSON.stringify({ rating: val })
               });
+              console.log('[Ratings] Post result:', result);
               await refreshRatingsUI();
               showToast('Saved');
             }catch(e){
+              console.error('[Ratings] Post failed:', e);
               if (e && (e.status === 401 || /401/.test(String(e.message||'')))){
                 if (window.showLoginModal) showLoginModal(); else alert('Please log in');
               } else {
@@ -12668,43 +12681,56 @@
           }
         
           async function refreshRatingsUI(){
+            console.log('[Ratings] refreshRatingsUI called', { currentContentType, currentContentId });
             const container = hostRatingsBox();
-            if (!container || !currentContentId || !currentContentType) return;
-        
+            if (!container || !currentContentId || !currentContentType) {
+              console.log('[Ratings] Missing container or content info', { container: !!container, currentContentId, currentContentType });
+              return;
+            }
+
             // Ensure "You" tile
             ensurePill(container);
-        
+
             // Fetch aggregated ratings
             let data = { ratings_by_user: {} };
             try {
-              data = await baseFetch(`/ratings/${currentContentType}/${currentContentId}`, { method: 'GET' });
+              const url = `/ratings/${currentContentType}/${currentContentId}`;
+              console.log('[Ratings] Fetching from:', url);
+              data = await baseFetch(url, { method: 'GET' });
+              console.log('[Ratings] Received data:', data);
             } catch(e){
-              console.warn('ratings fetch failed', e);
+              console.error('[Ratings] Fetch failed:', e);
             }
-        
+
             const cu = getCurrentUser();
             const me = (cu && (cu.username || cu.name)) || null;
-        
+            console.log('[Ratings] Current user:', me);
+            console.log('[Ratings] Ratings by user:', data.ratings_by_user);
+
             // Update "You" tile UI
             const input = document.getElementById('userRatingInput');
             const btn = document.getElementById('postUserRatingBtn');
             const youValEl = document.getElementById('userRatingValue');
             const yourVal = me ? data.ratings_by_user?.[me] : null;
-        
+            console.log('[Ratings] Your rating value:', yourVal);
+
             if (input) input.value = (yourVal || '');
             if (btn) btn.textContent = yourVal ? 'Update' : 'Post';
             if (youValEl) youValEl.textContent = yourVal ? `${yourVal}/10` : '—';
-        
+
             // Remove prior friend tiles
             container.querySelectorAll('.friend-rating-item').forEach(n => n.remove());
-        
+
             // Render friend ratings as tiles like others
             try{
               const friends = await getFriendUsernames();
+              console.log('[Ratings] Friends list:', friends);
               const friendEntries = Object.entries(data.ratings_by_user || {})
                 .filter(([u,_]) => (!me || u !== me) && friends.includes(u));
-        
+              console.log('[Ratings] Friend ratings to display:', friendEntries);
+
               for (const [u, v] of friendEntries){
+                console.log(`[Ratings] Creating tile for friend ${u} with rating ${v}`);
                 const tile = document.createElement('div');
                 tile.className = 'rating-item friend-rating-item';
                 tile.innerHTML = `
@@ -12712,9 +12738,11 @@
                   <div class="rating-value">${v}/10</div>
                 `;
                 container.appendChild(tile);
+                console.log('[Ratings] Tile appended to container');
               }
+              console.log('[Ratings] Finished rendering friend ratings');
             }catch(e){
-              console.warn('friends fetch failed', e);
+              console.error('[Ratings] Friends rendering failed:', e);
             }
           }
         
