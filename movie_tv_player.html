@@ -11203,8 +11203,7 @@
             // Start with channels filtered by country or favourites
             let baseChannels;
             if (selectedCountry === 'Favourites') {
-                const channelFavourites = JSON.parse(localStorage.getItem('channelFavourites') || '[]');
-                baseChannels = channelFavourites;
+                baseChannels = channelFavourites; // Use global variable loaded from DB
             } else if (selectedCountry === 'All') {
                 baseChannels = allChannels;
             } else {
@@ -11238,8 +11237,7 @@
 
             // Respect country filter when clearing search
             if (selectedCountry === 'Favourites') {
-                const channelFavourites = JSON.parse(localStorage.getItem('channelFavourites') || '[]');
-                currentDisplayedChannels = channelFavourites;
+                currentDisplayedChannels = channelFavourites; // Use global variable loaded from DB
             } else if (selectedCountry === 'All') {
                 currentDisplayedChannels = allChannels;
             } else {
