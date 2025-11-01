@@ -2759,6 +2759,12 @@ def add_to_watchlist():
             'added_at': datetime.utcnow()
         }
 
+        # First ensure the user has a watchlist array
+        users_collection.update_one(
+            {'_id': ObjectId(user_id), 'watchlist': {'$exists': False}},
+            {'$set': {'watchlist': []}}
+        )
+
         # Check if already in watchlist and update if so
         result = users_collection.update_one(
             {
@@ -2796,12 +2802,20 @@ def remove_from_watchlist(content_id):
     try:
         user_id = get_jwt_identity()
 
-        # Remove item from watchlist array (from all lists)
+        # Try to convert content_id to int if possible (TMDB IDs are integers)
+        try:
+            content_id_int = int(content_id)
+        except ValueError:
+            content_id_int = None
+
+        # Remove item from watchlist array (try both string and int versions)
         result = users_collection.update_one(
             {'_id': ObjectId(user_id)},
             {
                 '$pull': {
-                    'watchlist': {'content_id': content_id}
+                    'watchlist': {
+                        'content_id': {'$in': [content_id, content_id_int] if content_id_int else [content_id]}
+                    }
                 }
             }
         )
@@ -2809,9 +2823,7 @@ def remove_from_watchlist(content_id):
         if result.matched_count == 0:
             return jsonify({'error': 'User not found'}), 404
 
-        if result.modified_count == 0:
-            return jsonify({'error': 'Item not found in watchlist'}), 404
-
+        # Don't fail if item wasn't found - it might already be deleted
         return jsonify({'message': 'Removed from watchlist'}), 200
 
     except Exception as e:
@@ -2860,6 +2872,12 @@ def update_continue_watching():
             'last_watched': datetime.utcnow()
         }
 
+        # First ensure the user has a continue_watching array
+        users_collection.update_one(
+            {'_id': ObjectId(user_id), 'continue_watching': {'$exists': False}},
+            {'$set': {'continue_watching': []}}
+        )
+
         # Update existing item or add new one
         result = users_collection.update_one(
             {
@@ -2894,12 +2912,20 @@ def remove_from_continue_watching(content_id):
     try:
         user_id = get_jwt_identity()
 
-        # Remove item from continue_watching array
+        # Try to convert content_id to int if possible (TMDB IDs are integers)
+        try:
+            content_id_int = int(content_id)
+        except ValueError:
+            content_id_int = None
+
+        # Remove item from continue_watching array (try both string and int versions)
         result = users_collection.update_one(
             {'_id': ObjectId(user_id)},
             {
                 '$pull': {
-                    'continue_watching': {'content_id': content_id}
+                    'continue_watching': {
+                        'content_id': {'$in': [content_id, content_id_int] if content_id_int else [content_id]}
+                    }
                 }
             }
         )
@@ -2907,9 +2933,7 @@ def remove_from_continue_watching(content_id):
         if result.matched_count == 0:
             return jsonify({'error': 'User not found'}), 404
 
-        if result.modified_count == 0:
-            return jsonify({'error': 'Item not found'}), 404
-
+        # Don't fail if item wasn't found - it might already be deleted
         return jsonify({'message': 'Removed from continue watching'}), 200
 
     except Exception as e:
@@ -2949,6 +2973,12 @@ def add_to_favorites():
             'channel_name': data['channel_name'],
             'added_at': datetime.utcnow()
         }
+
+        # First ensure the user has a favorites array
+        users_collection.update_one(
+            {'_id': ObjectId(user_id), 'favorites': {'$exists': False}},
+            {'$set': {'favorites': []}}
+        )
 
         # Check if already in favorites and add if not
         result = users_collection.update_one(
