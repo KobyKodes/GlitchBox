@@ -3550,6 +3550,48 @@ def migrate_to_user_attributes():
 
 # ============= END DATABASE MIGRATION =============
 
+@app.route('/api/admin/drop-old-collections', methods=['POST'])
+def drop_old_collections():
+    """
+    Drop the old watchlists, continue_watching, and favorites collections
+    after confirming migration was successful.
+
+    Usage: POST with header 'X-Migration-Secret' matching MIGRATION_SECRET env var
+    """
+    try:
+        # Check migration secret
+        migration_secret = os.environ.get('MIGRATION_SECRET', '')
+        provided_secret = request.headers.get('X-Migration-Secret', '')
+
+        if not migration_secret or provided_secret != migration_secret:
+            return jsonify({'error': 'Unauthorized'}), 401
+
+        # Get collection stats before dropping
+        watchlists_collection = db['watchlists']
+        continue_watching_collection = db['continue_watching']
+        favorites_collection = db['favorites']
+
+        watchlist_count = watchlists_collection.count_documents({})
+        continue_watching_count = continue_watching_collection.count_documents({})
+        favorites_count = favorites_collection.count_documents({})
+
+        # Drop the collections
+        watchlists_collection.drop()
+        continue_watching_collection.drop()
+        favorites_collection.drop()
+
+        return jsonify({
+            'message': 'Old collections dropped successfully',
+            'deleted_collections': {
+                'watchlists': watchlist_count,
+                'continue_watching': continue_watching_count,
+                'favorites': favorites_count
+            }
+        }), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
     # Get port from environment variable (for Render.com/Railway/Heroku)
     port = int(os.environ.get('PORT', 5001))
