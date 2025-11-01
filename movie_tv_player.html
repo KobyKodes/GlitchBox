@@ -10903,32 +10903,17 @@
         // ============= LIVE CHANNELS SECTION =============
 
         // All TV Channels data organized by country
+        // Verified working channels only (tested on 2025-11-01)
+        // Total: 61 channels across 9 countries
         const allWorldChannels = [
             // Lebanon
-            { name: 'Aghani Aghani TV', url: 'https://streaming-a-1035.cdn.nextologies.com/6zj8y5nemi8a32vyjjbkv0oqx/77pcakd8reik3g8qdqnexlkmq/playlist.m3u8', category: 'Music', country: 'Lebanon', countryCode: 'LB', logo: 'https://i.imgur.com/o6HSfNg.png' },
-            { name: 'Al Ittihad', url: 'http://185.105.4.151:8080/_defapp_/ittihad/index.m3u8', category: 'News', country: 'Lebanon', countryCode: 'LB' },
-            { name: 'Al Jadeed', url: 'http://185.9.2.18/chid_391/mono.m3u8', category: 'General', country: 'Lebanon', countryCode: 'LB', logo: 'https://i.imgur.com/CfxR8o3.png' },
-            { name: 'Al Manar', url: 'https://edge.fastpublish.me/live/index.m3u8', category: 'News', country: 'Lebanon', countryCode: 'LB', logo: 'https://i.imgur.com/sOQLV7L.png' },
-            { name: 'Al Mayadeen', url: 'https://mdnlv.cdn.octivid.com/almdn/smil:mpegts.stream.smil/playlist.m3u8', category: 'News', country: 'Lebanon', countryCode: 'LB', logo: 'https://i.imgur.com/GtQOKeW.png' },
-            { name: 'ALWifak News TV', url: 'http://alwifaklive.info:1935/live/myStream/playlist.m3u8', category: 'News', country: 'Lebanon', countryCode: 'LB' },
-            { name: 'Arabica TV', url: 'http://istream.binarywaves.com:8081/hls/arabica/playlist.m3u8', category: 'Music', country: 'Lebanon', countryCode: 'LB', logo: 'https://i.imgur.com/sTOoDy1.png' },
-            { name: 'Future TV', url: 'https://live.kwikmotion.com/futurelive/ftv.smil/playlist.m3u8', category: 'General', country: 'Lebanon', countryCode: 'LB', logo: 'https://i.postimg.cc/43Ww9bQV/futuretv.png' },
-            { name: 'LTV', url: 'https://p-ltv.akamaized.net/ltv/ltv.m3u8', category: 'General', country: 'Lebanon', countryCode: 'LB' },
-            { name: 'Nabaa TV', url: 'http://31.14.40.237:1935/live/Nabaa/playlist.m3u8', category: 'News', country: 'Lebanon', countryCode: 'LB' },
-            { name: 'NBN', url: 'http://5.9.119.146:8883/nbn/index.m3u8', category: 'General', country: 'Lebanon', countryCode: 'LB', logo: 'https://i.imgur.com/EefFcIk.png' },
-            { name: 'OTV', url: 'https://fl1002.bozztv.com/ga-otvlebanon/index.m3u8', category: 'General', country: 'Lebanon', countryCode: 'LB', logo: 'https://i.imgur.com/toxFMeY.png' },
-            { name: 'Red TV Lebanon', url: 'https://live.kwikmotion.com/redtvlive/redtv.smil/playlist.m3u8', category: 'General', country: 'Lebanon', countryCode: 'LB' },
-            { name: 'Senses TV', url: 'https://sensestv.com:4433/hls/sensesonline/index.m3u8', category: 'Entertainment', country: 'Lebanon', countryCode: 'LB' },
-            { name: 'Tele Liban', url: 'https://cdn.catiacast.video/abr/ed8f807e2548db4507d2a6f4ba0c4a06/playlist.m3u8', category: 'General', country: 'Lebanon', countryCode: 'LB', logo: 'https://i.postimg.cc/d3RWtcXq/teleliban.png' },
-            { name: 'UNews', url: 'https://cdn.catiacast.video/abr/9436b5ab3c1171ab04a59af11951292f/playlist.m3u8', category: 'News', country: 'Lebanon', countryCode: 'LB' },
-            { name: 'Voice of Lebanon', url: 'https://svs.itworkscdn.net/vdltvlive/vdltv.smil/playlist.m3u8', category: 'News', country: 'Lebanon', countryCode: 'LB', logo: 'https://i.imgur.com/f8WcqRY.png' },
+            { name: 'Aghani Aghani TV', url: 'https://streaming-a-1035.cdn.nextologies.com/6zj8y5nemi8a32vyjjbkv0oqx/77pcakd8reik3g8qdqnexlkmq/playlist.m3u8', category: 'Music', country: 'Lebanon', countryCode: 'LB', logo: 'https://i.imgur.com/o6HSfNg.png' },            { name: 'Al Mayadeen', url: 'https://mdnlv.cdn.octivid.com/almdn/smil:mpegts.stream.smil/playlist.m3u8', category: 'News', country: 'Lebanon', countryCode: 'LB', logo: 'https://i.imgur.com/GtQOKeW.png' },            { name: 'Future TV', url: 'https://live.kwikmotion.com/futurelive/ftv.smil/playlist.m3u8', category: 'General', country: 'Lebanon', countryCode: 'LB', logo: 'https://i.postimg.cc/43Ww9bQV/futuretv.png' },
+            { name: 'LTV', url: 'https://p-ltv.akamaized.net/ltv/ltv.m3u8', category: 'General', country: 'Lebanon', countryCode: 'LB' },            { name: 'Red TV Lebanon', url: 'https://live.kwikmotion.com/redtvlive/redtv.smil/playlist.m3u8', category: 'General', country: 'Lebanon', countryCode: 'LB' },            { name: 'Tele Liban', url: 'https://cdn.catiacast.video/abr/ed8f807e2548db4507d2a6f4ba0c4a06/playlist.m3u8', category: 'General', country: 'Lebanon', countryCode: 'LB', logo: 'https://i.postimg.cc/d3RWtcXq/teleliban.png' },            { name: 'Voice of Lebanon', url: 'https://svs.itworkscdn.net/vdltvlive/vdltv.smil/playlist.m3u8', category: 'News', country: 'Lebanon', countryCode: 'LB', logo: 'https://i.imgur.com/f8WcqRY.png' },
 
             // Saudi Arabia
             { name: 'Al Arabiya Al Hadath', url: 'https://av.alarabiya.net/alarabiapublish/alhadath.smil/playlist.m3u8', category: 'News', country: 'Saudi Arabia', countryCode: 'SA' },
             { name: 'Al Ekhbariya', url: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-al-ekhbaria/297b3ef1cd0633ad9cfba7473a686a06/index.m3u8', category: 'News', country: 'Saudi Arabia', countryCode: 'SA' },
-            { name: 'Al Quran Al Kareem TV', url: 'https://cdn-globecast.akamaized.net/live/eds/saudi_quran/hls_roku/index.m3u8', category: 'Religious', country: 'Saudi Arabia', countryCode: 'SA' },
-            { name: 'Al Resalah', url: 'https://rotana.hibridcdn.net/rotananet/risala_net-7Y83PP5adWixDF93/playlist.m3u8', category: 'Religious', country: 'Saudi Arabia', countryCode: 'SA' },
-            { name: 'Al Saudiya', url: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-saudi-tv/2ad66056b51fd8c1b624854623112e43/index.m3u8', category: 'General', country: 'Saudi Arabia', countryCode: 'SA' },
+            { name: 'Al Quran Al Kareem TV', url: 'https://cdn-globecast.akamaized.net/live/eds/saudi_quran/hls_roku/index.m3u8', category: 'Religious', country: 'Saudi Arabia', countryCode: 'SA' },            { name: 'Al Saudiya', url: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-saudi-tv/2ad66056b51fd8c1b624854623112e43/index.m3u8', category: 'General', country: 'Saudi Arabia', countryCode: 'SA' },
             { name: 'Al Sunnah Al Nabawiyah TV', url: 'https://cdn-globecast.akamaized.net/live/eds/saudi_sunnah/hls_roku/index.m3u8', category: 'Religious', country: 'Saudi Arabia', countryCode: 'SA' },
             { name: 'SBC', url: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-sbc/90e09c0c28db26435799b4a14892a167/index.m3u8', category: 'General', country: 'Saudi Arabia', countryCode: 'SA' },
 
@@ -10943,87 +10928,31 @@
             { name: 'Noor Dubai', url: 'https://dmiffthftl.cdn.mangomolo.com/noordubaitv/smil:noordubaitv.smil/chunklist.m3u8', category: 'Religious', country: 'UAE', countryCode: 'AE' },
             { name: 'CNBC Arabiya', url: 'https://cnbc-live.akamaized.net/cnbc/master.m3u8', category: 'News', country: 'UAE', countryCode: 'AE' },
 
-            // Egypt
-            { name: 'CBC Egypt', url: 'https://bcovlive-a.akamaihd.net/0c223ac0a9d34b30b100cb92ee83b70a/us-west-2/6057955906001/playlist.m3u8', category: 'General', country: 'Egypt', countryCode: 'EG' },
-            { name: 'DMC Egypt', url: 'https://bcovlive-a.akamaihd.net/ba3169004d40484b9ff29e194964c9e8/eu-west-1/6057955906001/playlist.m3u8', category: 'General', country: 'Egypt', countryCode: 'EG' },
-            { name: 'MBC Masr', url: 'https://mbc1-enc.edgenextcdn.net/out/v1/d5036cabf11e45bf9d0db410ca135c18/index.m3u8', category: 'General', country: 'Egypt', countryCode: 'EG' },
-            { name: 'Nile News', url: 'https://uvotv-aniview.global.ssl.fastly.net/hls/live/2119198/alnilenews/playlist.m3u8', category: 'News', country: 'Egypt', countryCode: 'EG' },
-            { name: 'Egyptian TV', url: 'https://uvotv-aniview.global.ssl.fastly.net/hls/live/2120757/egyptiantvhd/playlist.m3u8', category: 'General', country: 'Egypt', countryCode: 'EG' },
-            { name: 'Alhayat TV', url: 'https://uvotv-aniview.global.ssl.fastly.net/10010/dvr/hls/alhayathd/playlist.m3u8', category: 'General', country: 'Egypt', countryCode: 'EG' },
-            { name: 'Al Masriyah', url: 'https://uvotv-aniview.global.ssl.fastly.net/hls/live/2119197/almasriya/playlist.m3u8', category: 'General', country: 'Egypt', countryCode: 'EG' },
-            { name: 'TeN Egypt', url: 'https://uvotv-aniview.global.ssl.fastly.net/10010/dvr/hls/ten/playlist.m3u8', category: 'Entertainment', country: 'Egypt', countryCode: 'EG' },
-
-            // Canada
-            { name: 'CBC News Network', url: 'https://cbcrclinear-tor.akamaized.net/hls/live/2042769/geo_allow_ca/CBCRCLINEAR_TOR_15/master5.m3u8', category: 'News', country: 'Canada', countryCode: 'CA' },
-            { name: 'CTV News', url: 'https://pe-fa-lp02a.9c9media.com/live/News1Digi/p/hls/00000201/38ef78f479b07aa0/index/0c6a10a2/live/stream/h264/v1/3500000/manifest.m3u8', category: 'News', country: 'Canada', countryCode: 'CA' },
-            { name: 'CityNews Toronto', url: 'https://citynewsregional.akamaized.net/hls/live/1024052/Regional_Live_7/master.m3u8', category: 'News', country: 'Canada', countryCode: 'CA' },
-            { name: 'TSN1', url: 'https://fl1.moveonjoy.com/TSN_1/index.m3u8', category: 'Sports', country: 'Canada', countryCode: 'CA' },
-            { name: 'Fight Network', url: 'https://d12a2vxqkkh1bo.cloudfront.net/hls/main.m3u8', category: 'Sports', country: 'Canada', countryCode: 'CA' },
-            { name: 'CBC Toronto', url: 'https://cbcrclinear-tor.akamaized.net/hls/live/2042760/CBCRCLINEAR_TOR_6/master5.m3u8', category: 'General', country: 'Canada', countryCode: 'CA' },
-            { name: 'Much', url: 'https://fl1.moveonjoy.com/MUCH/index.m3u8', category: 'Music', country: 'Canada', countryCode: 'CA' },
+            // Egypt            { name: 'MBC Masr', url: 'https://mbc1-enc.edgenextcdn.net/out/v1/d5036cabf11e45bf9d0db410ca135c18/index.m3u8', category: 'General', country: 'Egypt', countryCode: 'EG' },            // Canada            { name: 'CityNews Toronto', url: 'https://citynewsregional.akamaized.net/hls/live/1024052/Regional_Live_7/master.m3u8', category: 'News', country: 'Canada', countryCode: 'CA' },
+            { name: 'TSN1', url: 'https://fl1.moveonjoy.com/TSN_1/index.m3u8', category: 'Sports', country: 'Canada', countryCode: 'CA' },            { name: 'Much', url: 'https://fl1.moveonjoy.com/MUCH/index.m3u8', category: 'Music', country: 'Canada', countryCode: 'CA' },
             { name: 'CPAC', url: 'https://d7z3qjdsxbwoq.cloudfront.net/groupa/live/f9809cea-1e07-47cd-a94d-2ddd3e1351db/live.isml/.m3u8', category: 'News', country: 'Canada', countryCode: 'CA' },
-            { name: 'ICI Montreal', url: 'https://amdici.akamaized.net/hls/live/873426/ICI-Live-Stream/master.m3u8', category: 'General', country: 'Canada', countryCode: 'CA' },
-            { name: 'Télé-Québec', url: 'https://bcovlive-a.akamaihd.net/4b1c462c86094bae93b65adc84e43afc/us-west-2/6101674910001/playlist.m3u8', category: 'Education', country: 'Canada', countryCode: 'CA' },
-            { name: 'Golf Channel', url: 'https://fl1.moveonjoy.com/GOLF/index.m3u8', category: 'Sports', country: 'Canada', countryCode: 'CA' },
-            { name: 'TVOKids', url: 'https://bcovlive-a.akamaihd.net/rf86f817779524249abf842af6d16f55f/us-east-1/15364602001/playlist.m3u8', category: 'Kids', country: 'Canada', countryCode: 'CA' },
-
-            // UK
-            { name: 'BBC One London', url: 'https://november.queazified.co.uk/ee971134-115e-4418-8d1d-69dff7d4c6eb.m3u8', category: 'General', country: 'UK', countryCode: 'GB' },
-            { name: 'BBC Two HD', url: 'https://viamotionhsi.netplus.ch/live/eds/bbc2/browser-HLS8/bbc2.m3u8', category: 'General', country: 'UK', countryCode: 'GB' },
-            { name: 'Channel 4', url: 'https://x.canlitvapp.com/u-channel-4/index.m3u8', category: 'General', country: 'UK', countryCode: 'GB' },
-            { name: 'Channel 5', url: 'https://x.canlitvapp.com/u-channel-5/index.m3u8', category: 'General', country: 'UK', countryCode: 'GB' },
-            { name: 'ITV3', url: 'https://viamotionhsi.netplus.ch/live/eds/itv3/browser-HLS8/itv3.m3u8', category: 'Entertainment', country: 'UK', countryCode: 'GB' },
-            { name: 'GB News', url: 'https://amg01076-lightningintern-gbnewsau-samsungau-et7fz.amagi.tv/playlist/amg01076-lightningintern-gbnewsau-samsungau/playlist.m3u8', category: 'News', country: 'UK', countryCode: 'GB' },
-            { name: 'Film4 HD', url: 'https://viamotionhsi.netplus.ch/live/eds/film4/browser-HLS8/film4.m3u8', category: 'Movies', country: 'UK', countryCode: 'GB' },
-            { name: 'MUTV', url: 'https://bcovlive-a.akamaihd.net/r2d2c4ca5bf57456fb1d16255c1a535c8/eu-west-1/6058004203001/playlist.m3u8', category: 'Sports', country: 'UK', countryCode: 'GB' },
-            { name: 'CBeebies', url: 'https://x.canlitvapp.com/u-cbeebies/index.m3u8', category: 'Kids', country: 'UK', countryCode: 'GB' },
-            { name: 'TalkTV', url: 'https://amg00738-newsuk-amg00738c1-lg-gb-3426.playouts.now.amagi.tv/playlist/amg00738-newscorpukandirelandlimited-talktv-lggb/playlist.m3u8', category: 'News', country: 'UK', countryCode: 'GB' },
-            { name: 'QVC UK', url: 'https://qvcuk-live.akamaized.net/hls/live/2097112/qvc/master.m3u8', category: 'Shopping', country: 'UK', countryCode: 'GB' },
-            { name: 'Islam Channel', url: 'https://live.islamchannel.tv/live11/islamtv_english/bitrate1.isml/live.m3u8', category: 'Religious', country: 'UK', countryCode: 'GB' },
-
+            { name: 'ICI Montreal', url: 'https://amdici.akamaized.net/hls/live/873426/ICI-Live-Stream/master.m3u8', category: 'General', country: 'Canada', countryCode: 'CA' },            { name: 'Golf Channel', url: 'https://fl1.moveonjoy.com/GOLF/index.m3u8', category: 'Sports', country: 'Canada', countryCode: 'CA' },
+            // UK            { name: 'BBC Two HD', url: 'https://viamotionhsi.netplus.ch/live/eds/bbc2/browser-HLS8/bbc2.m3u8', category: 'General', country: 'UK', countryCode: 'GB' },            { name: 'ITV3', url: 'https://viamotionhsi.netplus.ch/live/eds/itv3/browser-HLS8/itv3.m3u8', category: 'Entertainment', country: 'UK', countryCode: 'GB' },            { name: 'Film4 HD', url: 'https://viamotionhsi.netplus.ch/live/eds/film4/browser-HLS8/film4.m3u8', category: 'Movies', country: 'UK', countryCode: 'GB' },            { name: 'QVC UK', url: 'https://qvcuk-live.akamaized.net/hls/live/2097112/qvc/master.m3u8', category: 'Shopping', country: 'UK', countryCode: 'GB' },
             // Germany
-            { name: 'Das Erste', url: 'https://derste247liveint.akamaized.net/hls/live/662735/daserste_int/master.m3u8', category: 'General', country: 'Germany', countryCode: 'DE' },
-            { name: 'ZDF', url: 'https://zdf-hls-15.akamaized.net/hls/live/2016498/de/high/master.m3u8', category: 'General', country: 'Germany', countryCode: 'DE' },
-            { name: 'ARD-alpha', url: 'https://brlive-lh.akamaihd.net/i/bralpha_germany@119899/master.m3u8', category: 'Education', country: 'Germany', countryCode: 'DE' },
-            { name: '3sat', url: 'https://zdf-hls-18.akamaized.net/hls/live/2016501/dach/high/master.m3u8', category: 'General', country: 'Germany', countryCode: 'DE' },
-            { name: 'tagesschau 24', url: 'https://tagesschau.akamaized.net/hls/live/2020115/tagesschau/tagesschau_1/master.m3u8', category: 'News', country: 'Germany', countryCode: 'DE' },
+            { name: 'Das Erste', url: 'https://derste247liveint.akamaized.net/hls/live/662735/daserste_int/master.m3u8', category: 'General', country: 'Germany', countryCode: 'DE' },            { name: 'ARD-alpha', url: 'https://brlive-lh.akamaihd.net/i/bralpha_germany@119899/master.m3u8', category: 'Education', country: 'Germany', countryCode: 'DE' },            { name: 'tagesschau 24', url: 'https://tagesschau.akamaized.net/hls/live/2020115/tagesschau/tagesschau_1/master.m3u8', category: 'News', country: 'Germany', countryCode: 'DE' },
             { name: 'WELT', url: 'https://viamotionhsi.netplus.ch/live/eds/n24/browser-HLS8/n24.m3u8', category: 'News', country: 'Germany', countryCode: 'DE' },
             { name: 'Dokusat', url: 'https://muc3.iptv-playoutcenter.de/dokusat/dokusat1/playlist.m3u8', category: 'Documentary', country: 'Germany', countryCode: 'DE' },
-            { name: 'KiKA', url: 'https://kikageohls.akamaized.net/hls/live/2022693/livetvkika_de/master.m3u8', category: 'Kids', country: 'Germany', countryCode: 'DE' },
-            { name: 'Magenta Musik 360', url: 'https://streaming.magentamusik.de/csm/573870/magentamusik1/index.m3u8', category: 'Music', country: 'Germany', countryCode: 'DE' },
-            { name: 'More Than Sports TV', url: 'https://mts1.iptv-playoutcenter.de/mts/mts-web/playlist.m3u8', category: 'Sports', country: 'Germany', countryCode: 'DE' },
-            { name: 'ARTE', url: 'https://artesimulcast.akamaized.net/hls/live/2030993/artelive_de/index.m3u8', category: 'Entertainment', country: 'Germany', countryCode: 'DE' },
-            { name: 'WDR Fernsehen', url: 'https://wdr-live.ard-mcdn.de/wdr/live/hls/de/master.m3u8', category: 'General', country: 'Germany', countryCode: 'DE' },
+            { name: 'KiKA', url: 'https://kikageohls.akamaized.net/hls/live/2022693/livetvkika_de/master.m3u8', category: 'Kids', country: 'Germany', countryCode: 'DE' },            { name: 'More Than Sports TV', url: 'https://mts1.iptv-playoutcenter.de/mts/mts-web/playlist.m3u8', category: 'Sports', country: 'Germany', countryCode: 'DE' },            { name: 'WDR Fernsehen', url: 'https://wdr-live.ard-mcdn.de/wdr/live/hls/de/master.m3u8', category: 'General', country: 'Germany', countryCode: 'DE' },
 
             // USA
             { name: 'ABC News New York', url: 'https://content.uplynk.com/channel/ext/72750b711f704e4a94b5cfe6dc99f5e1/wabc_24x7_news.m3u8', category: 'News', country: 'USA', countryCode: 'US', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/WABC_TV_New_2021.svg/512px-WABC_TV_New_2021.svg.png' },
             { name: 'CBS News New York', url: 'https://cbsn-ny.cbsnstream.cbsnews.com/out/v1/ec3897d58a9b45129a77d67aa247d136/master.m3u8', category: 'News', country: 'USA', countryCode: 'US' },
             { name: 'CBS News Chicago', url: 'https://cbsn-chi.cbsnstream.cbsnews.com/out/v1/b2fc0d5715d54908adf07f97d2616646/master.m3u8', category: 'News', country: 'USA', countryCode: 'US' },
             { name: 'CBS News Los Angeles', url: 'https://cbsn-la.cbsnstream.cbsnews.com/out/v1/57b6c4534a164accb6b1872b501e0028/master.m3u8', category: 'News', country: 'USA', countryCode: 'US' },
-            { name: 'Cheddar News', url: 'https://cheddar-us.samsung.wurl.tv/playlist.m3u8', category: 'News', country: 'USA', countryCode: 'US' },
-            { name: 'Bloomberg TV', url: 'https://bloomberg-bloomberg-3-br.samsung.wurl.tv/manifest/playlist.m3u8', category: 'News', country: 'USA', countryCode: 'US', logo: 'https://i.imgur.com/OuogLHx.png' },
-            { name: 'C-SPAN', url: 'https://fl1.moveonjoy.com/C-SPAN/index.m3u8', category: 'News', country: 'USA', countryCode: 'US' },
-            { name: 'CNBC', url: 'https://fl1.moveonjoy.com/CNBC/index.m3u8', category: 'News', country: 'USA', countryCode: 'US', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/CNBC_logo.svg/512px-CNBC_logo.svg.png' },
-            { name: 'AMC', url: 'https://fl1.moveonjoy.com/AMC_NETWORK/index.m3u8', category: 'Entertainment', country: 'USA', countryCode: 'US', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/AMC_logo_2019.svg/512px-AMC_logo_2019.svg.png' },
-            { name: 'BBC America', url: 'https://bcovlive-a.akamaihd.net/7f5ec16d102f4b5d92e8e27bc95ff424/us-east-1/6240731308001/playlist.m3u8', category: 'Entertainment', country: 'USA', countryCode: 'US' },
-            { name: 'Bravo', url: 'https://fl1.moveonjoy.com/BRAVO/index.m3u8', category: 'Entertainment', country: 'USA', countryCode: 'US', logo: 'https://i.imgur.com/JmTIRLF.png' },
-            { name: 'Comedy Central', url: 'https://fl1.moveonjoy.com/Comedy_Central/index.m3u8', category: 'Entertainment', country: 'USA', countryCode: 'US', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Comedy_Central_2018.svg/512px-Comedy_Central_2018.svg.png' },
-            { name: 'Comet', url: 'https://fast-channels.sinclairstoryline.com/COMET/index.m3u8', category: 'Movies', country: 'USA', countryCode: 'US' },
-            { name: 'Cozi TV', url: 'https://fl1.moveonjoy.com/COZI_TV/index.m3u8', category: 'Entertainment', country: 'USA', countryCode: 'US' },
-            { name: 'CMT', url: 'https://fl1.moveonjoy.com/CMT/index.m3u8', category: 'Music', country: 'USA', countryCode: 'US' },
-            { name: 'Antenna TV', url: 'https://fl1.moveonjoy.com/Antenna_TV/index.m3u8', category: 'Entertainment', country: 'USA', countryCode: 'US' },
-            { name: 'Bounce', url: 'https://fl1.moveonjoy.com/BOUNCE_TV/index.m3u8', category: 'Entertainment', country: 'USA', countryCode: 'US' },
-            { name: 'Buzzr', url: 'https://fl1.moveonjoy.com/Buzzr/index.m3u8', category: 'Entertainment', country: 'USA', countryCode: 'US' },
-            { name: 'Aspire', url: 'https://fl1.moveonjoy.com/Aspire/index.m3u8', category: 'Entertainment', country: 'USA', countryCode: 'US' },
-            { name: 'beIN Sports USA', url: 'http://fl1.moveonjoy.com/BEIN_SPORTS/index.m3u8', category: 'Sports', country: 'USA', countryCode: 'US', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Bein_Sports_Logo.svg/512px-Bein_Sports_Logo.svg.png' },
-            { name: 'CBS Sports Network', url: 'https://fl1.moveonjoy.com/CBS_SPORTS_NETWORK/index.m3u8', category: 'Sports', country: 'USA', countryCode: 'US', logo: 'https://i.imgur.com/A8CnA8g.png' },
+            { name: 'Cheddar News', url: 'https://cheddar-us.samsung.wurl.tv/playlist.m3u8', category: 'News', country: 'USA', countryCode: 'US' },            { name: 'CNBC', url: 'https://fl1.moveonjoy.com/CNBC/index.m3u8', category: 'News', country: 'USA', countryCode: 'US', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/CNBC_logo.svg/512px-CNBC_logo.svg.png' },            { name: 'BBC America', url: 'https://bcovlive-a.akamaihd.net/7f5ec16d102f4b5d92e8e27bc95ff424/us-east-1/6240731308001/playlist.m3u8', category: 'Entertainment', country: 'USA', countryCode: 'US' },
+            { name: 'Bravo', url: 'https://fl1.moveonjoy.com/BRAVO/index.m3u8', category: 'Entertainment', country: 'USA', countryCode: 'US', logo: 'https://i.imgur.com/JmTIRLF.png' },            { name: 'Comet', url: 'https://fast-channels.sinclairstoryline.com/COMET/index.m3u8', category: 'Movies', country: 'USA', countryCode: 'US' },            { name: 'CMT', url: 'https://fl1.moveonjoy.com/CMT/index.m3u8', category: 'Music', country: 'USA', countryCode: 'US' },
+            { name: 'Antenna TV', url: 'https://fl1.moveonjoy.com/Antenna_TV/index.m3u8', category: 'Entertainment', country: 'USA', countryCode: 'US' },            { name: 'Buzzr', url: 'https://fl1.moveonjoy.com/Buzzr/index.m3u8', category: 'Entertainment', country: 'USA', countryCode: 'US' },
+            { name: 'Aspire', url: 'https://fl1.moveonjoy.com/Aspire/index.m3u8', category: 'Entertainment', country: 'USA', countryCode: 'US' },            { name: 'CBS Sports Network', url: 'https://fl1.moveonjoy.com/CBS_SPORTS_NETWORK/index.m3u8', category: 'Sports', country: 'USA', countryCode: 'US', logo: 'https://i.imgur.com/A8CnA8g.png' },
             { name: 'ACC Network', url: 'https://fl1.moveonjoy.com/ACC_NETWORK/index.m3u8', category: 'Sports', country: 'USA', countryCode: 'US' },
             { name: 'AXS TV', url: 'https://fl1.moveonjoy.com/Axs_TV/index.m3u8', category: 'Entertainment', country: 'USA', countryCode: 'US' },
             { name: '3ABN Kids', url: 'https://3abn.bozztv.com/3abn2/Kids_live/smil:Kids_live.smil/playlist.m3u8', category: 'Kids', country: 'USA', countryCode: 'US' },
             { name: 'Baby Shark TV', url: 'https://newidco-babysharktv-1-eu.rakuten.wurl.tv/playlist.m3u8', category: 'Kids', country: 'USA', countryCode: 'US' },
-            { name: 'BabyFirst', url: 'https://streams2.sofast.tv/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/c8d16110-566c-4e95-a1df-55d175e9e201/manifest.m3u8', category: 'Kids', country: 'USA', countryCode: 'US' },
-            { name: 'Brat TV', url: 'https://amg00350-amg00350c1-klowdtv-us-2536.playouts.now.amagi.tv/playlist/amg00350-bratstudiofast-brat-klowdtvus/playlist.m3u8', category: 'Kids', country: 'USA', countryCode: 'US' },
-            { name: 'Catholic TV', url: 'https://catholictvhd-lh.akamaized.net/hls/live/2043390/CTVLiveHD/master.m3u8', category: 'Religious', country: 'USA', countryCode: 'US' }
+            { name: 'BabyFirst', url: 'https://streams2.sofast.tv/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/c8d16110-566c-4e95-a1df-55d175e9e201/manifest.m3u8', category: 'Kids', country: 'USA', countryCode: 'US' },            { name: 'Catholic TV', url: 'https://catholictvhd-lh.akamaized.net/hls/live/2043390/CTVLiveHD/master.m3u8', category: 'Religious', country: 'USA', countryCode: 'US' }
         ];
 
         let allChannels = [];
