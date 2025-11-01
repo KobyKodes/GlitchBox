@@ -54,9 +54,6 @@ db = client['retroflix']
 
 # Collections
 users_collection = db['users']
-watchlists_collection = db['watchlists']
-continue_watching_collection = db['continue_watching']
-favorites_collection = db['favorites']
 comments_collection = db['comments']
 comment_likes_collection = db['comment_likes']
 friend_requests_collection = db['friend_requests']
@@ -66,9 +63,6 @@ ratings_collection = db['ratings']
 try:
     users_collection.create_index('username', unique=True)
     users_collection.create_index('email', unique=True)
-    watchlists_collection.create_index([('user_id', 1), ('content_id', 1)])
-    continue_watching_collection.create_index([('user_id', 1), ('content_id', 1)])
-    favorites_collection.create_index([('user_id', 1), ('channel_id', 1)])
     comments_collection.create_index([('content_id', 1), ('user_id', 1)])
     comment_likes_collection.create_index([('comment_id', 1), ('user_id', 1)], unique=True)
     ratings_collection.create_index([('content_key', 1), ('user_id', 1)], unique=True)
@@ -2648,7 +2642,10 @@ def register():
             'email': email,
             'password_hash': generate_password_hash(password),
             'created_at': datetime.utcnow(),
-            'friends': []
+            'friends': [],
+            'watchlist': [],
+            'continue_watching': [],
+            'favorites': []
         }
 
         result = users_collection.insert_one(user)
@@ -2729,12 +2726,13 @@ def get_current_user():
 def get_watchlist():
     try:
         user_id = get_jwt_identity()
-        watchlist_items = list(watchlists_collection.find({'user_id': ObjectId(user_id)}))
+        user = users_collection.find_one({'_id': ObjectId(user_id)})
 
-        # Convert ObjectId to string for JSON serialization
-        for item in watchlist_items:
-            item['_id'] = str(item['_id'])
-            item['user_id'] = str(item['user_id'])
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+
+        # Get watchlist from user document (default to empty array)
+        watchlist_items = user.get('watchlist', [])
 
         return jsonify(watchlist_items), 200
 
@@ -2752,18 +2750,7 @@ def add_to_watchlist():
         # Get list name (default to "My Watchlist" for backwards compatibility)
         list_name = data.get('list_name', 'My Watchlist')
 
-        # Check if already in this specific watchlist
-        existing = watchlists_collection.find_one({
-            'user_id': ObjectId(user_id),
-            'content_id': data['content_id'],
-            'list_name': list_name
-        })
-
-        if existing:
-            return jsonify({'error': 'Item already in watchlist'}), 400
-
         watchlist_item = {
-            'user_id': ObjectId(user_id),
             'content_id': data['content_id'],
             'content_type': data['content_type'],
             'title': data['title'],
@@ -2772,9 +2759,30 @@ def add_to_watchlist():
             'added_at': datetime.utcnow()
         }
 
-        result = watchlists_collection.insert_one(watchlist_item)
-        watchlist_item['_id'] = str(result.inserted_id)
-        watchlist_item['user_id'] = str(watchlist_item['user_id'])
+        # Check if already in watchlist and update if so
+        result = users_collection.update_one(
+            {
+                '_id': ObjectId(user_id),
+                'watchlist': {
+                    '$not': {
+                        '$elemMatch': {
+                            'content_id': data['content_id'],
+                            'list_name': list_name
+                        }
+                    }
+                }
+            },
+            {
+                '$push': {'watchlist': watchlist_item}
+            }
+        )
+
+        if result.matched_count == 0:
+            # Either user not found or item already exists
+            user = users_collection.find_one({'_id': ObjectId(user_id)})
+            if not user:
+                return jsonify({'error': 'User not found'}), 404
+            return jsonify({'error': 'Item already in watchlist'}), 400
 
         return jsonify(watchlist_item), 201
 
@@ -2788,13 +2796,20 @@ def remove_from_watchlist(content_id):
     try:
         user_id = get_jwt_identity()
 
-        # Delete from all watchlists for this user
-        result = watchlists_collection.delete_many({
-            'user_id': ObjectId(user_id),
-            'content_id': content_id
-        })
+        # Remove item from watchlist array (from all lists)
+        result = users_collection.update_one(
+            {'_id': ObjectId(user_id)},
+            {
+                '$pull': {
+                    'watchlist': {'content_id': content_id}
+                }
+            }
+        )
 
-        if result.deleted_count == 0:
+        if result.matched_count == 0:
+            return jsonify({'error': 'User not found'}), 404
+
+        if result.modified_count == 0:
             return jsonify({'error': 'Item not found in watchlist'}), 404
 
         return jsonify({'message': 'Removed from watchlist'}), 200
@@ -2810,11 +2825,16 @@ def remove_from_watchlist(content_id):
 def get_continue_watching():
     try:
         user_id = get_jwt_identity()
-        items = list(continue_watching_collection.find({'user_id': ObjectId(user_id)}).sort('last_watched', -1))
+        user = users_collection.find_one({'_id': ObjectId(user_id)})
 
-        for item in items:
-            item['_id'] = str(item['_id'])
-            item['user_id'] = str(item['user_id'])
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+
+        # Get continue watching from user document (default to empty array)
+        items = user.get('continue_watching', [])
+
+        # Sort by last_watched in descending order
+        items = sorted(items, key=lambda x: x.get('last_watched', datetime.min), reverse=True)
 
         return jsonify(items), 200
 
@@ -2829,25 +2849,38 @@ def update_continue_watching():
         user_id = get_jwt_identity()
         data = request.get_json()
 
-        # Update or insert
-        continue_watching_collection.update_one(
+        continue_watching_item = {
+            'content_id': data['content_id'],
+            'content_type': data['content_type'],
+            'title': data['title'],
+            'poster_path': data.get('poster_path'),
+            'progress': data.get('progress', 0),
+            'season': data.get('season'),
+            'episode': data.get('episode'),
+            'last_watched': datetime.utcnow()
+        }
+
+        # Update existing item or add new one
+        result = users_collection.update_one(
             {
-                'user_id': ObjectId(user_id),
-                'content_id': data['content_id']
+                '_id': ObjectId(user_id),
+                'continue_watching.content_id': data['content_id']
             },
             {
                 '$set': {
-                    'content_type': data['content_type'],
-                    'title': data['title'],
-                    'poster_path': data.get('poster_path'),
-                    'progress': data.get('progress', 0),
-                    'season': data.get('season'),
-                    'episode': data.get('episode'),
-                    'last_watched': datetime.utcnow()
+                    'continue_watching.$': continue_watching_item
                 }
-            },
-            upsert=True
+            }
         )
+
+        # If no existing item was updated, add a new one
+        if result.matched_count == 0:
+            users_collection.update_one(
+                {'_id': ObjectId(user_id)},
+                {
+                    '$push': {'continue_watching': continue_watching_item}
+                }
+            )
 
         return jsonify({'message': 'Continue watching updated'}), 200
 
@@ -2861,12 +2894,20 @@ def remove_from_continue_watching(content_id):
     try:
         user_id = get_jwt_identity()
 
-        result = continue_watching_collection.delete_one({
-            'user_id': ObjectId(user_id),
-            'content_id': content_id
-        })
+        # Remove item from continue_watching array
+        result = users_collection.update_one(
+            {'_id': ObjectId(user_id)},
+            {
+                '$pull': {
+                    'continue_watching': {'content_id': content_id}
+                }
+            }
+        )
 
-        if result.deleted_count == 0:
+        if result.matched_count == 0:
+            return jsonify({'error': 'User not found'}), 404
+
+        if result.modified_count == 0:
             return jsonify({'error': 'Item not found'}), 404
 
         return jsonify({'message': 'Removed from continue watching'}), 200
@@ -2882,11 +2923,13 @@ def remove_from_continue_watching(content_id):
 def get_favorites():
     try:
         user_id = get_jwt_identity()
-        favorites = list(favorites_collection.find({'user_id': ObjectId(user_id)}))
+        user = users_collection.find_one({'_id': ObjectId(user_id)})
 
-        for item in favorites:
-            item['_id'] = str(item['_id'])
-            item['user_id'] = str(item['user_id'])
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+
+        # Get favorites from user document (default to empty array)
+        favorites = user.get('favorites', [])
 
         return jsonify(favorites), 200
 
@@ -2901,25 +2944,29 @@ def add_to_favorites():
         user_id = get_jwt_identity()
         data = request.get_json()
 
-        # Check if already in favorites
-        existing = favorites_collection.find_one({
-            'user_id': ObjectId(user_id),
-            'channel_id': data['channel_id']
-        })
-
-        if existing:
-            return jsonify({'error': 'Channel already in favorites'}), 400
-
         favorite_item = {
-            'user_id': ObjectId(user_id),
             'channel_id': data['channel_id'],
             'channel_name': data['channel_name'],
             'added_at': datetime.utcnow()
         }
 
-        result = favorites_collection.insert_one(favorite_item)
-        favorite_item['_id'] = str(result.inserted_id)
-        favorite_item['user_id'] = str(favorite_item['user_id'])
+        # Check if already in favorites and add if not
+        result = users_collection.update_one(
+            {
+                '_id': ObjectId(user_id),
+                'favorites.channel_id': {'$ne': data['channel_id']}
+            },
+            {
+                '$push': {'favorites': favorite_item}
+            }
+        )
+
+        if result.matched_count == 0:
+            # Either user not found or channel already in favorites
+            user = users_collection.find_one({'_id': ObjectId(user_id)})
+            if not user:
+                return jsonify({'error': 'User not found'}), 404
+            return jsonify({'error': 'Channel already in favorites'}), 400
 
         return jsonify(favorite_item), 201
 
@@ -2933,12 +2980,20 @@ def remove_from_favorites(channel_id):
     try:
         user_id = get_jwt_identity()
 
-        result = favorites_collection.delete_one({
-            'user_id': ObjectId(user_id),
-            'channel_id': channel_id
-        })
+        # Remove channel from favorites array
+        result = users_collection.update_one(
+            {'_id': ObjectId(user_id)},
+            {
+                '$pull': {
+                    'favorites': {'channel_id': channel_id}
+                }
+            }
+        )
 
-        if result.deleted_count == 0:
+        if result.matched_count == 0:
+            return jsonify({'error': 'User not found'}), 404
+
+        if result.modified_count == 0:
             return jsonify({'error': 'Channel not found in favorites'}), 404
 
         return jsonify({'message': 'Removed from favorites'}), 200
@@ -3385,6 +3440,115 @@ def unlike_comment(comment_id):
         return jsonify({'error': str(e)}), 500
 
 # ============= END AUTHENTICATION & SOCIAL FEATURES =============
+
+# ============= DATABASE MIGRATION ENDPOINT (ONE-TIME USE) =============
+
+@app.route('/api/admin/migrate-to-user-attributes', methods=['POST'])
+def migrate_to_user_attributes():
+    """
+    One-time migration endpoint to move watchlist, continue_watching, and favorites
+    from separate collections to user document attributes.
+
+    Usage: POST with header 'X-Migration-Secret' matching MIGRATION_SECRET env var
+    """
+    try:
+        # Check migration secret
+        migration_secret = os.environ.get('MIGRATION_SECRET', '')
+        provided_secret = request.headers.get('X-Migration-Secret', '')
+
+        if not migration_secret or provided_secret != migration_secret:
+            return jsonify({'error': 'Unauthorized'}), 401
+
+        # Check if old collections still exist
+        watchlists_collection = db['watchlists']
+        continue_watching_collection = db['continue_watching']
+        favorites_collection = db['favorites']
+
+        # Get all users
+        users = list(users_collection.find({}))
+
+        migrated_users = 0
+        total_watchlist_items = 0
+        total_continue_watching_items = 0
+        total_favorite_items = 0
+
+        for user in users:
+            user_id = user['_id']
+
+            # Check if already migrated (has these arrays)
+            if 'watchlist' in user and 'continue_watching' in user and 'favorites' in user:
+                continue
+
+            # Initialize arrays
+            watchlist = []
+            continue_watching = []
+            favorites = []
+
+            # Migrate watchlist items
+            watchlist_items = list(watchlists_collection.find({'user_id': user_id}))
+            for item in watchlist_items:
+                watchlist.append({
+                    'content_id': item['content_id'],
+                    'content_type': item['content_type'],
+                    'title': item['title'],
+                    'poster_path': item.get('poster_path'),
+                    'list_name': item.get('list_name', 'My Watchlist'),
+                    'added_at': item.get('added_at', datetime.utcnow())
+                })
+            total_watchlist_items += len(watchlist_items)
+
+            # Migrate continue watching items
+            continue_watching_items = list(continue_watching_collection.find({'user_id': user_id}))
+            for item in continue_watching_items:
+                continue_watching.append({
+                    'content_id': item['content_id'],
+                    'content_type': item['content_type'],
+                    'title': item['title'],
+                    'poster_path': item.get('poster_path'),
+                    'progress': item.get('progress', 0),
+                    'season': item.get('season'),
+                    'episode': item.get('episode'),
+                    'last_watched': item.get('last_watched', datetime.utcnow())
+                })
+            total_continue_watching_items += len(continue_watching_items)
+
+            # Migrate favorites items
+            favorite_items = list(favorites_collection.find({'user_id': user_id}))
+            for item in favorite_items:
+                favorites.append({
+                    'channel_id': item['channel_id'],
+                    'channel_name': item['channel_name'],
+                    'added_at': item.get('added_at', datetime.utcnow())
+                })
+            total_favorite_items += len(favorite_items)
+
+            # Update user document
+            users_collection.update_one(
+                {'_id': user_id},
+                {
+                    '$set': {
+                        'watchlist': watchlist,
+                        'continue_watching': continue_watching,
+                        'favorites': favorites
+                    }
+                }
+            )
+            migrated_users += 1
+
+        return jsonify({
+            'message': 'Migration completed successfully',
+            'migrated_users': migrated_users,
+            'total_items': {
+                'watchlist': total_watchlist_items,
+                'continue_watching': total_continue_watching_items,
+                'favorites': total_favorite_items
+            }
+        }), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# ============= END DATABASE MIGRATION =============
 
 if __name__ == '__main__':
     # Get port from environment variable (for Render.com/Railway/Heroku)
