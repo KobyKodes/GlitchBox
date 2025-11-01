@@ -12093,6 +12093,18 @@
 
             try {
                 const comments = await apiRequest(`/comments/${contentId}`);
+                console.log('[Comments] Loaded comments:', comments);
+                console.log('[Comments] Number of top-level comments:', comments.length);
+                comments.forEach((comment, i) => {
+                    console.log(`[Comments] Comment ${i}:`, comment.comment_text.substring(0, 30));
+                    console.log(`[Comments]   - Has ${comment.replies?.length || 0} direct replies`);
+                    if (comment.replies && comment.replies.length > 0) {
+                        comment.replies.forEach((reply, j) => {
+                            console.log(`[Comments]     Reply ${j}:`, reply.comment_text.substring(0, 30));
+                            console.log(`[Comments]       - Has ${reply.replies?.length || 0} nested replies`);
+                        });
+                    }
+                });
                 currentContentComments = comments;
                 return comments;
             } catch (error) {
@@ -12182,11 +12194,14 @@
 
         // Recursive function to render nested replies
         function renderReplies(replies, depth = 0) {
+            console.log(`[Comments] renderReplies called with ${replies?.length || 0} replies at depth ${depth}`);
             if (!replies || replies.length === 0) return '';
 
             const marginLeft = 20; // Consistent left margin for all nested levels
 
-            return replies.map(reply => {
+            return replies.map((reply, index) => {
+                console.log(`[Comments]   Rendering reply ${index} at depth ${depth}: "${reply.comment_text.substring(0, 30)}"`);
+                console.log(`[Comments]     Reply has ${reply.replies?.length || 0} nested replies`);
                 const replyDate = new Date(reply.created_at);
                 const isOwnReply = currentUser && reply.user_id === currentUser.id;
                 const likeIconReply = reply.liked_by_user ? '❤️' : '🤍';
@@ -12437,8 +12452,10 @@
 
         // Submit reply
         async function submitReply(parentCommentId) {
+            console.log('[Comments] submitReply called with parentCommentId:', parentCommentId);
             const textarea = document.getElementById(`reply-textarea-${parentCommentId}`);
             const replyText = textarea.value.trim();
+            console.log('[Comments] Reply text:', replyText);
 
             if (!replyText) {
                 showError('Please enter a reply');
@@ -12450,21 +12467,28 @@
                 return;
             }
 
+            const payload = {
+                content_id: currentContentId,
+                content_type: currentContentType,
+                comment_text: replyText,
+                parent_comment_id: parentCommentId
+            };
+            console.log('[Comments] Submitting reply with payload:', payload);
+
             try {
-                await apiRequest('/comments', {
+                const result = await apiRequest('/comments', {
                     method: 'POST',
-                    body: JSON.stringify({
-                        content_id: currentContentId,
-                        content_type: currentContentType,
-                        comment_text: replyText,
-                        parent_comment_id: parentCommentId
-                    })
+                    body: JSON.stringify(payload)
                 });
+                console.log('[Comments] Reply submitted successfully:', result);
 
                 textarea.value = '';
                 hideReplyBox(parentCommentId);
+                console.log('[Comments] Refreshing comments display...');
                 await displayComments(currentContentId);
+                console.log('[Comments] Comments display refreshed');
             } catch (error) {
+                console.error('[Comments] Error submitting reply:', error);
                 showError(error.message);
             }
         }

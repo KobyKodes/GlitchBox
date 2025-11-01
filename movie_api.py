@@ -3290,16 +3290,19 @@ def get_comments(content_id):
         print(f"[Comments] Friend IDs: {friend_ids}")
 
         # Helper function to recursively get all nested replies
-        def get_nested_replies(parent_id, friend_ids, user_id):
+        def get_nested_replies(parent_id, friend_ids, user_id, depth=0):
             """Recursively fetch all nested replies for a comment"""
             replies = list(comments_collection.find({
                 'parent_comment_id': parent_id,
                 'user_id': {'$in': friend_ids}
             }).sort('created_at', 1))
 
+            print(f"[Comments] {'  ' * depth}Found {len(replies)} replies for parent {parent_id}")
+
             # Process each reply and get its nested replies
             for reply in replies:
                 reply_id = reply['_id']
+                print(f"[Comments] {'  ' * depth}Processing reply {reply_id}: {reply['comment_text'][:30]}")
 
                 # Get like count and user's like status
                 reply_like_count = comment_likes_collection.count_documents({'comment_id': reply_id})
@@ -3312,7 +3315,9 @@ def get_comments(content_id):
                 reply['liked_by_user'] = reply_user_liked
 
                 # Recursively get nested replies for this reply
-                reply['replies'] = get_nested_replies(reply_id, friend_ids, user_id)
+                nested = get_nested_replies(reply_id, friend_ids, user_id, depth + 1)
+                reply['replies'] = nested
+                print(f"[Comments] {'  ' * depth}Reply {reply_id} has {len(nested)} nested replies")
 
                 # Convert ObjectIds to strings
                 reply['_id'] = str(reply['_id'])
