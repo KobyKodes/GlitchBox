@@ -11398,14 +11398,21 @@
                 headers['Authorization'] = `Bearer ${authToken}`;
             }
 
+            const url = `${AUTH_API_BASE_URL}${endpoint}`;
+            console.log('[API] Request:', options.method || 'GET', url);
+            console.log('[API] Headers:', headers);
+
             try {
-                const response = await fetch(`${AUTH_API_BASE_URL}${endpoint}`, {
+                const response = await fetch(url, {
                     ...options,
                     headers
                 });
 
+                console.log('[API] Response status:', response.status);
+
                 if (response.status === 401) {
                     // Token expired or invalid
+                    console.log('[API] 401 Unauthorized - logging out');
                     logout();
                     throw new Error('Authentication required');
                 }
