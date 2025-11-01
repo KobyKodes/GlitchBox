@@ -3289,6 +3289,39 @@ def get_comments(content_id):
         print(f"[Comments] User ID: {user_id}")
         print(f"[Comments] Friend IDs: {friend_ids}")
 
+        # Helper function to recursively get all nested replies
+        def get_nested_replies(parent_id, friend_ids, user_id):
+            """Recursively fetch all nested replies for a comment"""
+            replies = list(comments_collection.find({
+                'parent_comment_id': parent_id,
+                'user_id': {'$in': friend_ids}
+            }).sort('created_at', 1))
+
+            # Process each reply and get its nested replies
+            for reply in replies:
+                reply_id = reply['_id']
+
+                # Get like count and user's like status
+                reply_like_count = comment_likes_collection.count_documents({'comment_id': reply_id})
+                reply['like_count'] = reply_like_count
+
+                reply_user_liked = comment_likes_collection.find_one({
+                    'comment_id': reply_id,
+                    'user_id': ObjectId(user_id)
+                }) is not None
+                reply['liked_by_user'] = reply_user_liked
+
+                # Recursively get nested replies for this reply
+                reply['replies'] = get_nested_replies(reply_id, friend_ids, user_id)
+
+                # Convert ObjectIds to strings
+                reply['_id'] = str(reply['_id'])
+                reply['user_id'] = str(reply['user_id'])
+                reply['parent_comment_id'] = str(reply['parent_comment_id'])
+                reply['created_at'] = reply['created_at'].isoformat()
+
+            return replies
+
         # Get comments from user and their friends - use integer content_id
         # Only get top-level comments (no parent_comment_id)
         comments = list(comments_collection.find({
@@ -3314,30 +3347,9 @@ def get_comments(content_id):
             }) is not None
             comment['liked_by_user'] = user_liked
 
-            # Get replies
-            replies = list(comments_collection.find({
-                'parent_comment_id': comment_id,
-                'user_id': {'$in': friend_ids}
-            }).sort('created_at', 1))
+            # Get all nested replies recursively
+            comment['replies'] = get_nested_replies(comment_id, friend_ids, user_id)
 
-            # Process replies
-            for reply in replies:
-                reply_id = reply['_id']
-                reply_like_count = comment_likes_collection.count_documents({'comment_id': reply_id})
-                reply['like_count'] = reply_like_count
-
-                reply_user_liked = comment_likes_collection.find_one({
-                    'comment_id': reply_id,
-                    'user_id': ObjectId(user_id)
-                }) is not None
-                reply['liked_by_user'] = reply_user_liked
-
-                reply['_id'] = str(reply['_id'])
-                reply['user_id'] = str(reply['user_id'])
-                reply['parent_comment_id'] = str(reply['parent_comment_id'])
-                reply['created_at'] = reply['created_at'].isoformat()
-
-            comment['replies'] = replies
             comment['_id'] = str(comment['_id'])
             comment['user_id'] = str(comment['user_id'])
             comment['created_at'] = comment['created_at'].isoformat()
