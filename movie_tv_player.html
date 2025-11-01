@@ -11913,8 +11913,23 @@
 
             try {
                 console.log('[Friends] Fetching friends list...');
-                const friends = await apiRequest('/friends');
-                console.log('[Friends] Received friends:', friends);
+                const response = await apiRequest('/friends');
+                console.log('[Friends] Received response:', response);
+                console.log('[Friends] Response type:', typeof response);
+                console.log('[Friends] Is array:', Array.isArray(response));
+
+                // Handle different response formats
+                let friends = response;
+                if (response && response.friends && Array.isArray(response.friends)) {
+                    friends = response.friends;
+                } else if (!Array.isArray(response)) {
+                    console.error('[Friends] Response is not an array:', response);
+                    const friendsList = document.getElementById('friendsList');
+                    friendsList.innerHTML = '<p style="color: #ff6b6b; padding: 20px; text-align: center;">Error loading friends</p>';
+                    return;
+                }
+
+                console.log('[Friends] Friends array:', friends);
                 currentFriendsList = friends; // Store for checking status
                 const friendsList = document.getElementById('friendsList');
 

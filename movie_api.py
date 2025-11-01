@@ -999,21 +999,22 @@ def api_omdb_lookup(imdb_id):
     return jsonify(data), 200
 
 # ---- Friends list (user's accepted friends) ----
-@app.route('/api/friends', methods=['GET'])
-@jwt_required(optional=True)
-def api_friends():
-    identity = get_jwt_identity()
-    if not identity:
-        return jsonify({'friends': []}), 200
-    u = _identity_to_user(identity)
-    if not u or not u.get('username'):
-        return jsonify({'friends': []}), 200
-    # ensure we have _id
-    user_doc = users_collection.find_one({'username': u['username']}, {'_id': 1, 'username': 1})
-    if not user_doc:
-        return jsonify({'friends': []}), 200
-    usernames = list(_get_friends_usernames_for(user_doc['_id']) or [])
-    return jsonify({'friends': usernames}), 200
+## Duplicate route removed - using the one at line 3037 instead
+# @app.route('/api/friends', methods=['GET'])
+# @jwt_required(optional=True)
+# def api_friends():
+#     identity = get_jwt_identity()
+#     if not identity:
+#         return jsonify({'friends': []}), 200
+#     u = _identity_to_user(identity)
+#     if not u or not u.get('username'):
+#         return jsonify({'friends': []}), 200
+#     # ensure we have _id
+#     user_doc = users_collection.find_one({'username': u['username']}, {'_id': 1, 'username': 1})
+#     if not user_doc:
+#         return jsonify({'friends': []}), 200
+#     usernames = list(_get_friends_usernames_for(user_doc['_id']) or [])
+#     return jsonify({'friends': usernames}), 200
 
 # ---- Ratings (get & post) ----
 @app.route('/api/ratings/<content_type>/<int:tmdb_id>', methods=['GET'])
@@ -1179,15 +1180,16 @@ def post_rating(content_type, tmdb_id):
     return get_ratings(content_type, tmdb_id)
 
 # ---------- Friends ----------
-@app.route('/api/friends', methods=['GET'])
-@jwt_required()
-def get_friends_me():
-    identity = get_jwt_identity()
-    udoc = _identity_to_user(identity)
-    if not udoc:
-        return jsonify({"error": "User not found"}), 401
-    friends = _get_friends_usernames_for(udoc["_id"])
-    return jsonify({"friends": [{"username": u} for u in friends]})
+## Duplicate route removed - using the one at line 3037 instead
+# @app.route('/api/friends', methods=['GET'])
+# @jwt_required()
+# def get_friends_me():
+#     identity = get_jwt_identity()
+#     udoc = _identity_to_user(identity)
+#     if not udoc:
+#         return jsonify({"error": "User not found"}), 401
+#     friends = _get_friends_usernames_for(udoc["_id"])
+#     return jsonify({"friends": [{"username": u} for u in friends]})
 
 
 
