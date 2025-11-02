@@ -12802,9 +12802,21 @@
             try{
               const friends = await getFriendUsernames();
               console.log('[Ratings] Friends list:', friends);
-              const friendEntries = Object.entries(data.ratings_by_user || {})
-                .filter(([u,_]) => (!me || u !== me) && friends.includes(u));
+              console.log('[Ratings] Current user (me):', me);
+
+              // Log all ratings to see who has rated
+              const allRatings = Object.entries(data.ratings_by_user || {});
+              console.log('[Ratings] All ratings:', allRatings);
+
+              // Filter to only show friend ratings (exclude own rating)
+              const friendEntries = allRatings.filter(([username, rating]) => {
+                const isMe = (me && username === me);
+                const isFriend = friends.includes(username);
+                console.log(`[Ratings] Check ${username}: isMe=${isMe}, isFriend=${isFriend}`);
+                return !isMe && isFriend;
+              });
               console.log('[Ratings] Friend ratings to display:', friendEntries);
+              console.log('[Ratings] Number of friend ratings:', friendEntries.length);
 
               for (const [u, v] of friendEntries){
                 console.log(`[Ratings] Creating tile for friend ${u} with rating ${v}`);
@@ -12815,9 +12827,9 @@
                   <div class="rating-value">${v}/10</div>
                 `;
                 container.appendChild(tile);
-                console.log('[Ratings] Tile appended to container');
+                console.log('[Ratings] Tile appended to container for ${u}');
               }
-              console.log('[Ratings] Finished rendering friend ratings');
+              console.log('[Ratings] Finished rendering friend ratings. Total rendered:', friendEntries.length);
             }catch(e){
               console.error('[Ratings] Friends rendering failed:', e);
             }
