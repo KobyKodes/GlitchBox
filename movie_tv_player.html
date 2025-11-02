@@ -12846,10 +12846,21 @@
                 if (m){
                   currentContentType = m[1];
                   currentContentId = parseInt(m[2], 10);
+                  console.log('[Ratings] Fetch intercepted:', currentContentType, currentContentId);
                   // after response resolves and DOM updates, seed the pill
-                  setTimeout(setupUserRatingsPill, 150);
+                  // Try multiple times with increasing delays to ensure DOM is ready
+                  setTimeout(() => {
+                    console.log('[Ratings] First attempt to setup ratings UI');
+                    setupUserRatingsPill();
+                  }, 300);
+                  setTimeout(() => {
+                    console.log('[Ratings] Second attempt to setup ratings UI');
+                    setupUserRatingsPill();
+                  }, 800);
                 }
-              }catch(_){}
+              }catch(e){
+                console.error('[Ratings] Fetch wrapper error:', e);
+              }
               return res;
             };
             Object.defineProperty(wrapped, '__rfRatingsWrap', { value: true });
@@ -12871,11 +12882,21 @@
         
           function setupUserRatingsPill(){
             const box = hostRatingsBox();
-            console.debug('[ratings] setupUserRatingsPill: container?', !!box, { currentContentType, currentContentId });
-            if (!box) return;
+            console.log('[Ratings] setupUserRatingsPill called - container found:', !!box, 'contentType:', currentContentType, 'contentId:', currentContentId);
+            if (!box) {
+              console.log('[Ratings] No ratings container found yet, will retry');
+              return;
+            }
+            console.log('[Ratings] Ensuring pill exists...');
             ensurePill(box);
+            console.log('[Ratings] Setting up grid observer...');
             observeGrid(box);
-            try { refreshRatingsUI(); } catch(e){ console.error(e); }
+            console.log('[Ratings] Calling refreshRatingsUI to load friend ratings...');
+            try {
+              refreshRatingsUI();
+            } catch(e){
+              console.error('[Ratings] refreshRatingsUI error:', e);
+            }
           }
         
           document.addEventListener('DOMContentLoaded', () => {
