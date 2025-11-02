@@ -3999,7 +3999,11 @@
                 <button class="btn" onclick="showRegisterModal()" style="padding: 10px 20px;">Sign Up</button>
             </div>
             <div id="userMenu" style="display: none;">
-                <span id="usernameDisplay" style="color: var(--primary-color); font-family: 'VT323', monospace; font-size: 20px;"></span>
+                <div style="position: relative; display: inline-block;">
+                    <span id="usernameDisplay" style="color: var(--primary-color); font-family: 'VT323', monospace; font-size: 20px;"></span>
+                    <div id="friendRequestNotification" style="display: none; position: absolute; top: -8px; right: -20px; background: #ff00ff; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 12px; text-align: center; line-height: 18px; cursor: pointer; box-shadow: 0 0 10px #ff00ff; font-family: 'VT323', monospace; font-weight: bold;" onclick="toggleFriendRequestDropdown()"></div>
+                    <div id="friendRequestDropdown" style="display: none; position: absolute; top: 30px; left: 0; background: #0f0f1e; border: 2px solid #ff00ff; border-radius: 4px; padding: 10px; min-width: 250px; z-index: 1000; box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);"></div>
+                </div>
                 <button class="btn" onclick="showFriendsModal()" style="padding: 10px 20px;">Friends</button>
                 <button class="btn" onclick="logout()" style="padding: 10px 20px;">Logout</button>
             </div>
@@ -11463,6 +11467,112 @@
             document.getElementById('friendsModal').style.display = 'none';
         }
 
+        // Friend Request Notifications
+        let pendingFriendRequests = [];
+
+        async function fetchPendingFriendRequests() {
+            if (!authToken) return;
+
+            try {
+                const requests = await apiRequest('/friends/requests', { method: 'GET' });
+                pendingFriendRequests = requests || [];
+                updateFriendRequestNotification();
+            } catch (error) {
+                console.error('[Friend Requests] Failed to fetch:', error);
+                pendingFriendRequests = [];
+                updateFriendRequestNotification();
+            }
+        }
+
+        function updateFriendRequestNotification() {
+            const notificationBadge = document.getElementById('friendRequestNotification');
+            const count = pendingFriendRequests.length;
+
+            if (count > 0) {
+                notificationBadge.textContent = count;
+                notificationBadge.style.display = 'block';
+            } else {
+                notificationBadge.style.display = 'none';
+            }
+        }
+
+        window.toggleFriendRequestDropdown = function() {
+            const dropdown = document.getElementById('friendRequestDropdown');
+
+            if (dropdown.style.display === 'none' || dropdown.style.display === '') {
+                // Show dropdown
+                renderFriendRequestDropdown();
+                dropdown.style.display = 'block';
+
+                // Close dropdown when clicking outside
+                setTimeout(() => {
+                    document.addEventListener('click', closeFriendRequestDropdownOutside);
+                }, 0);
+            } else {
+                // Hide dropdown
+                dropdown.style.display = 'none';
+                document.removeEventListener('click', closeFriendRequestDropdownOutside);
+            }
+        }
+
+        function closeFriendRequestDropdownOutside(e) {
+            const dropdown = document.getElementById('friendRequestDropdown');
+            const notification = document.getElementById('friendRequestNotification');
+
+            if (!dropdown.contains(e.target) && !notification.contains(e.target)) {
+                dropdown.style.display = 'none';
+                document.removeEventListener('click', closeFriendRequestDropdownOutside);
+            }
+        }
+
+        function renderFriendRequestDropdown() {
+            const dropdown = document.getElementById('friendRequestDropdown');
+
+            if (pendingFriendRequests.length === 0) {
+                dropdown.innerHTML = '<div style="color: #ccc; font-family: \'VT323\', monospace; font-size: 14px; text-align: center;">No pending requests</div>';
+                return;
+            }
+
+            let html = '<div style="font-family: \'VT323\', monospace; font-size: 14px; color: var(--primary-color); margin-bottom: 8px; font-weight: bold;">Friend Requests:</div>';
+
+            pendingFriendRequests.forEach(req => {
+                const timeAgo = getTimeAgo(new Date(req.created_at));
+                html += `
+                    <div style="padding: 8px; background: rgba(255, 0, 255, 0.1); border: 1px solid rgba(255, 0, 255, 0.3); border-radius: 4px; margin-bottom: 6px; cursor: pointer; transition: all 0.2s;"
+                         onclick="openFriendRequestInModal()"
+                         onmouseover="this.style.background='rgba(255, 0, 255, 0.2)'"
+                         onmouseout="this.style.background='rgba(255, 0, 255, 0.1)'">
+                        <div style="color: var(--accent-color); font-weight: bold;">${req.from_user.username}</div>
+                        <div style="color: #999; font-size: 12px;">${timeAgo}</div>
+                    </div>
+                `;
+            });
+
+            dropdown.innerHTML = html;
+        }
+
+        function getTimeAgo(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+
+            if (seconds < 60) return 'just now';
+            if (seconds < 3600) return Math.floor(seconds / 60) + 'm ago';
+            if (seconds < 86400) return Math.floor(seconds / 3600) + 'h ago';
+            if (seconds < 604800) return Math.floor(seconds / 86400) + 'd ago';
+            return Math.floor(seconds / 604800) + 'w ago';
+        }
+
+        window.openFriendRequestInModal = function() {
+            // Close dropdown
+            document.getElementById('friendRequestDropdown').style.display = 'none';
+            document.removeEventListener('click', closeFriendRequestDropdownOutside);
+
+            // Open friends modal
+            showFriendsModal();
+        }
+
+        // Poll for friend requests every 30 seconds
+        setInterval(fetchPendingFriendRequests, 30000);
+
         // Close modals on outside click
         document.getElementById('loginModal')?.addEventListener('click', function(e) {
             if (e.target === this) closeLoginModal();
@@ -11647,7 +11757,8 @@
                 await Promise.all([
                     loadWatchlist(),
                     loadContinueWatching(),
-                    loadFavorites()
+                    loadFavorites(),
+                    fetchPendingFriendRequests()
                 ]);
 
                 console.log('[Auth] User data loaded successfully');
@@ -12108,6 +12219,7 @@
                 showStatus('Friend request accepted!');
                 await loadFriends();
                 await loadFriendRequests();
+                await fetchPendingFriendRequests();
             } catch (error) {
                 showError(error.message);
             }
@@ -12118,6 +12230,7 @@
                 await apiRequest(`/friends/requests/${requestId}/reject`, { method: 'POST' });
                 showStatus('Friend request rejected');
                 await loadFriendRequests();
+                await fetchPendingFriendRequests();
             } catch (error) {
                 showError(error.message);
             }
