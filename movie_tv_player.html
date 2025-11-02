@@ -4001,7 +4001,7 @@
             <div id="userMenu" style="display: none;">
                 <div style="position: relative; display: inline-block;">
                     <span id="usernameDisplay" style="color: var(--primary-color); font-family: 'VT323', monospace; font-size: 20px;"></span>
-                    <div id="friendRequestNotification" style="display: none; position: absolute; top: -8px; right: -20px; background: #ff00ff; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 12px; text-align: center; line-height: 18px; cursor: pointer; box-shadow: 0 0 10px #ff00ff; font-family: 'VT323', monospace; font-weight: bold;" onclick="toggleFriendRequestDropdown()"></div>
+                    <div id="friendRequestNotification" style="display: none; position: absolute; top: -8px; right: -22px; background: #ff00ff; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 13px; text-align: center; line-height: 20px; cursor: pointer; box-shadow: 0 0 10px #ff00ff; font-family: 'VT323', monospace; font-weight: bold;" onclick="toggleFriendRequestDropdown()"></div>
                     <div id="friendRequestDropdown" style="display: none; position: absolute; top: 30px; left: 0; background: #0f0f1e; border: 2px solid #ff00ff; border-radius: 4px; padding: 10px; min-width: 250px; z-index: 1000; box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);"></div>
                 </div>
                 <button class="btn" onclick="showFriendsModal()" style="padding: 10px 20px;">Friends</button>
@@ -11471,11 +11471,17 @@
         let pendingFriendRequests = [];
 
         async function fetchPendingFriendRequests() {
-            if (!authToken) return;
+            if (!authToken) {
+                console.log('[Friend Requests] No auth token, skipping fetch');
+                return;
+            }
 
             try {
+                console.log('[Friend Requests] Fetching pending requests...');
                 const requests = await apiRequest('/friends/requests', { method: 'GET' });
+                console.log('[Friend Requests] Received:', requests);
                 pendingFriendRequests = requests || [];
+                console.log('[Friend Requests] Count:', pendingFriendRequests.length);
                 updateFriendRequestNotification();
             } catch (error) {
                 console.error('[Friend Requests] Failed to fetch:', error);
@@ -11488,11 +11494,19 @@
             const notificationBadge = document.getElementById('friendRequestNotification');
             const count = pendingFriendRequests.length;
 
-            if (count > 0) {
-                notificationBadge.textContent = count;
-                notificationBadge.style.display = 'block';
+            console.log('[Friend Requests] Updating notification badge - count:', count, 'badge element:', !!notificationBadge);
+
+            if (notificationBadge) {
+                if (count > 0) {
+                    notificationBadge.textContent = count;
+                    notificationBadge.style.display = 'block';
+                    console.log('[Friend Requests] Badge shown with count:', count);
+                } else {
+                    notificationBadge.style.display = 'none';
+                    console.log('[Friend Requests] Badge hidden (no requests)');
+                }
             } else {
-                notificationBadge.style.display = 'none';
+                console.error('[Friend Requests] Notification badge element not found!');
             }
         }
 
@@ -11572,6 +11586,9 @@
 
         // Poll for friend requests every 30 seconds
         setInterval(fetchPendingFriendRequests, 30000);
+
+        // Expose for testing
+        window.testFriendNotification = fetchPendingFriendRequests;
 
         // Close modals on outside click
         document.getElementById('loginModal')?.addEventListener('click', function(e) {
