@@ -12615,6 +12615,7 @@
           // Track current title identity (movie/tv + TMDB id)
           let currentContentType = window.currentContentType || null;
           let currentContentId   = window.currentContentId   || null;
+          let isRefreshing = false; // Prevent concurrent refreshes
         
           // ---- DOM location helpers ----
           function closestContainerFromKnownIds(){
@@ -12747,12 +12748,22 @@
           }
         
           async function refreshRatingsUI(){
-            console.log('[Ratings] refreshRatingsUI called', { currentContentType, currentContentId });
+            console.log('[Ratings] refreshRatingsUI called', { currentContentType, currentContentId, isRefreshing });
+
+            // Prevent concurrent refreshes
+            if (isRefreshing) {
+              console.log('[Ratings] Already refreshing, skipping...');
+              return;
+            }
+
             const container = hostRatingsBox();
             if (!container || !currentContentId || !currentContentType) {
               console.log('[Ratings] Missing container or content info', { container: !!container, currentContentId, currentContentType });
               return;
             }
+
+            isRefreshing = true;
+            console.log('[Ratings] Starting refresh...');
 
             // Ensure "You" tile
             ensurePill(container);
@@ -12832,6 +12843,9 @@
               console.log('[Ratings] Finished rendering friend ratings. Total rendered:', friendEntries.length);
             }catch(e){
               console.error('[Ratings] Friends rendering failed:', e);
+            } finally {
+              isRefreshing = false;
+              console.log('[Ratings] Refresh complete, flag reset');
             }
           }
         

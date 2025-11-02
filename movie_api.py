@@ -1017,57 +1017,58 @@ def api_omdb_lookup(imdb_id):
 #     return jsonify({'friends': usernames}), 200
 
 # ---- Ratings (get & post) ----
-@app.route('/api/ratings/<content_type>/<int:tmdb_id>', methods=['GET'])
-@jwt_required(optional=True)
-def api_get_ratings(content_type, tmdb_id):
-    key = _content_key(content_type, tmdb_id)
-    cur = ratings_collection.find({'content_key': key}, {'_id': 0, 'username': 1, 'rating': 1})
-    ratings_by_user = {}
-    for d in cur:
-        try:
-            u = d.get('username')
-            v = float(d.get('rating')) if d.get('rating') is not None else None
-            if u and v is not None:
-                ratings_by_user[u] = v
-        except Exception:
-            continue
-    return jsonify({'content_key': key, 'ratings_by_user': ratings_by_user}), 200
-
-@app.route('/api/ratings/<content_type>/<int:tmdb_id>', methods=['POST'])
-@jwt_required()
-def api_post_rating(content_type, tmdb_id):
-    identity = get_jwt_identity()
-    u = _identity_to_user(identity)
-    if not u or not u.get('username'):
-        return jsonify({'error': 'Unauthorized'}), 401
-    user_doc = users_collection.find_one({'username': u['username']}, {'_id': 1, 'username': 1})
-    if not user_doc:
-        return jsonify({'error': 'Unauthorized'}), 401
-
-    payload = request.get_json(silent=True) or {}
-    try:
-        rating = float(payload.get('rating'))
-    except Exception:
-        return jsonify({'error': 'Invalid rating'}), 400
-    if not (1.0 <= rating <= 10.0):
-        return jsonify({'error': 'Rating must be between 1 and 10'}), 400
-
-    key = _content_key(content_type, tmdb_id)
-    ratings_collection.update_one(
-        {'content_key': key, 'user_id': user_doc['_id']},
-        {'$set': {
-            'username': user_doc['username'],
-            'rating': rating,
-            'updated_at': datetime.utcnow()
-        }},
-        upsert=True
-    )
-
-    doc = ratings_collection.find_one(
-        {'content_key': key, 'user_id': user_doc['_id']},
-        {'_id': 0, 'username': 1, 'rating': 1}
-    )
-    return jsonify({'ok': True, 'rating': doc}), 200
+## Duplicate routes removed - using the ones at lines 1139-1180 instead
+# @app.route('/api/ratings/<content_type>/<int:tmdb_id>', methods=['GET'])
+# @jwt_required(optional=True)
+# def api_get_ratings(content_type, tmdb_id):
+#     key = _content_key(content_type, tmdb_id)
+#     cur = ratings_collection.find({'content_key': key}, {'_id': 0, 'username': 1, 'rating': 1})
+#     ratings_by_user = {}
+#     for d in cur:
+#         try:
+#             u = d.get('username')
+#             v = float(d.get('rating')) if d.get('rating') is not None else None
+#             if u and v is not None:
+#                 ratings_by_user[u] = v
+#         except Exception:
+#             continue
+#     return jsonify({'content_key': key, 'ratings_by_user': ratings_by_user}), 200
+#
+# @app.route('/api/ratings/<content_type>/<int:tmdb_id>', methods=['POST'])
+# @jwt_required()
+# def api_post_rating(content_type, tmdb_id):
+#     identity = get_jwt_identity()
+#     u = _identity_to_user(identity)
+#     if not u or not u.get('username'):
+#         return jsonify({'error': 'Unauthorized'}), 401
+#     user_doc = users_collection.find_one({'username': u['username']}, {'_id': 1, 'username': 1})
+#     if not user_doc:
+#         return jsonify({'error': 'Unauthorized'}), 401
+#
+#     payload = request.get_json(silent=True) or {}
+#     try:
+#         rating = float(payload.get('rating'))
+#     except Exception:
+#         return jsonify({'error': 'Invalid rating'}), 400
+#     if not (1.0 <= rating <= 10.0):
+#         return jsonify({'error': 'Rating must be between 1 and 10'}), 400
+#
+#     key = _content_key(content_type, tmdb_id)
+#     ratings_collection.update_one(
+#         {'content_key': key, 'user_id': user_doc['_id']},
+#         {'$set': {
+#             'username': user_doc['username'],
+#             'rating': rating,
+#             'updated_at': datetime.utcnow()
+#         }},
+#         upsert=True
+#     )
+#
+#     doc = ratings_collection.find_one(
+#         {'content_key': key, 'user_id': user_doc['_id']},
+#         {'_id': 0, 'username': 1, 'rating': 1}
+#     )
+#     return jsonify({'ok': True, 'rating': doc}), 200
 
 # ==== Ratings & Friends (MongoDB) =============================================
 
@@ -1139,8 +1140,10 @@ def _get_friends_usernames_for(user_id: ObjectId):
 @app.route('/api/ratings/<content_type>/<int:tmdb_id>', methods=['GET'])
 def get_ratings(content_type, tmdb_id):
     key = _content_key(content_type, tmdb_id)
+    print(f"[Ratings] GET {content_type}/{tmdb_id}, key: {key}")
     cursor = ratings_collection.find({"content_key": key}, {"username": 1, "rating": 1})
     ratings_by_user = {doc["username"]: float(doc["rating"]) for doc in cursor if "username" in doc and "rating" in doc}
+    print(f"[Ratings] Found {len(ratings_by_user)} ratings: {ratings_by_user}")
     values = list(ratings_by_user.values())
     avg = round(sum(values) / len(values), 2) if values else None
     return jsonify({
@@ -1170,11 +1173,16 @@ def post_rating(content_type, tmdb_id):
     key = _content_key(content_type, tmdb_id)
     now = datetime.utcnow().isoformat()
 
-    ratings_collection.update_one(
+    print(f"[Ratings] POST {content_type}/{tmdb_id} by {udoc['username']}: rating={rating}")
+    print(f"[Ratings] Updating with key={key}, user_id={udoc['_id']}")
+
+    result = ratings_collection.update_one(
         {"content_key": key, "user_id": udoc["_id"]},
         {"$set": {"username": udoc["username"], "rating": round(rating, 1), "updated_at": now}},
         upsert=True
     )
+
+    print(f"[Ratings] Update result: matched={result.matched_count}, modified={result.modified_count}, upserted_id={result.upserted_id}")
 
     # Return fresh aggregate
     return get_ratings(content_type, tmdb_id)
