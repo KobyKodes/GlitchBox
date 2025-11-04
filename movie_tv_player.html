@@ -1151,6 +1151,8 @@
             flex-wrap: wrap;
             align-items: center;
             justify-content: center;
+            position: relative;
+            overflow: visible;
         }
 
         .loading {
@@ -3776,8 +3778,9 @@
 
         /* ============= SOURCE MENU DROPDOWN ============= */
         .source-menu-container {
-            position: relative;
+            position: relative !important;
             display: inline-block;
+            overflow: visible;
         }
 
         .source-menu-btn {
@@ -3874,6 +3877,75 @@
             font-size: 24px;
         }
         /* ============= END SOURCE MENU DROPDOWN ============= */
+
+        /* ============= SOURCE TOOLTIP ARROW ============= */
+        .source-tooltip-hint {
+            position: absolute;
+            left: calc(100% + 20px);
+            top: 50%;
+            transform: translateY(-50%);
+            display: none;
+            z-index: 100001;
+            animation: gentleBounce 2s ease-in-out infinite;
+        }
+
+        .source-tooltip-hint.active {
+            display: flex;
+            align-items: center;
+            gap: 0;
+        }
+
+        .source-tooltip-arrow-left {
+            width: 0;
+            height: 0;
+            border-top: 12px solid transparent;
+            border-bottom: 12px solid transparent;
+            border-right: 15px solid var(--primary-color, #00ff9f);
+            filter: drop-shadow(0 0 8px rgba(0, 255, 159, 0.5));
+        }
+
+        .source-tooltip-box {
+            background: var(--bg-dark, #0f0f1e);
+            border: 2px solid var(--primary-color, #00ff9f);
+            border-radius: 8px;
+            padding: 12px 40px 12px 16px;
+            color: var(--primary-color, #00ff9f);
+            font-family: 'VT323', monospace;
+            font-size: 18px;
+            white-space: nowrap;
+            box-shadow: 0 0 20px rgba(0, 255, 159, 0.5);
+            position: relative;
+        }
+
+        .source-tooltip-close {
+            position: absolute;
+            top: 4px;
+            right: 6px;
+            background: none;
+            border: none;
+            color: var(--secondary-color, #ff00ff);
+            font-size: 24px;
+            cursor: pointer;
+            font-family: 'VT323', monospace;
+            line-height: 1;
+            padding: 8px;
+            transition: all 0.2s;
+        }
+
+        .source-tooltip-close:hover {
+            color: var(--primary-color, #00ff9f);
+            transform: scale(1.2);
+        }
+
+        @keyframes gentleBounce {
+            0%, 100% {
+                transform: translateY(-50%) translateX(0);
+            }
+            50% {
+                transform: translateY(-50%) translateX(-8px);
+            }
+        }
+        /* ============= END SOURCE TOOLTIP ARROW ============= */
     </style>
 
     <!-- Monetag Ads Integration -->
@@ -4488,6 +4560,15 @@
                             <span>SuperEmbed</span>
                             <span class="source-check" id="superembed-check" style="display: none;">✓</span>
                         </button>
+                    </div>
+
+                    <!-- Tooltip beside source button -->
+                    <div class="source-tooltip-hint" id="sourceTooltipHint">
+                        <div class="source-tooltip-arrow-left"></div>
+                        <div class="source-tooltip-box">
+                            <button class="source-tooltip-close" onclick="dismissSourceHint()">×</button>
+                            Change source if stuck or not loading
+                        </div>
                     </div>
                 </div>
             </div>
@@ -7063,6 +7144,9 @@
 
             // Update checkmarks
             updateSourceCheckmarks();
+
+            // Dismiss hint when user clicks source button
+            dismissSourceHint();
         }
 
         function closeSourceMenu() {
@@ -7160,6 +7244,39 @@
             // Hide sports source button when playing movies/TV
             const sportsSourceBtn = document.getElementById('sportsSourceBtn');
             if (sportsSourceBtn) sportsSourceBtn.style.display = 'none';
+
+            // Show hint if user hasn't dismissed it
+            showSourceHint();
+        }
+
+        // Source tooltip hint - simple implementation
+        function showSourceHint() {
+            // Check if user has dismissed it before
+            if (localStorage.getItem('sourceHintDismissed') === 'true') {
+                return;
+            }
+
+            const hint = document.getElementById('sourceTooltipHint');
+            if (hint) {
+                // Show after 1 second delay
+                setTimeout(() => {
+                    hint.classList.add('active');
+                }, 1000);
+            }
+        }
+
+        window.dismissSourceHint = function() {
+            const hint = document.getElementById('sourceTooltipHint');
+            if (hint) {
+                hint.classList.remove('active');
+                localStorage.setItem('sourceHintDismissed', 'true');
+            }
+        }
+
+        // Helper to reset hint (for testing)
+        window.resetSourceHint = function() {
+            localStorage.removeItem('sourceHintDismissed');
+            console.log('Source hint reset! Reload and play content to see it again.');
         }
 
         function updateNextEpisodeButton() {
@@ -11215,6 +11332,9 @@
             const sourceMenuContainer = document.getElementById('sourceMenuContainer');
             if (sourceMenuContainer) sourceMenuContainer.style.display = 'none';
 
+            // Hide source hint
+            dismissSourceHint();
+
             // Hide next episode button
             const nextEpisodeBtn = document.getElementById('nextEpisodeBtn');
             if (nextEpisodeBtn) nextEpisodeBtn.style.display = 'none';
@@ -11652,6 +11772,9 @@
             // Hide video source button
             const sourceMenuContainer2 = document.getElementById('sourceMenuContainer');
             if (sourceMenuContainer2) sourceMenuContainer2.style.display = 'none';
+
+            // Hide source hint
+            dismissSourceHint();
 
             // Hide next episode button
             const nextEpisodeBtn = document.getElementById('nextEpisodeBtn');
