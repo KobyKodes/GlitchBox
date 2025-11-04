@@ -5018,6 +5018,28 @@
             <div id="watchlistDisplay" class="horizontal-scroll-container" style="display: none;"></div>
             <div id="statisticsDisplay" style="display: none; padding: 20px;"></div>
             <div id="sportsDisplay" style="display: none; padding: 20px;">
+                <!-- OK.ru Video Embed Section -->
+                <div style="margin-bottom: 32px; padding: 20px; background: rgba(0, 255, 159, 0.05); border: 2px solid var(--primary-color, #00ff9f); border-radius: 8px;">
+                    <h3 style="margin: 0 0 16px 0; font-family: 'Press Start 2P', cursive; color: var(--primary-color, #00ff9f); font-size: 14px; text-align: center;">
+                        🎥 OK.RU VIDEO EMBED
+                    </h3>
+                    <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                        <input type="text" id="okruVideoId" class="search-input"
+                               placeholder="Enter OK.ru video ID (e.g., 10015470525964)"
+                               autocomplete="off"
+                               style="flex: 1; min-width: 250px;">
+                        <button onclick="embedOkruVideo()" class="effects-btn" style="padding: 12px 24px; font-size: 18px; white-space: nowrap;">
+                            🎬 Embed Video
+                        </button>
+                        <button onclick="clearOkruEmbed()" class="btn btn-secondary" style="padding: 12px 24px; font-size: 18px; white-space: nowrap;">
+                            Clear
+                        </button>
+                    </div>
+                    <div style="margin-top: 12px; font-size: 14px; color: var(--accent-color, #00d9ff); text-align: center;">
+                        💡 Find videos on ok.ru and paste the video ID here
+                    </div>
+                </div>
+
                 <!-- Sports Search -->
                 <div style="margin-bottom: 24px;">
                     <div style="position: relative; display: flex; gap: 8px; align-items: center;">
@@ -11504,6 +11526,120 @@
             }
         `;
         document.head.appendChild(style);
+
+        // ============= OK.RU VIDEO EMBED SECTION =============
+
+        // Embed OK.ru video by ID
+        window.embedOkruVideo = function() {
+            const videoIdInput = document.getElementById('okruVideoId');
+            const videoId = videoIdInput.value.trim();
+
+            if (!videoId) {
+                showError('Please enter an OK.ru video ID');
+                return;
+            }
+
+            // Validate that it looks like a valid video ID (numeric)
+            if (!/^\d+$/.test(videoId)) {
+                showError('Invalid video ID. Please enter only the numeric ID (e.g., 10015470525964)');
+                return;
+            }
+
+            // Build the OK.ru embed URL
+            const embedUrl = `https://ok.ru/videoembed/${videoId}?autoplay=1`;
+
+            console.log('Embedding OK.ru video:', embedUrl);
+
+            // Update current content info
+            currentContentId = videoId;
+            currentContentType = 'okru_video';
+            currentContentTitle = `OK.ru Video: ${videoId}`;
+
+            // Show the player section
+            const playerSection = document.getElementById('playerSection');
+            const currentContent = document.getElementById('currentContent');
+            if (playerSection) playerSection.style.display = 'block';
+            if (currentContent) currentContent.style.display = 'block';
+
+            // Hide TV controls
+            const tvControls = document.getElementById('tvControls');
+            if (tvControls) tvControls.style.display = 'none';
+
+            // Hide OMDB details
+            const omdbDetails = document.getElementById('omdbDetails');
+            const omdbRatings = document.getElementById('omdbRatings');
+            if (omdbDetails) omdbDetails.style.display = 'none';
+            if (omdbRatings) omdbRatings.style.display = 'none';
+
+            // Update content info display
+            const titleEl = document.getElementById('currentTitle');
+            const yearEl = document.getElementById('currentYear');
+            const overviewEl = document.getElementById('currentOverview');
+            const posterEl = document.getElementById('currentPoster');
+
+            if (titleEl) titleEl.textContent = 'OK.ru Sports Video';
+            if (yearEl) yearEl.textContent = 'Live Sports Stream';
+            if (overviewEl) overviewEl.textContent = `Watching OK.ru video ID: ${videoId}`;
+
+            // Set backdrop
+            const backdropImage = document.getElementById('backdropImage');
+            if (backdropImage) {
+                backdropImage.style.backgroundImage = 'linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 50%, #16213e 100%)';
+            }
+
+            // Hide poster
+            if (posterEl) {
+                posterEl.style.display = 'none';
+            }
+
+            // Hide sports source button
+            const sportsSourceBtn = document.getElementById('sportsSourceBtn');
+            if (sportsSourceBtn) sportsSourceBtn.style.display = 'none';
+
+            // Hide video source button (for movies/TV)
+            const sourceMenuContainer = document.getElementById('sourceMenuContainer');
+            if (sourceMenuContainer) sourceMenuContainer.style.display = 'none';
+
+            // Hide source hint
+            dismissSourceHint();
+
+            // Hide next episode button
+            const nextEpisodeBtn = document.getElementById('nextEpisodeBtn');
+            if (nextEpisodeBtn) nextEpisodeBtn.style.display = 'none';
+
+            // Load the video in the iframe
+            loadPlayerContent(embedUrl);
+
+            // Scroll to player
+            if (currentContent) {
+                currentContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            showStatus('Loading OK.ru video...');
+        }
+
+        // Clear OK.ru video embed
+        window.clearOkruEmbed = function() {
+            const videoIdInput = document.getElementById('okruVideoId');
+            if (videoIdInput) {
+                videoIdInput.value = '';
+            }
+            showStatus('OK.ru video input cleared');
+        }
+
+        // Add Enter key support for OK.ru video input
+        document.addEventListener('DOMContentLoaded', function() {
+            const okruInput = document.getElementById('okruVideoId');
+            if (okruInput) {
+                okruInput.addEventListener('keypress', function(event) {
+                    if (event.key === 'Enter') {
+                        embedOkruVideo();
+                    }
+                });
+            }
+        });
+
+        // ============= END OK.RU VIDEO EMBED SECTION =============
 
         // ============= END SPORTS STREAMING SECTION =============
 
