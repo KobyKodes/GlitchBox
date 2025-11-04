@@ -5402,18 +5402,23 @@
             if (!box) return;
             ensurePill(box);
 
-            // Only refresh if we haven't already refreshed for this content
-            const contentKey = `${currentContentType}_${currentContentId}`;
-            if (__earlyLastRefreshedContentId !== contentKey) {
-                __earlyLastRefreshedContentId = contentKey;
-                try { refreshRatingsUI(); } catch(e){ console.error(e); }
+            // Only refresh if we have valid content info and haven't already refreshed for this content
+            if (currentContentType && currentContentId) {
+                const contentKey = `${currentContentType}_${currentContentId}`;
+                if (__earlyLastRefreshedContentId !== contentKey) {
+                    __earlyLastRefreshedContentId = contentKey;
+                    console.debug('[ratings] Refreshing for:', contentKey);
+                    try { refreshRatingsUI(); } catch(e){ console.error(e); }
+                } else {
+                    console.debug('[ratings] Already refreshed for:', contentKey);
+                }
             }
         }
 
         // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
-            // Load Continue Watching by default
-            showTab('continue-watching');
+            // Load Movies by default (Continue Watching is toggled off)
+            showTab('movies');
 
             const searchInput = document.getElementById('searchInput');
 
@@ -13577,18 +13582,22 @@
             console.log('[Ratings] Setting up grid observer...');
             observeGrid(box);
 
-            // Only refresh if we haven't already refreshed for this content
-            const contentKey = `${currentContentType}_${currentContentId}`;
-            if (__lastRefreshedContentId !== contentKey) {
-              console.log('[Ratings] Calling refreshRatingsUI to load friend ratings...');
-              __lastRefreshedContentId = contentKey;
-              try {
-                refreshRatingsUI();
-              } catch(e){
-                console.error('[Ratings] refreshRatingsUI error:', e);
+            // Only refresh if we have valid content info and haven't already refreshed for this content
+            if (currentContentType && currentContentId) {
+              const contentKey = `${currentContentType}_${currentContentId}`;
+              if (__lastRefreshedContentId !== contentKey) {
+                console.log('[Ratings] Calling refreshRatingsUI to load friend ratings for:', contentKey);
+                __lastRefreshedContentId = contentKey;
+                try {
+                  refreshRatingsUI();
+                } catch(e){
+                  console.error('[Ratings] refreshRatingsUI error:', e);
+                }
+              } else {
+                console.log('[Ratings] Already refreshed for this content:', contentKey);
               }
             } else {
-              console.log('[Ratings] Already refreshed for this content, skipping');
+              console.log('[Ratings] No valid content info yet, skipping refresh');
             }
           }
         
