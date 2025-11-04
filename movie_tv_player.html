@@ -3893,6 +3893,7 @@
             display: flex;
             align-items: center;
             gap: 0;
+            flex-direction: row;
         }
 
         .source-tooltip-arrow-left {
@@ -3902,6 +3903,7 @@
             border-bottom: 12px solid transparent;
             border-right: 15px solid var(--primary-color, #00ff9f);
             filter: drop-shadow(0 0 8px rgba(0, 255, 159, 0.5));
+            flex-shrink: 0;
         }
 
         .source-tooltip-box {
@@ -3943,6 +3945,68 @@
             }
             50% {
                 transform: translateY(-50%) translateX(-8px);
+            }
+        }
+
+        /* Responsive: Switch to top positioning on smaller screens */
+        @media (max-width: 768px) {
+            .source-tooltip-hint {
+                left: auto;
+                right: 0;
+                top: auto;
+                bottom: calc(100% + 15px);
+                transform: none;
+                animation: gentleBounceVertical 2s ease-in-out infinite;
+            }
+
+            .source-tooltip-hint.active {
+                flex-direction: column;
+                align-items: flex-end;
+            }
+
+            .source-tooltip-arrow-left {
+                display: none;
+            }
+
+            .source-tooltip-hint::after {
+                content: '';
+                width: 0;
+                height: 0;
+                border-left: 12px solid transparent;
+                border-right: 12px solid transparent;
+                border-top: 15px solid var(--primary-color, #00ff9f);
+                filter: drop-shadow(0 0 8px rgba(0, 255, 159, 0.5));
+                margin-right: 20px;
+            }
+
+            .source-tooltip-box {
+                white-space: normal;
+                max-width: 200px;
+                font-size: 16px;
+                padding: 10px 36px 10px 14px;
+            }
+
+            @keyframes gentleBounceVertical {
+                0%, 100% {
+                    transform: translateY(0);
+                }
+                50% {
+                    transform: translateY(5px);
+                }
+            }
+        }
+
+        /* Even smaller screens - compact text */
+        @media (max-width: 480px) {
+            .source-tooltip-box {
+                max-width: 160px;
+                font-size: 14px;
+                padding: 8px 32px 8px 12px;
+            }
+
+            .source-tooltip-close {
+                font-size: 20px;
+                padding: 6px;
             }
         }
         /* ============= END SOURCE TOOLTIP ARROW ============= */
@@ -5329,12 +5393,21 @@
 
         /* ---------- end Ratings (You + Friends) helpers ---------- */
 
+        // Track which content has been refreshed (shared with later definition)
+        let __earlyLastRefreshedContentId = null;
+
         function setupUserRatingsPill(){
             const box = ensureOmdbDom() || hostRatingsBox();
             console.debug('[ratings] setupUserRatingsPill: container?', !!box, { currentContentType, currentContentId });
             if (!box) return;
             ensurePill(box);
-            try { refreshRatingsUI(); } catch(e){ console.error(e); } 
+
+            // Only refresh if we haven't already refreshed for this content
+            const contentKey = `${currentContentType}_${currentContentId}`;
+            if (__earlyLastRefreshedContentId !== contentKey) {
+                __earlyLastRefreshedContentId = contentKey;
+                try { refreshRatingsUI(); } catch(e){ console.error(e); }
+            }
         }
 
         // Initialize the app
@@ -7250,14 +7323,18 @@
         }
 
         // Source tooltip hint - simple implementation
+        // Track if hint has been shown in this session only (not persisted)
+        let sourceHintShownThisSession = false;
+
         function showSourceHint() {
-            // Check if user has dismissed it before
-            if (localStorage.getItem('sourceHintDismissed') === 'true') {
+            // Only show once per page load/session
+            if (sourceHintShownThisSession) {
                 return;
             }
 
             const hint = document.getElementById('sourceTooltipHint');
             if (hint) {
+                sourceHintShownThisSession = true;
                 // Show after 1 second delay
                 setTimeout(() => {
                     hint.classList.add('active');
@@ -7269,14 +7346,7 @@
             const hint = document.getElementById('sourceTooltipHint');
             if (hint) {
                 hint.classList.remove('active');
-                localStorage.setItem('sourceHintDismissed', 'true');
             }
-        }
-
-        // Helper to reset hint (for testing)
-        window.resetSourceHint = function() {
-            localStorage.removeItem('sourceHintDismissed');
-            console.log('Source hint reset! Reload and play content to see it again.');
         }
 
         function updateNextEpisodeButton() {
@@ -7680,6 +7750,17 @@
             currentContentUrl = '';
             currentContentId = null;
             currentContentData = null;
+
+            // Reset ratings refresh trackers for next content
+            if (typeof __lastRefreshedContentId !== 'undefined') {
+                __lastRefreshedContentId = null;
+            }
+            if (typeof __earlyLastRefreshedContentId !== 'undefined') {
+                __earlyLastRefreshedContentId = null;
+            }
+
+            // Reset source hint for next content load
+            sourceHintShownThisSession = false;
 
             // Hide stop button
             const stopBtn = document.getElementById('stopBtn');
@@ -13482,6 +13563,8 @@
             }catch(_){}
           }
         
+          let __lastRefreshedContentId = null;
+
           function setupUserRatingsPill(){
             const box = hostRatingsBox();
             console.log('[Ratings] setupUserRatingsPill called - container found:', !!box, 'contentType:', currentContentType, 'contentId:', currentContentId);
@@ -13493,11 +13576,19 @@
             ensurePill(box);
             console.log('[Ratings] Setting up grid observer...');
             observeGrid(box);
-            console.log('[Ratings] Calling refreshRatingsUI to load friend ratings...');
-            try {
-              refreshRatingsUI();
-            } catch(e){
-              console.error('[Ratings] refreshRatingsUI error:', e);
+
+            // Only refresh if we haven't already refreshed for this content
+            const contentKey = `${currentContentType}_${currentContentId}`;
+            if (__lastRefreshedContentId !== contentKey) {
+              console.log('[Ratings] Calling refreshRatingsUI to load friend ratings...');
+              __lastRefreshedContentId = contentKey;
+              try {
+                refreshRatingsUI();
+              } catch(e){
+                console.error('[Ratings] refreshRatingsUI error:', e);
+              }
+            } else {
+              console.log('[Ratings] Already refreshed for this content, skipping');
             }
           }
         
