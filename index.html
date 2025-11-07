@@ -4599,8 +4599,8 @@
             <div class="player-controls">
                 <button onclick="playNextEpisode()" class="btn" id="nextEpisodeBtn" style="display: none;">Next Episode</button>
                 <button onclick="toggleFullscreen()" class="btn btn-secondary">Fullscreen</button>
-                <button id="sportsSourceBtn" class="btn btn-secondary" onclick="switchSportsSource()" style="display: none;" title="Switch between available sources">
-                    <span id="sportsSourceBtnText">Source 1</span> 🔄
+                <button id="sportsSourceBtn" class="btn btn-secondary" onclick="switchSportsSource()" style="display: none;">
+                    <span id="sportsSourceBtnText">Source 1</span>
                 </button>
                 <button onclick="toggleComments()" class="btn btn-secondary" id="commentsBtn" style="display: none;">💬 Comments</button>
                 <button onclick="copyCurrentUrl()" class="btn btn-secondary">Copy URL</button>
@@ -5037,6 +5037,9 @@
                 <div id="sportsFilters" style="margin-bottom: 24px; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
                     <button class="bg-animation-toggle" onclick="toggleLiveFilter()" id="liveSportsBtn">
                         ◆ Live Now
+                    </button>
+                    <button class="bg-animation-toggle" onclick="toggleArabicFilter()" id="arabicSportsBtn">
+                        🇸🇦 Arabic Commentary
                     </button>
                     <div id="sportTypeButtons" style="display: contents;"></div>
                 </div>
@@ -11012,7 +11015,7 @@
 
         // ============= SPORTS STREAMING SECTION =============
 
-        const WESTREAM_BASE_URL = 'https://westream.su';  // Free sports streaming API
+        const WESTREAM_BASE_URL = 'https://westream.su';  // Free sports streaming API with Arabic commentary
         let allSportsMatches = [];
         let availableSports = [];
         let isLiveFilterActive = false; // Toggle state for live filter
@@ -11283,9 +11286,6 @@
             const sport = match.category || 'Sports';
             const sportDisplay = sport.charAt(0).toUpperCase() + sport.slice(1);
 
-            // Get source count
-            const sourceCount = match.sources ? match.sources.length : 0;
-
             return `
                 <div class="content-card" onclick='playSportsStream(${index})' style="--accent-color: ${isLive ? '#ff00ff' : '#00d9ff'}; --primary-color: ${isLive ? '#00ff9f' : '#00ff9f'};">
                     ${isLive ? `
@@ -11297,11 +11297,6 @@
                             SPORTS
                         </div>
                     `}
-                    ${sourceCount > 1 ? `
-                        <div class="content-type-badge" style="background: rgba(255,165,0,0.9); border-color: #ffa500; top: 50px;">
-                            ${sourceCount} Sources
-                        </div>
-                    ` : ''}
 
                     <div class="content-poster" style="padding: 20px; min-height: 300px; display: flex; flex-direction: column; justify-content: center; background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 50%, #16213e 100%);">
                         <div style="text-align: center; margin-bottom: 16px;">
@@ -11483,14 +11478,7 @@
 
                 // Get source name
                 const currentSource = sources[currentSportsSourceIndex];
-                let sourceName;
-
-                if (currentSource?.source === 'okru') {
-                    // Use title if available for OK.ru sources
-                    sourceName = currentSource.title || 'OK.ru';
-                } else {
-                    sourceName = currentSource?.source?.toUpperCase() || `Source ${currentSportsSourceIndex + 1}`;
-                }
+                const sourceName = currentSource?.source?.toUpperCase() || `Source ${currentSportsSourceIndex + 1}`;
 
                 btnText.textContent = `${sourceName} (${currentSportsSourceIndex + 1}/${sources.length})`;
             } else {
