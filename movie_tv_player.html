@@ -5301,7 +5301,14 @@
         async function getFriendUsernames(){
           try {
             const r = await baseRequest('/friends', { method: 'GET' });
-            return (r && Array.isArray(r.friends)) ? r.friends.map(f => (f.username || f)) : [];
+            // Handle both array and object formats
+            let friendsList = [];
+            if (Array.isArray(r)) {
+              friendsList = r;
+            } else if (r && Array.isArray(r.friends)) {
+              friendsList = r.friends;
+            }
+            return friendsList.map(f => f.username || f);
           } catch(_) {
             return [];
           }
@@ -6524,6 +6531,11 @@
                 // Update video source button
                 updateVideoSourceButton();
 
+                // Refresh user ratings UI to show friends' ratings
+                setTimeout(() => {
+                    setupUserRatingsPill();
+                }, 500);
+
             } catch (error) {
                 console.error('Play content error:', error);
                 showError(`Failed to load content: ${error.message}`);
@@ -7132,8 +7144,6 @@
                 const playerSection = document.getElementById('playerSection');
                 if (playerSection) {
                     playerSection.style.display = 'block';
-                    // Scroll to player for better UX
-                    playerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
 
                 // Load with appropriate player (video element for direct, iframe for embed)
@@ -7199,8 +7209,6 @@
                 const playerSection = document.getElementById('playerSection');
                 if (playerSection) {
                     playerSection.style.display = 'block';
-                    // Scroll to player for better UX
-                    playerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
 
                 // Load with appropriate player (video element for direct, iframe for embed)
