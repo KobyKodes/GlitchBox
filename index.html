@@ -5083,9 +5083,6 @@
             <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
                 <div class="watchparty-title">
                     Watchparty
-                    <div id="hostBadge" style="display: none; font-size: 10px; background: linear-gradient(135deg, #ffd700, #ff8c00); color: #0f0f1e; padding: 2px 8px; border-radius: 4px; margin-top: 4px; font-weight: bold; text-shadow: none; border: 2px solid #ffa500; box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);">
-                        ★ YOU ARE HOST
-                    </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 6px; flex: 1; justify-content: center;">
                     <span class="watchparty-room-code" id="watchpartyRoomCodeLabel">Code:</span>
@@ -9759,12 +9756,6 @@
                 addSystemMessage(`${data.username} is now the host`);
                 // showStatus(`${data.username} is now controlling playback`);
 
-                // Update UI to show/hide host indicators
-                const hostBadge = document.getElementById('hostBadge');
-                if (hostBadge) {
-                    hostBadge.style.display = isHost ? 'block' : 'none';
-                }
-
                 // Re-setup video sync listeners if I'm the new host
                 if (isHost) {
                     const playerVideo = document.getElementById('playerVideo');
@@ -10176,12 +10167,6 @@
         function updateWatchpartyUI(data) {
             document.getElementById('watchpartyRoomCode').textContent = data.room_code;
             updateUsersList(data.users);
-
-            // Show host badge only for host
-            const hostBadge = document.getElementById('hostBadge');
-            if (hostBadge) {
-                hostBadge.style.display = isHost ? 'block' : 'none';
-            }
 
             // Re-setup video sync listeners when host status changes
             const playerVideo = document.getElementById('playerVideo');
