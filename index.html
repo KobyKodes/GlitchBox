@@ -5398,6 +5398,23 @@
           }
         }
 
+        function clearRatingsUI() {
+          const container = hostRatingsBox();
+          if (!container) return;
+
+          // Clear friend rating tiles
+          container.querySelectorAll('.friend-rating-item').forEach(n => n.remove());
+
+          // Reset "You" tile to default state
+          const input = document.getElementById('userRatingInput');
+          const btn = document.getElementById('postUserRatingBtn');
+          const youValEl = document.getElementById('userRatingValue');
+
+          if (input) input.value = '';
+          if (btn) btn.textContent = 'Post';
+          if (youValEl) youValEl.textContent = '—';
+        }
+
         /* ---------- end Ratings (You + Friends) helpers ---------- */
 
         // Track which content has been refreshed (shared with later definition)
@@ -6230,8 +6247,12 @@
         }
 
         async function playContent(contentId, contentTitle, contentType) {
-         
+
             hideError();
+
+            // Clear old ratings immediately to prevent showing wrong data
+            clearRatingsUI();
+            __earlyLastRefreshedContentId = null;
 
             // Scroll to player section immediately
             const playerSection = document.querySelector('.player-section');
