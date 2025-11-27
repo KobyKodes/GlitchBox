@@ -1598,26 +1598,365 @@
             }
         }
 
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.75rem;
+            }
+
+            .header p {
+                font-size: 0.85rem;
+            }
+
+            .user-menu-container {
+                top: 12px;
+                left: 12px;
+            }
+
+            .user-menu-btn {
+                padding: 8px 12px;
+                font-size: 18px;
+                gap: 6px;
+                line-height: 1;
+                display: flex;
+                align-items: center;
+            }
+
+            .user-menu-btn.logged-in {
+                padding: 8px 12px;
+                font-size: 18px;
+                gap: 6px;
+                line-height: 1;
+                display: flex;
+                align-items: center;
+            }
+
+            .user-menu-btn.logged-in #userMenuIcon {
+                width: 18px;
+                height: 18px;
+            }
+
+            #userMenuText {
+                font-size: 16px;
+                line-height: 1;
+            }
+
+            .bg-animation-toggle {
+                padding: 8px 12px;
+                font-size: 18px;
+                line-height: 1;
+                display: flex;
+                align-items: center;
+            }
+
+            .bg-animation-toggle[onclick*="toggleWatchpartyPanel"] {
+                padding: 8px 12px;
+                font-size: 18px;
+                line-height: 1;
+            }
+
+            .theme-selector-btn,
+            .bg-animation-toggle[onclick*="toggleEffectsPanel"] {
+                padding: 8px 12px;
+                font-size: 18px;
+            }
+
+            /* Top-right and bottom-right button containers */
+            div[style*="position: fixed"][style*="top: 20px"][style*="right: 20px"] {
+                top: 12px !important;
+                right: 12px !important;
+            }
+
+            /* Bottom-right button container */
+            div[style*="position: fixed"][style*="bottom: 20px"][style*="right: 20px"] {
+                bottom: 12px !important;
+                right: 12px !important;
+                gap: 8px !important;
+            }
+        }
+
         @media (max-width: 480px) {
+            .container {
+                padding: 24px 0;
+            }
+
+            .header,
+            .search-section,
+            .tabs {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .header p {
+                font-size: 0.75rem;
+            }
+
+            .user-menu-container {
+                top: 10px;
+                left: 10px;
+            }
+
+            .user-menu-btn {
+                padding: 4px 8px;
+                font-size: 14px;
+                gap: 3px;
+                line-height: 1;
+                display: flex;
+                align-items: center;
+            }
+
+            .user-menu-btn.logged-in {
+                padding: 4px 8px;
+                font-size: 14px;
+                gap: 3px;
+                line-height: 1;
+                display: flex;
+                align-items: center;
+            }
+
+            .user-menu-btn.logged-in #userMenuIcon {
+                width: 14px;
+                height: 14px;
+            }
+
+            #userMenuText {
+                font-size: 12px;
+                line-height: 1;
+            }
+
+            .bg-animation-toggle {
+                padding: 4px 8px;
+                font-size: 14px;
+                line-height: 1;
+                display: flex;
+                align-items: center;
+            }
+
+            .bg-animation-toggle[onclick*="toggleWatchpartyPanel"] {
+                padding: 4px 8px;
+                font-size: 14px;
+                line-height: 1;
+            }
+
+            .theme-selector-btn,
+            .bg-animation-toggle[onclick*="toggleEffectsPanel"] {
+                padding: 4px 8px;
+                font-size: 14px;
+            }
+
+            /* Top-right and bottom-right button containers */
+            div[style*="position: fixed"][style*="top: 20px"][style*="right: 20px"] {
+                top: 10px !important;
+                right: 10px !important;
+            }
+
+            /* Bottom-right button container */
+            div[style*="position: fixed"][style*="bottom: 20px"][style*="right: 20px"] {
+                bottom: 10px !important;
+                right: 10px !important;
+                gap: 5px !important;
+            }
+
+            .player-section {
+                padding: 16px 0;
+            }
+
             .current-content {
-                padding: 8px;
+                padding: 8px 0;
                 gap: 8px;
                 grid-template-columns: 1fr;
+                display: flex;
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 440px) {
+            .header h1 {
+                font-size: 1.3rem;
+            }
+
+            .header p {
+                font-size: 0.7rem;
+            }
+
+            .user-menu-container {
+                top: 8px;
+                left: 8px;
+            }
+
+            .user-menu-btn {
+                padding: 3px 6px;
+                font-size: 12px;
+                gap: 2px;
+                line-height: 1;
+                display: flex;
+                align-items: center;
+            }
+
+            .user-menu-btn.logged-in {
+                padding: 3px 6px;
+                font-size: 12px;
+                gap: 2px;
+                line-height: 1;
+                display: flex;
+                align-items: center;
+            }
+
+            .user-menu-btn.logged-in #userMenuIcon {
+                width: 12px;
+                height: 12px;
+            }
+
+            #userMenuText {
+                font-size: 11px;
+                line-height: 1;
+            }
+
+            .bg-animation-toggle {
+                padding: 3px 6px;
+                font-size: 12px;
+                line-height: 1;
+                display: flex;
+                align-items: center;
+            }
+
+            .bg-animation-toggle[onclick*="toggleWatchpartyPanel"] {
+                padding: 3px 6px;
+                font-size: 12px;
+                line-height: 1;
+            }
+
+            .theme-selector-btn,
+            .bg-animation-toggle[onclick*="toggleEffectsPanel"] {
+                padding: 3px 6px;
+                font-size: 12px;
+            }
+
+            /* Top-right and bottom-right button containers */
+            div[style*="position: fixed"][style*="top: 20px"][style*="right: 20px"] {
+                top: 8px !important;
+                right: 8px !important;
+            }
+
+            /* Bottom-right button container */
+            div[style*="position: fixed"][style*="bottom: 20px"][style*="right: 20px"] {
+                bottom: 8px !important;
+                right: 8px !important;
+                gap: 4px !important;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .header {
+                margin-top: 40px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .header p {
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 410px) {
+            .header {
+                margin-top: 40px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .header p {
+                font-size: 0.9rem;
+            }
+
+            .user-menu-container {
+                top: 6px;
+                left: 6px;
+            }
+
+            .user-menu-btn {
+                padding: 2px 5px;
+                font-size: 11px;
+                gap: 2px;
+                line-height: 1;
+                display: flex;
+                align-items: center;
+            }
+
+            .user-menu-btn.logged-in {
+                padding: 2px 5px;
+                font-size: 11px;
+                gap: 2px;
+                line-height: 1;
+                display: flex;
+                align-items: center;
+            }
+
+            .user-menu-btn.logged-in #userMenuIcon {
+                width: 11px;
+                height: 11px;
+            }
+
+            #userMenuText {
+                font-size: 10px;
+                line-height: 1;
+            }
+
+            .bg-animation-toggle {
+                line-height: 1;
+                display: flex;
+                align-items: center;
+            }
+
+            .bg-animation-toggle[onclick*="toggleWatchpartyPanel"] {
+                padding: 2px 5px;
+                font-size: 11px;
+                line-height: 1;
+            }
+
+            /* Top-right button container */
+            div[style*="position: fixed"][style*="top: 20px"][style*="right: 20px"] {
+                top: 6px !important;
+                right: 6px !important;
             }
 
             .poster-container {
-                grid-column: 1 !important;
-                grid-row: 1 !important;
-                justify-self: center;
+                grid-column: unset !important;
+                grid-row: unset !important;
+                justify-self: flex-start;
                 order: 1;
+                padding: 0 16px;
+                align-self: flex-start;
+            }
+
+            .poster-container #playerWatchlistBtn {
+                padding: 6px 12px;
+                font-size: 14px;
+                width: 100px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .poster-container #playerWatchlistBtn #playerWatchlistBtnText {
+                font-size: 14px;
             }
 
             .current-content-info {
-                grid-column: 1 !important;
-                grid-row: 2 !important;
+                grid-column: unset !important;
+                grid-row: unset !important;
                 order: 2;
                 gap: 8px;
                 width: 100%;
+                padding: 0;
+                min-width: 0;
             }
 
             .current-content-poster {
@@ -1630,80 +1969,124 @@
             .episode-description,
             .tv-controls {
                 width: 100%;
+                max-width: 100%;
                 box-sizing: border-box;
+                margin: 0;
             }
 
-            .omdb-details,
-            .cast-section,
+            .omdb-details {
+                padding: 0;
+                border-radius: 0;
+                background: transparent;
+                border: none;
+                box-shadow: none;
+            }
+
+            .cast-section {
+                padding: 16px;
+                border-radius: 0;
+                margin: 0;
+            }
+
             .episode-description {
-                padding: 8px;
+                padding: 16px;
+                border-radius: 0;
+            }
+
+            .omdb-details .detail-item {
+                padding-left: 16px;
+                padding-right: 16px;
             }
 
             .current-content-info h3 {
                 font-size: 1.3rem;
                 text-align: center;
+                padding: 0 16px;
             }
 
             .current-content-info p {
                 text-align: center;
                 font-size: 18px;
+                padding: 0 16px;
+            }
+
+            .omdb-ratings {
+                width: 100%;
+                max-width: 100%;
+                margin: 0;
+                padding: 0;
             }
 
             .ratings-container {
-                gap: 6px;
+                gap: 12px;
+                justify-content: center;
+                padding: 0 16px;
+                width: 100%;
+                max-width: 100%;
             }
 
             .rating-item {
-                padding: 6px 12px;
+                padding: 8px 16px;
+                min-width: 90px;
+                flex: 0 1 auto;
             }
 
             .rating-source {
-                font-size: 12px;
-            }
-
-            .rating-value {
-                font-size: 20px;
-            }
-
-            .cast-grid {
-                grid-template-columns: repeat(auto-fit, minmax(75px, 1fr));
-                gap: 10px;
-            }
-
-            .cast-member {
-                padding: 3px;
-            }
-
-            .cast-member-image {
-                width: 50px;
-                height: 50px;
-            }
-
-            .cast-member-name {
                 font-size: 14px;
             }
 
+            .rating-value {
+                font-size: 22px;
+            }
+
+            .cast-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                padding: 0;
+            }
+
+            .cast-member {
+                padding: 4px;
+            }
+
+            .cast-member-image {
+                width: 70px;
+                height: 70px;
+            }
+
+            .cast-member-name {
+                font-size: 15px;
+            }
+
             .cast-member-character {
-                font-size: 12px;
+                font-size: 13px;
             }
 
             #currentOverview,
             #episodeDescriptionText {
-                font-size: 18px;
-                line-height: 1.4;
+                font-size: 22px;
+                line-height: 1.5;
+                width: 100%;
+                max-width: 100%;
+            }
+
+            #currentOverview {
+                padding: 0 16px;
             }
 
             .detail-item {
-                font-size: 14px;
-                margin-bottom: 4px;
+                font-size: 16px;
+                margin-bottom: 6px;
+                line-height: 1.5;
             }
 
             .tv-controls {
-                padding: 10px;
+                padding: 16px;
                 margin: 0;
                 display: flex;
                 flex-direction: column;
                 align-items: stretch;
+                border-radius: 0;
             }
 
             .season-selector,
