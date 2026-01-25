@@ -12614,7 +12614,7 @@
                         resultsDiv.innerHTML = '<div style="padding: 16px; color: #ffb000;">Searching...</div>';
 
                         // Use the existing search function
-                        const response = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=5492f8f13c3de8b6b8f95a9e0ae7db71&query=${encodeURIComponent(query)}`);
+                        const response = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=e577f3394a629d69efa3a9414e172237&query=${encodeURIComponent(query)}`);
                         const data = await response.json();
 
                         if (data.results && data.results.length > 0) {
@@ -12840,7 +12840,7 @@
                         ? `https://api.themoviedb.org/3/movie/${item.id}`
                         : `https://api.themoviedb.org/3/tv/${item.id}`;
 
-                    const response = await fetch(`${endpoint}?api_key=a24e379b5c670ce90c22a645395b50ad`);
+                    const response = await fetch(`${endpoint}?api_key=e577f3394a629d69efa3a9414e172237`);
                     if (response.ok) {
                         const data = await response.json();
                         rating = data.vote_average ? data.vote_average.toFixed(1) : null;
