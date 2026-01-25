@@ -3705,6 +3705,249 @@
             100% { background-position: 0% 50%; }
         }
 
+        /* Theme: Phosphor Burn - Vintage CRT Amber Monitor */
+        [data-theme="phosphor"] {
+            --primary-color: #ffb000;
+            --secondary-color: #33ff66;
+            --accent-color: #ff6600;
+            --bg-dark: #0a0800;
+            --bg-medium: #1a1408;
+            --bg-light: #2a2010;
+            --primary-glow: rgba(255, 176, 0, 0.5);
+            --secondary-glow: rgba(51, 255, 102, 0.4);
+        }
+
+        [data-theme="phosphor"] body {
+            background: #0a0800;
+            background-image:
+                radial-gradient(ellipse at center, #1a1408 0%, #0a0800 70%, #050400 100%),
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 176, 0, 0.02) 2px, rgba(255, 176, 0, 0.02) 4px);
+            color: #ffb000;
+        }
+
+        @keyframes phosphorBurn {
+            0%, 100% {
+                text-shadow: 0 0 10px rgba(255, 176, 0, 0.8),
+                             0 0 20px rgba(255, 176, 0, 0.4);
+            }
+            50% {
+                text-shadow: 0 0 15px rgba(255, 176, 0, 1),
+                             0 0 30px rgba(255, 176, 0, 0.6),
+                             0 0 5px rgba(51, 255, 102, 0.3);
+            }
+        }
+
+        @keyframes phosphorGhost {
+            0%, 100% { opacity: 1; filter: blur(0px); }
+            25% { opacity: 0.95; filter: blur(0.5px); }
+            75% { opacity: 0.97; filter: blur(0.3px); }
+        }
+
+        /* Phosphor Burn - Header with phosphor burn animation */
+        [data-theme="phosphor"] .header h1 {
+            color: #ffb000;
+            text-shadow: 0 0 10px rgba(255, 176, 0, 0.8),
+                         0 0 20px rgba(255, 176, 0, 0.4);
+            animation: phosphorBurn 3s ease-in-out infinite;
+        }
+
+        [data-theme="phosphor"] .header p {
+            color: #33ff66;
+            text-shadow: 0 0 8px rgba(51, 255, 102, 0.5);
+        }
+
+        /* Phosphor Burn - Buttons */
+        [data-theme="phosphor"] .btn,
+        [data-theme="phosphor"] .nav-btn {
+            background: linear-gradient(180deg, #ffb000 0%, #cc8c00 100%);
+            border: 2px solid #ffb000;
+            color: #0a0800;
+            box-shadow: 0 0 10px rgba(255, 176, 0, 0.4),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        [data-theme="phosphor"] .btn:hover,
+        [data-theme="phosphor"] .nav-btn:hover {
+            background: linear-gradient(180deg, #33ff66 0%, #28cc52 100%);
+            border-color: #33ff66;
+            color: #0a0800;
+            box-shadow: 0 0 15px rgba(51, 255, 102, 0.5);
+        }
+
+        [data-theme="phosphor"] .btn-secondary {
+            background: linear-gradient(180deg, #33ff66 0%, #28cc52 100%);
+            border: 2px solid #33ff66;
+            color: #0a0800;
+            box-shadow: 0 0 10px rgba(51, 255, 102, 0.4);
+        }
+
+        [data-theme="phosphor"] .btn-secondary:hover {
+            background: linear-gradient(180deg, #ffb000 0%, #cc8c00 100%);
+            border-color: #ffb000;
+            color: #0a0800;
+            box-shadow: 0 0 15px rgba(255, 176, 0, 0.5);
+        }
+
+        /* Phosphor Burn - Effects buttons */
+        [data-theme="phosphor"] .effects-btn {
+            background: linear-gradient(180deg, #ffb000 0%, #cc8c00 100%);
+            border: 2px solid #ffb000;
+            color: #0a0800;
+        }
+
+        [data-theme="phosphor"] .effects-btn:hover,
+        [data-theme="phosphor"] .effects-btn.active {
+            background: linear-gradient(180deg, #33ff66 0%, #28cc52 100%);
+            border-color: #33ff66;
+            box-shadow: 0 0 15px rgba(51, 255, 102, 0.5);
+        }
+
+        /* Phosphor Burn - Content Cards with CRT vignette */
+        [data-theme="phosphor"] .content-card {
+            background: linear-gradient(145deg, #1a1408 0%, #0f0c05 100%);
+            border: 2px solid #ffb000;
+            box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.5),
+                        0 0 15px rgba(255, 176, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            animation: phosphorGhost 4s ease-in-out infinite;
+        }
+
+        [data-theme="phosphor"] .content-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.3) 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        [data-theme="phosphor"] .content-card:hover {
+            border-color: #33ff66;
+            box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.5),
+                        0 0 25px rgba(51, 255, 102, 0.5);
+            transform: translate(-2px, -2px);
+        }
+
+        [data-theme="phosphor"] .content-card .rating {
+            background: #33ff66;
+            color: #0a0800;
+            box-shadow: 0 0 8px rgba(51, 255, 102, 0.5);
+        }
+
+        [data-theme="phosphor"] .content-card h3 {
+            color: #ffb000;
+            text-shadow: 0 0 5px rgba(255, 176, 0, 0.5);
+        }
+
+        [data-theme="phosphor"] .content-card p,
+        [data-theme="phosphor"] .content-card .year {
+            color: rgba(255, 176, 0, 0.7);
+        }
+
+        /* Phosphor Burn - Input fields */
+        [data-theme="phosphor"] input[type="text"],
+        [data-theme="phosphor"] input[type="search"],
+        [data-theme="phosphor"] .search-input {
+            background: #0a0800;
+            border: 2px solid #ffb000;
+            color: #ffb000;
+            box-shadow: inset 0 0 10px rgba(255, 176, 0, 0.1);
+        }
+
+        [data-theme="phosphor"] input[type="text"]:focus,
+        [data-theme="phosphor"] input[type="search"]:focus,
+        [data-theme="phosphor"] .search-input:focus {
+            border-color: #33ff66;
+            box-shadow: 0 0 15px rgba(51, 255, 102, 0.4),
+                        inset 0 0 10px rgba(51, 255, 102, 0.1);
+            outline: none;
+        }
+
+        [data-theme="phosphor"] input::placeholder {
+            color: rgba(255, 176, 0, 0.5);
+        }
+
+        /* Phosphor Burn - Modals and panels */
+        [data-theme="phosphor"] .modal-content,
+        [data-theme="phosphor"] .panel {
+            background: linear-gradient(145deg, #1a1408 0%, #0f0c05 100%);
+            border: 2px solid #ffb000;
+            box-shadow: 0 0 30px rgba(255, 176, 0, 0.3);
+        }
+
+        [data-theme="phosphor"] .theme-selector-panel,
+        [data-theme="phosphor"] .effects-panel {
+            background: linear-gradient(145deg, #1a1408 0%, #0f0c05 100%);
+            border: 2px solid #ffb000;
+            box-shadow: 0 0 30px rgba(255, 176, 0, 0.4);
+        }
+
+        /* Phosphor Burn - Theme selector button */
+        [data-theme="phosphor"] .theme-selector-btn {
+            background: linear-gradient(180deg, #ffb000 0%, #cc8c00 100%);
+            border-color: #ffb000;
+            box-shadow: 0 0 15px rgba(255, 176, 0, 0.5);
+        }
+
+        [data-theme="phosphor"] .theme-selector-btn:hover {
+            background: linear-gradient(180deg, #33ff66 0%, #28cc52 100%);
+            border-color: #33ff66;
+            box-shadow: 0 0 20px rgba(51, 255, 102, 0.6);
+        }
+
+        /* Phosphor Burn - Scrollbar */
+        [data-theme="phosphor"] ::-webkit-scrollbar {
+            width: 12px;
+            background: #0a0800;
+        }
+
+        [data-theme="phosphor"] ::-webkit-scrollbar-track {
+            background: #0a0800;
+            border: 1px solid #1a1408;
+        }
+
+        [data-theme="phosphor"] ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #ffb000 0%, #cc8c00 100%);
+            border: 1px solid #ffb000;
+            border-radius: 0;
+        }
+
+        [data-theme="phosphor"] ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #33ff66 0%, #28cc52 100%);
+            border-color: #33ff66;
+        }
+
+        /* Phosphor Burn - Category tabs and filters */
+        [data-theme="phosphor"] .category-tab,
+        [data-theme="phosphor"] .filter-btn {
+            background: transparent;
+            border: 2px solid #ffb000;
+            color: #ffb000;
+        }
+
+        [data-theme="phosphor"] .category-tab:hover,
+        [data-theme="phosphor"] .filter-btn:hover,
+        [data-theme="phosphor"] .category-tab.active,
+        [data-theme="phosphor"] .filter-btn.active {
+            background: #ffb000;
+            color: #0a0800;
+            box-shadow: 0 0 15px rgba(255, 176, 0, 0.5);
+        }
+
+        /* Phosphor Burn - Navigation and links */
+        [data-theme="phosphor"] a {
+            color: #33ff66;
+        }
+
+        [data-theme="phosphor"] a:hover {
+            color: #ffb000;
+            text-shadow: 0 0 8px rgba(255, 176, 0, 0.5);
+        }
+
         /* Apply theme colors to existing elements */
         .header {
             border: none;
@@ -11089,7 +11332,8 @@
             'ocean': { name: 'Ocean', color: '#00d4ff' },
             'dracula': { name: 'Dracula', color: '#bd93f9' },
             'midnight': { name: 'Midnight Oil', color: '#ffd700' },
-            'jspecial': { name: "J's Special", color: '#ff1493' }
+            'jspecial': { name: "J's Special", color: '#ff1493' },
+            'phosphor': { name: 'Phosphor Burn', color: '#ffb000' }
         };
 
         let currentTheme = localStorage.getItem('selectedTheme') || 'jspecial';
