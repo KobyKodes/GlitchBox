@@ -4240,241 +4240,381 @@
         }
 
         /* ============= PHOSPHOR MODERN - FLOATING WATCHLIST ============= */
-        .floating-watchlist {
+        /* ============= WATCHLIST CONTAINER & PANEL (PHOSPHOR MODERN) ============= */
+        .watchlist-container {
             display: none;
             position: fixed;
+            top: 80px;
             left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 100000;
+            z-index: 100001;
         }
 
-        .floating-watchlist-btn {
-            width: 56px;
-            height: 56px;
-            background: var(--bg-elevated, #3A352E);
-            border: 1px solid var(--border-subtle, rgba(245, 166, 35, 0.15));
-            border-radius: 50%;
-            color: var(--text-primary, #F5F0E8);
-            box-shadow: 0 4px 12px var(--shadow-color, rgba(0, 0, 0, 0.4));
-            cursor: pointer;
+        .watchlist-trigger-btn {
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            transition: all 0.2s ease;
+            gap: 10px;
+            padding: 12px 18px;
+            background: var(--bg-elevated, #3A352E);
+            border: 1px solid var(--border-subtle, rgba(245, 166, 35, 0.15));
+            border-radius: 12px;
+            color: var(--text-primary, #F5F0E8);
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .floating-watchlist-btn:hover {
+        .watchlist-trigger-btn:hover {
             background: var(--primary-color, #F5A623);
             color: var(--bg-dark, #1A1714);
             border-color: var(--primary-color, #F5A623);
-            transform: scale(1.05);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(245, 166, 35, 0.25);
         }
 
-        .floating-watchlist-panel {
+        .watchlist-trigger-btn svg {
+            transition: transform 0.2s ease;
+        }
+
+        .watchlist-trigger-btn:hover svg {
+            transform: scale(1.1);
+        }
+
+        .watchlist-trigger-label {
+            letter-spacing: 0.02em;
+        }
+
+        /* Slide Panel */
+        .watchlist-slide-panel {
             position: absolute;
-            left: 66px;
-            top: 50%;
-            transform: translateY(-50%) scaleX(0);
-            transform-origin: left center;
-            width: 320px;
-            max-height: 70vh;
+            top: calc(100% + 12px);
+            left: 0;
+            width: 380px;
+            max-height: 75vh;
             background: var(--bg-elevated, #3A352E);
             border: 1px solid var(--border-subtle, rgba(245, 166, 35, 0.15));
-            border-radius: 16px;
-            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
-            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.03);
             opacity: 0;
-            transition: transform 0.3s ease, opacity 0.3s ease;
+            visibility: hidden;
+            transform: translateY(-12px) scale(0.96);
+            transform-origin: top left;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
-        .floating-watchlist-panel.active {
-            transform: translateY(-50%) scaleX(1);
+        .watchlist-slide-panel.active {
             opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
         }
 
-        .watchlist-panel-header {
-            padding: 20px;
-            border-bottom: 1px solid var(--border-subtle, rgba(245, 166, 35, 0.15));
+        /* Panel Header */
+        .watchlist-slide-header {
+            padding: 20px 24px 16px;
+            border-bottom: 1px solid var(--border-subtle, rgba(245, 166, 35, 0.1));
+            background: linear-gradient(180deg, rgba(245, 166, 35, 0.04) 0%, transparent 100%);
+        }
+
+        .watchlist-slide-title-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .watchlist-panel-title {
+        .watchlist-slide-title {
             font-family: 'Outfit', sans-serif;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 600;
             color: var(--text-primary, #F5F0E8);
+            margin: 0;
+            letter-spacing: -0.01em;
         }
 
-        .watchlist-panel-close {
-            background: none;
+        .watchlist-slide-close {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
             border: none;
+            border-radius: 10px;
             color: var(--text-secondary, #A39E94);
-            font-size: 24px;
             cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 6px;
             transition: all 0.15s ease;
-            line-height: 1;
         }
 
-        .watchlist-panel-close:hover {
-            background: rgba(245, 166, 35, 0.1);
+        .watchlist-slide-close:hover {
+            background: rgba(245, 166, 35, 0.12);
             color: var(--text-primary, #F5F0E8);
         }
 
-        .watchlist-lists {
-            padding: 12px;
-            max-height: calc(70vh - 80px);
+        /* Lists View */
+        .watchlist-slide-lists {
+            flex: 1;
             overflow-y: auto;
+            padding: 16px;
         }
 
-        .watchlist-list-item {
+        .watchlist-slide-list-card {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 14px 16px;
-            border-radius: 10px;
+            gap: 14px;
+            padding: 16px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid transparent;
+            border-radius: 14px;
             cursor: pointer;
-            transition: background 0.15s ease;
-            margin-bottom: 4px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .watchlist-list-item:hover {
-            background: rgba(245, 166, 35, 0.1);
+        .watchlist-slide-list-card:hover {
+            background: rgba(245, 166, 35, 0.08);
+            border-color: rgba(245, 166, 35, 0.2);
+            transform: translateX(4px);
         }
 
-        .watchlist-list-icon {
-            width: 40px;
-            height: 40px;
-            background: var(--primary-color, #F5A623);
-            border-radius: 10px;
+        .watchlist-slide-list-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-color, #F5A623) 0%, var(--primary-muted, #D4912A) 100%);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--bg-dark, #1A1714);
-            font-size: 18px;
+            font-size: 20px;
+            box-shadow: 0 4px 12px rgba(245, 166, 35, 0.25);
         }
 
-        .watchlist-list-info {
+        .watchlist-slide-list-icon svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .watchlist-slide-list-details {
             flex: 1;
+            min-width: 0;
         }
 
-        .watchlist-list-name {
+        .watchlist-slide-list-name {
             font-family: 'Outfit', sans-serif;
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 500;
             color: var(--text-primary, #F5F0E8);
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .watchlist-list-count {
+        .watchlist-slide-list-count {
             font-family: 'Outfit', sans-serif;
             font-size: 13px;
             color: var(--text-secondary, #A39E94);
-            margin-top: 2px;
         }
 
-        .watchlist-items {
-            padding: 12px;
-            max-height: calc(70vh - 80px);
+        .watchlist-slide-list-arrow {
+            color: var(--text-secondary, #A39E94);
+            opacity: 0;
+            transform: translateX(-8px);
+            transition: all 0.2s ease;
+        }
+
+        .watchlist-slide-list-card:hover .watchlist-slide-list-arrow {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Items View */
+        .watchlist-slide-items {
+            flex: 1;
             overflow-y: auto;
+            padding: 16px;
         }
 
-        .watchlist-back-btn {
-            display: flex;
+        .watchlist-slide-back {
+            display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 10px 12px;
-            margin-bottom: 12px;
-            background: none;
-            border: none;
+            padding: 10px 14px;
+            margin-bottom: 16px;
+            background: rgba(245, 166, 35, 0.08);
+            border: 1px solid rgba(245, 166, 35, 0.15);
+            border-radius: 10px;
             color: var(--primary-color, #F5A623);
             font-family: 'Outfit', sans-serif;
             font-size: 14px;
+            font-weight: 500;
             cursor: pointer;
-            border-radius: 8px;
-            transition: background 0.15s ease;
+            transition: all 0.15s ease;
         }
 
-        .watchlist-back-btn:hover {
-            background: rgba(245, 166, 35, 0.1);
+        .watchlist-slide-back:hover {
+            background: rgba(245, 166, 35, 0.15);
+            border-color: rgba(245, 166, 35, 0.3);
         }
 
-        .watchlist-content-item {
+        .watchlist-slide-items-grid {
             display: flex;
+            flex-direction: column;
             gap: 12px;
+        }
+
+        /* Individual Item Card */
+        .watchlist-item-card {
+            display: flex;
+            gap: 14px;
             padding: 12px;
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid transparent;
+            border-radius: 14px;
             cursor: pointer;
-            transition: background 0.15s ease;
-            margin-bottom: 8px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .watchlist-content-item:hover {
-            background: rgba(245, 166, 35, 0.08);
+        .watchlist-item-card:hover {
+            background: rgba(245, 166, 35, 0.06);
+            border-color: rgba(245, 166, 35, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
         }
 
-        .watchlist-content-poster {
-            width: 60px;
-            height: 90px;
-            border-radius: 8px;
+        .watchlist-item-poster {
+            width: 64px;
+            height: 96px;
+            border-radius: 10px;
             object-fit: cover;
             background: var(--bg-medium, #242019);
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
-        .watchlist-content-info {
+        .watchlist-item-info {
             flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            min-width: 0;
+            padding: 4px 0;
         }
 
-        .watchlist-content-title {
+        .watchlist-item-title {
             font-family: 'Outfit', sans-serif;
             font-size: 15px;
-            font-weight: 500;
+            font-weight: 600;
             color: var(--text-primary, #F5F0E8);
-            margin-bottom: 4px;
+            margin-bottom: 6px;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
-        .watchlist-content-meta {
+        .watchlist-item-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .watchlist-item-type {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            background: rgba(245, 166, 35, 0.12);
+            border-radius: 6px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--primary-color, #F5A623);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .watchlist-item-rating {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
             font-family: 'Outfit', sans-serif;
             font-size: 13px;
             color: var(--text-secondary, #A39E94);
         }
 
-        .watchlist-empty {
+        .watchlist-item-rating svg {
+            width: 14px;
+            height: 14px;
+            color: #FFD700;
+            fill: #FFD700;
+        }
+
+        .watchlist-item-rating-value {
+            font-weight: 600;
+            color: var(--text-primary, #F5F0E8);
+        }
+
+        /* Empty State */
+        .watchlist-slide-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 24px;
             text-align: center;
-            padding: 40px 20px;
-            color: var(--text-secondary, #A39E94);
+        }
+
+        .watchlist-slide-empty-icon {
+            width: 72px;
+            height: 72px;
+            margin-bottom: 20px;
+            background: rgba(245, 166, 35, 0.08);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color, #F5A623);
+            opacity: 0.6;
+        }
+
+        .watchlist-slide-empty-icon svg {
+            width: 32px;
+            height: 32px;
+        }
+
+        .watchlist-slide-empty-text {
             font-family: 'Outfit', sans-serif;
+            font-size: 15px;
+            color: var(--text-secondary, #A39E94);
+            line-height: 1.5;
         }
 
-        .watchlist-empty-icon {
-            font-size: 48px;
-            margin-bottom: 12px;
-            opacity: 0.5;
+        /* Mobile adjustments */
+            .watchlist-slide-panel {
+                width: calc(100vw - 40px);
+                max-width: 340px;
+            }
+
+            .watchlist-slide-list-card {
+                padding: 14px;
+            }
+
+            .watchlist-item-poster {
+                width: 56px;
+                height: 84px;
+            }
         }
 
-        /* Mobile adjustments for floating watchlist */
-        @media (max-width: 768px) {
-            .floating-watchlist {
-                left: 10px;
-            }
-
-            .floating-watchlist-btn {
-                width: 50px;
-                height: 50px;
-            }
-
-            .floating-watchlist-panel {
-                width: calc(100vw - 80px);
-                max-width: 300px;
-                left: 60px;
-            }
+        /* Phosphor theme specific - show watchlist container */
+        [data-theme="phosphor"] .watchlist-container {
+            display: block;
         }
 
         /* ============= PHOSPHOR MODERN - USER MENU OVERRIDES ============= */
@@ -5289,24 +5429,41 @@
         </div>
     </div>
 
-    <!-- Floating Watchlist (Phosphor Theme Only) -->
-    <div id="floatingWatchlist" class="floating-watchlist">
-        <button class="floating-watchlist-btn" onclick="toggleFloatingWatchlist()">
-            <img src="to-do-list.png" alt="Watchlist" style="width: 28px; height: 28px;">
+    <!-- Watchlist Button & Panel (Below User Menu) -->
+    <div id="watchlistContainer" class="watchlist-container">
+        <button class="watchlist-trigger-btn" id="watchlistTriggerBtn" onclick="toggleWatchlistPanel()">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span class="watchlist-trigger-label">Lists</span>
         </button>
-        <div class="floating-watchlist-panel" id="floatingWatchlistPanel">
-            <div class="watchlist-panel-header">
-                <span class="watchlist-panel-title" id="watchlistPanelTitle">My Lists</span>
-                <button class="watchlist-panel-close" onclick="toggleFloatingWatchlist()">&times;</button>
+
+        <div class="watchlist-slide-panel" id="watchlistSlidePanel">
+            <div class="watchlist-slide-header">
+                <div class="watchlist-slide-title-row">
+                    <h2 class="watchlist-slide-title" id="watchlistSlideTitle">My Watchlists</h2>
+                    <button class="watchlist-slide-close" onclick="toggleWatchlistPanel()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 6L6 18M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
-            <div class="watchlist-lists" id="watchlistLists">
+
+            <!-- Lists View -->
+            <div class="watchlist-slide-lists" id="watchlistSlideLists">
                 <!-- Lists populated by JS -->
             </div>
-            <div class="watchlist-items" id="watchlistItems" style="display: none;">
-                <button class="watchlist-back-btn" onclick="showWatchlistLists()">
-                    &#8592; Back to Lists
+
+            <!-- Items View (hidden by default) -->
+            <div class="watchlist-slide-items" id="watchlistSlideItems" style="display: none;">
+                <button class="watchlist-slide-back" onclick="showWatchlistListsView()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Back to Lists
                 </button>
-                <div id="watchlistItemsContent">
+                <div class="watchlist-slide-items-grid" id="watchlistSlideItemsGrid">
                     <!-- Items populated by JS -->
                 </div>
             </div>
@@ -12031,7 +12188,7 @@
             const curvature = document.getElementById('crtCurvature');
             const powerLed = document.getElementById('crtPowerLed');
             const floatingSearch = document.getElementById('floatingSearch');
-            const floatingWatchlist = document.getElementById('floatingWatchlist');
+            const watchlistContainer = document.getElementById('watchlistContainer');
 
             if (isPhosphor) {
                 // Modern phosphor theme - hide all CRT effects
@@ -12040,9 +12197,11 @@
                 if (powerLed) powerLed.style.display = 'none';
                 // Show modern floating elements
                 if (floatingSearch) floatingSearch.style.display = 'block';
-                if (floatingWatchlist) floatingWatchlist.style.display = 'block';
+                if (watchlistContainer) watchlistContainer.style.display = 'block';
                 // Render the watchlist lists
-                renderWatchlistLists();
+                if (typeof renderWatchlistLists === 'function') {
+                    renderWatchlistLists();
+                }
                 // Update auth UI to add menu items
                 updateAuthUI();
             } else {
@@ -12050,7 +12209,7 @@
                 if (curvature) curvature.style.display = 'none';
                 if (powerLed) powerLed.style.display = 'none';
                 if (floatingSearch) floatingSearch.style.display = 'none';
-                if (floatingWatchlist) floatingWatchlist.style.display = 'none';
+                if (watchlistContainer) watchlistContainer.style.display = 'none';
             }
         }
 
@@ -12553,6 +12712,192 @@
             );
         }
 
+        // ============= WATCHLIST PANEL FUNCTIONS =============
+        let watchlistPanelOpen = false;
+        let currentWatchlistView = 'lists'; // 'lists' or 'items'
+        let selectedListName = '';
+
+        window.toggleWatchlistPanel = function() {
+            const panel = document.getElementById('watchlistSlidePanel');
+            if (!panel) return;
+
+            watchlistPanelOpen = !watchlistPanelOpen;
+
+            if (watchlistPanelOpen) {
+                panel.classList.add('active');
+                renderWatchlistLists();
+            } else {
+                panel.classList.remove('active');
+                // Reset to lists view when closing
+                setTimeout(() => {
+                    showWatchlistListsView();
+                }, 300);
+            }
+        };
+
+        window.showWatchlistListsView = function() {
+            const listsContainer = document.getElementById('watchlistSlideLists');
+            const itemsContainer = document.getElementById('watchlistSlideItems');
+            const title = document.getElementById('watchlistSlideTitle');
+
+            if (listsContainer) listsContainer.style.display = 'block';
+            if (itemsContainer) itemsContainer.style.display = 'none';
+            if (title) title.textContent = 'My Watchlists';
+            currentWatchlistView = 'lists';
+        };
+
+        function renderWatchlistLists() {
+            const container = document.getElementById('watchlistSlideLists');
+            if (!container) return;
+
+            const listNames = Object.keys(watchlists);
+
+            if (listNames.length === 0) {
+                container.innerHTML = `
+                    <div class="watchlist-slide-empty">
+                        <div class="watchlist-slide-empty-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                            </svg>
+                        </div>
+                        <p class="watchlist-slide-empty-text">No watchlists yet.<br>Start adding movies and shows!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = listNames.map(listName => {
+                const items = watchlists[listName] || [];
+                const count = items.length;
+                return `
+                    <div class="watchlist-slide-list-card" onclick="showWatchlistItems('${listName.replace(/'/g, "\\'")}')">
+                        <div class="watchlist-slide-list-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                            </svg>
+                        </div>
+                        <div class="watchlist-slide-list-details">
+                            <div class="watchlist-slide-list-name">${listName}</div>
+                            <div class="watchlist-slide-list-count">${count} ${count === 1 ? 'item' : 'items'}</div>
+                        </div>
+                        <div class="watchlist-slide-list-arrow">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 18l6-6-6-6"/>
+                            </svg>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.showWatchlistItems = async function(listName) {
+            const listsContainer = document.getElementById('watchlistSlideLists');
+            const itemsContainer = document.getElementById('watchlistSlideItems');
+            const itemsGrid = document.getElementById('watchlistSlideItemsGrid');
+            const title = document.getElementById('watchlistSlideTitle');
+
+            if (listsContainer) listsContainer.style.display = 'none';
+            if (itemsContainer) itemsContainer.style.display = 'block';
+            if (title) title.textContent = listName;
+
+            selectedListName = listName;
+            currentWatchlistView = 'items';
+
+            const items = watchlists[listName] || [];
+
+            if (items.length === 0) {
+                itemsGrid.innerHTML = `
+                    <div class="watchlist-slide-empty">
+                        <div class="watchlist-slide-empty-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                <path d="M9 10h.01M15 10h.01M8 14s1.5 2 4 2 4-2 4-2"/>
+                            </svg>
+                        </div>
+                        <p class="watchlist-slide-empty-text">This list is empty.<br>Add some content to get started!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Show loading state first
+            itemsGrid.innerHTML = items.map(() => `
+                <div class="watchlist-item-card" style="opacity: 0.5;">
+                    <div class="watchlist-item-poster" style="background: var(--bg-medium);"></div>
+                    <div class="watchlist-item-info">
+                        <div class="watchlist-item-title" style="background: var(--bg-medium); height: 18px; width: 80%; border-radius: 4px;"></div>
+                        <div class="watchlist-item-meta" style="background: var(--bg-medium); height: 14px; width: 60%; border-radius: 4px; margin-top: 8px;"></div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Fetch IMDB ratings for each item
+            const itemsWithRatings = await Promise.all(items.map(async (item) => {
+                let rating = null;
+                try {
+                    // Fetch details to get vote_average (TMDB rating) which we'll display
+                    const endpoint = item.type === 'movie'
+                        ? `https://api.themoviedb.org/3/movie/${item.id}`
+                        : `https://api.themoviedb.org/3/tv/${item.id}`;
+
+                    const response = await fetch(`${endpoint}?api_key=a24e379b5c670ce90c22a645395b50ad`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        rating = data.vote_average ? data.vote_average.toFixed(1) : null;
+                    }
+                } catch (e) {
+                    console.log('Failed to fetch rating for', item.title);
+                }
+                return { ...item, rating };
+            }));
+
+            // Render items with ratings
+            itemsGrid.innerHTML = itemsWithRatings.map(item => `
+                <div class="watchlist-item-card" onclick="playWatchlistItem(${item.id}, '${item.type}')">
+                    <img class="watchlist-item-poster"
+                         src="${item.posterUrl || 'https://via.placeholder.com/64x96/242019/666?text=No+Image'}"
+                         alt="${item.title}"
+                         onerror="this.src='https://via.placeholder.com/64x96/242019/666?text=No+Image'">
+                    <div class="watchlist-item-info">
+                        <div class="watchlist-item-title">${item.title}</div>
+                        <div class="watchlist-item-meta">
+                            <span class="watchlist-item-type">${item.type === 'movie' ? 'Movie' : 'TV Show'}</span>
+                            ${item.rating ? `
+                                <span class="watchlist-item-rating">
+                                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                    <span class="watchlist-item-rating-value">${item.rating}</span>
+                                </span>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        };
+
+        window.playWatchlistItem = function(id, type) {
+            // Close the panel
+            toggleWatchlistPanel();
+
+            // Navigate to player
+            if (type === 'movie') {
+                window.location.href = `movie_tv_player.html?type=movie&id=${id}`;
+            } else {
+                window.location.href = `movie_tv_player.html?type=tv&id=${id}&season=1&episode=1`;
+            }
+        };
+
+        // Click outside to close watchlist panel
+        function setupWatchlistClickOutside() {
+            document.addEventListener('click', function(event) {
+                const container = document.getElementById('watchlistContainer');
+                const panel = document.getElementById('watchlistSlidePanel');
+
+                if (watchlistPanelOpen && container && !container.contains(event.target)) {
+                    toggleWatchlistPanel();
+                }
+            });
+        }
+
         // ============= END PHOSPHOR THEME FUNCTIONS =============
 
         // Initialize theme and animations
@@ -12568,6 +12913,7 @@
             setupClickOutsideListeners();
             initFloatingSearch();
             setupFloatingSearchClickOutside();
+            setupWatchlistClickOutside();
         });
 
         // ============= CLICK OUTSIDE TO CLOSE PANELS =============
