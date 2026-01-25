@@ -14,6 +14,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <!-- <script src="https://fpyf8.com/88/tag.min.js" data-zone="178035" async data-cfasync="false"></script> -->
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -3323,262 +3324,290 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Theme: Phosphor Burn - Vintage CRT Amber Monitor */
+        /* Theme: Phosphor Burn - Modern Minimalist Warm Amber */
         [data-theme="phosphor"] {
-            --primary-color: #ffb000;
-            --secondary-color: #33ff66;
-            --accent-color: #ff6600;
-            --bg-dark: #0a0800;
-            --bg-medium: #1a1408;
-            --bg-light: #2a2010;
-            --primary-glow: rgba(255, 176, 0, 0.5);
-            --secondary-glow: rgba(51, 255, 102, 0.4);
+            --primary-color: #F5A623;
+            --primary-muted: #D4912A;
+            --secondary-color: #E8DCC4;
+            --accent-color: #C7956D;
+            --bg-dark: #1A1714;
+            --bg-medium: #242019;
+            --bg-light: #2E2A24;
+            --bg-elevated: #3A352E;
+            --text-primary: #F5F0E8;
+            --text-secondary: #A39E94;
+            --border-subtle: rgba(245, 166, 35, 0.15);
+            --shadow-color: rgba(0, 0, 0, 0.4);
+            --primary-glow: rgba(245, 166, 35, 0.3);
+            --secondary-glow: rgba(232, 220, 196, 0.2);
         }
 
         [data-theme="phosphor"] body {
-            background: #0a0800;
-            background-image:
-                radial-gradient(ellipse at center, #1a1408 0%, #0a0800 70%, #050400 100%),
-                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 176, 0, 0.02) 2px, rgba(255, 176, 0, 0.02) 4px);
-            color: #ffb000;
+            background: var(--bg-dark);
+            background-image: none;
+            color: var(--text-primary);
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+            animation: none !important;
         }
 
-        @keyframes phosphorBurn {
-            0%, 100% {
-                text-shadow: 0 0 10px rgba(255, 176, 0, 0.8),
-                             0 0 20px rgba(255, 176, 0, 0.4);
-            }
-            50% {
-                text-shadow: 0 0 15px rgba(255, 176, 0, 1),
-                             0 0 30px rgba(255, 176, 0, 0.6),
-                             0 0 5px rgba(51, 255, 102, 0.3);
-            }
+        /* Phosphor Modern - Typography */
+        [data-theme="phosphor"] * {
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
-        @keyframes phosphorGhost {
-            0%, 100% { opacity: 1; filter: blur(0px); }
-            25% { opacity: 0.95; filter: blur(0.5px); }
-            75% { opacity: 0.97; filter: blur(0.3px); }
-        }
-
-        /* Phosphor Burn - Header with phosphor burn animation */
+        /* Phosphor Modern - Header */
         [data-theme="phosphor"] .header h1 {
-            color: #ffb000;
-            text-shadow: 0 0 10px rgba(255, 176, 0, 0.8),
-                         0 0 20px rgba(255, 176, 0, 0.4);
-            animation: phosphorBurn 3s ease-in-out infinite;
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: var(--primary-color);
+            text-shadow: none;
+            animation: none;
         }
 
         [data-theme="phosphor"] .header p {
-            color: #33ff66;
-            text-shadow: 0 0 8px rgba(51, 255, 102, 0.5);
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-secondary);
+            text-shadow: none;
         }
 
-        /* Phosphor Burn - Buttons */
+        /* Phosphor Modern - Buttons (Flat, Refined) */
         [data-theme="phosphor"] .btn,
         [data-theme="phosphor"] .nav-btn {
-            background: linear-gradient(180deg, #ffb000 0%, #cc8c00 100%);
-            border: 2px solid #ffb000;
-            color: #0a0800;
-            box-shadow: 0 0 10px rgba(255, 176, 0, 0.4),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            background: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+            color: var(--bg-dark);
+            font-family: 'Outfit', sans-serif;
+            font-weight: 500;
+            padding: 12px 24px;
+            box-shadow: none;
+            transition: background 0.2s ease, transform 0.1s ease;
         }
 
         [data-theme="phosphor"] .btn:hover,
         [data-theme="phosphor"] .nav-btn:hover {
-            background: linear-gradient(180deg, #33ff66 0%, #28cc52 100%);
-            border-color: #33ff66;
-            color: #0a0800;
-            box-shadow: 0 0 15px rgba(51, 255, 102, 0.5);
+            background: var(--primary-muted);
+            transform: translateY(-1px);
+            box-shadow: none;
+        }
+
+        [data-theme="phosphor"] .btn:active,
+        [data-theme="phosphor"] .nav-btn:active {
+            transform: translateY(0);
+        }
+
+        [data-theme="phosphor"] .btn::before,
+        [data-theme="phosphor"] .nav-btn::before {
+            display: none;
         }
 
         [data-theme="phosphor"] .btn-secondary {
-            background: linear-gradient(180deg, #33ff66 0%, #28cc52 100%);
-            border: 2px solid #33ff66;
-            color: #0a0800;
-            box-shadow: 0 0 10px rgba(51, 255, 102, 0.4);
+            background: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            box-shadow: none;
         }
 
         [data-theme="phosphor"] .btn-secondary:hover {
-            background: linear-gradient(180deg, #ffb000 0%, #cc8c00 100%);
-            border-color: #ffb000;
-            color: #0a0800;
-            box-shadow: 0 0 15px rgba(255, 176, 0, 0.5);
+            background: rgba(245, 166, 35, 0.1);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            box-shadow: none;
         }
 
-        /* Phosphor Burn - Effects buttons */
+        /* Phosphor Modern - Effects buttons */
         [data-theme="phosphor"] .effects-btn {
-            background: linear-gradient(180deg, #ffb000 0%, #cc8c00 100%);
-            border: 2px solid #ffb000;
-            color: #0a0800;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+            font-family: 'Outfit', sans-serif;
+            border-radius: 8px;
         }
 
         [data-theme="phosphor"] .effects-btn:hover,
         [data-theme="phosphor"] .effects-btn.active {
-            background: linear-gradient(180deg, #33ff66 0%, #28cc52 100%);
-            border-color: #33ff66;
-            box-shadow: 0 0 15px rgba(51, 255, 102, 0.5);
+            background: rgba(245, 166, 35, 0.15);
+            border-color: var(--primary-color);
+            box-shadow: none;
         }
 
-        /* Phosphor Burn - Content Cards with CRT vignette */
+        /* Phosphor Modern - Content Cards (Clean, Minimal) */
         [data-theme="phosphor"] .content-card {
-            background: linear-gradient(145deg, #1a1408 0%, #0f0c05 100%);
-            border: 2px solid #ffb000;
-            box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.5),
-                        0 0 15px rgba(255, 176, 0, 0.3);
+            background: var(--bg-light);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px var(--shadow-color);
             position: relative;
             overflow: hidden;
-            animation: phosphorGhost 4s ease-in-out infinite;
+            animation: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        [data-theme="phosphor"] .content-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.3) 100%);
-            pointer-events: none;
-            z-index: 1;
+        [data-theme="phosphor"] .content-card::before,
+        [data-theme="phosphor"] .content-card::after {
+            display: none !important;
         }
 
         [data-theme="phosphor"] .content-card:hover {
-            border-color: #33ff66;
-            box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.5),
-                        0 0 25px rgba(51, 255, 102, 0.5);
-            transform: translate(-2px, -2px);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px var(--shadow-color);
+            border-color: var(--primary-color);
         }
 
         [data-theme="phosphor"] .content-card .rating {
-            background: #33ff66;
-            color: #0a0800;
-            box-shadow: 0 0 8px rgba(51, 255, 102, 0.5);
+            background: var(--primary-color);
+            color: var(--bg-dark);
+            box-shadow: none;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 500;
+            border-radius: 6px;
         }
 
         [data-theme="phosphor"] .content-card h3 {
-            color: #ffb000;
-            text-shadow: 0 0 5px rgba(255, 176, 0, 0.5);
+            color: var(--text-primary);
+            text-shadow: none;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 500;
         }
 
         [data-theme="phosphor"] .content-card p,
         [data-theme="phosphor"] .content-card .year {
-            color: rgba(255, 176, 0, 0.7);
+            color: var(--text-secondary);
+            font-family: 'Outfit', sans-serif;
         }
 
-        /* Phosphor Burn - Input fields */
+        [data-theme="phosphor"] .content-card .content-poster {
+            filter: none;
+            border-radius: 10px 10px 0 0;
+        }
+
+        /* Phosphor Modern - Input fields */
         [data-theme="phosphor"] input[type="text"],
         [data-theme="phosphor"] input[type="search"],
         [data-theme="phosphor"] .search-input {
-            background: #0a0800;
-            border: 2px solid #ffb000;
-            color: #ffb000;
-            box-shadow: inset 0 0 10px rgba(255, 176, 0, 0.1);
+            background: var(--bg-medium);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Outfit', sans-serif;
+            box-shadow: none;
         }
 
         [data-theme="phosphor"] input[type="text"]:focus,
         [data-theme="phosphor"] input[type="search"]:focus,
         [data-theme="phosphor"] .search-input:focus {
-            border-color: #33ff66;
-            box-shadow: 0 0 15px rgba(51, 255, 102, 0.4),
-                        inset 0 0 10px rgba(51, 255, 102, 0.1);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.1);
             outline: none;
         }
 
         [data-theme="phosphor"] input::placeholder {
-            color: rgba(255, 176, 0, 0.5);
+            color: var(--text-secondary);
         }
 
-        /* Phosphor Burn - Modals and panels */
+        /* Phosphor Modern - Modals and panels */
         [data-theme="phosphor"] .modal-content,
         [data-theme="phosphor"] .panel {
-            background: linear-gradient(145deg, #1a1408 0%, #0f0c05 100%);
-            border: 2px solid #ffb000;
-            box-shadow: 0 0 30px rgba(255, 176, 0, 0.3);
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
         }
 
         [data-theme="phosphor"] .theme-selector-panel,
-        [data-theme="phosphor"] .effects-panel {
-            background: linear-gradient(145deg, #1a1408 0%, #0f0c05 100%);
-            border: 2px solid #ffb000;
-            box-shadow: 0 0 30px rgba(255, 176, 0, 0.4);
+        [data-theme="phosphor"] .effects-panel,
+        [data-theme="phosphor"] .bg-effects-panel {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(20px);
         }
 
-        /* Phosphor Burn - Theme selector button */
+        /* Phosphor Modern - Theme selector button - HIDDEN */
         [data-theme="phosphor"] .theme-selector-btn {
-            background: linear-gradient(180deg, #ffb000 0%, #cc8c00 100%);
-            border-color: #ffb000;
-            box-shadow: 0 0 15px rgba(255, 176, 0, 0.5);
+            display: none !important;
         }
 
-        [data-theme="phosphor"] .theme-selector-btn:hover {
-            background: linear-gradient(180deg, #33ff66 0%, #28cc52 100%);
-            border-color: #33ff66;
-            box-shadow: 0 0 20px rgba(51, 255, 102, 0.6);
-        }
-
-        /* Phosphor Burn - Scrollbar */
+        /* Phosphor Modern - Scrollbar */
         [data-theme="phosphor"] ::-webkit-scrollbar {
-            width: 12px;
-            background: #0a0800;
+            width: 8px;
+            background: transparent;
         }
 
         [data-theme="phosphor"] ::-webkit-scrollbar-track {
-            background: #0a0800;
-            border: 1px solid #1a1408;
+            background: var(--bg-medium);
+            border-radius: 4px;
         }
 
         [data-theme="phosphor"] ::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, #ffb000 0%, #cc8c00 100%);
-            border: 1px solid #ffb000;
-            border-radius: 0;
+            background: var(--primary-color);
+            border-radius: 4px;
         }
 
         [data-theme="phosphor"] ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, #33ff66 0%, #28cc52 100%);
-            border-color: #33ff66;
+            background: var(--primary-muted);
         }
 
-        /* Phosphor Burn - Category tabs and filters */
+        /* Phosphor Modern - Category tabs and filters */
         [data-theme="phosphor"] .category-tab,
         [data-theme="phosphor"] .filter-btn {
             background: transparent;
-            border: 2px solid #ffb000;
-            color: #ffb000;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.2s ease;
         }
 
         [data-theme="phosphor"] .category-tab:hover,
         [data-theme="phosphor"] .filter-btn:hover,
         [data-theme="phosphor"] .category-tab.active,
         [data-theme="phosphor"] .filter-btn.active {
-            background: #ffb000;
-            color: #0a0800;
-            box-shadow: 0 0 15px rgba(255, 176, 0, 0.5);
+            background: var(--primary-color);
+            color: var(--bg-dark);
+            border-color: var(--primary-color);
+            box-shadow: none;
         }
 
-        /* Phosphor Burn - Navigation and links */
+        /* Phosphor Modern - Navigation and links */
         [data-theme="phosphor"] a {
-            color: #33ff66;
+            color: var(--primary-color);
         }
 
         [data-theme="phosphor"] a:hover {
-            color: #ffb000;
-            text-shadow: 0 0 8px rgba(255, 176, 0, 0.5);
+            color: var(--primary-muted);
+            text-shadow: none;
         }
 
-        /* ============= PHOSPHOR BURN CRT REDESIGN ============= */
+        /* ============= PHOSPHOR MODERN MINIMALIST REDESIGN ============= */
 
         /* Hide existing search bar in phosphor theme */
         [data-theme="phosphor"] .search-section {
             display: none !important;
         }
 
-        /* Show phosphor-only elements (boot overlay is controlled by JS only) */
+        /* Show floating search only, HIDE all CRT effects */
+        [data-theme="phosphor"] .floating-search,
+        [data-theme="phosphor"] .floating-watchlist {
+            display: block;
+        }
+
+        /* Hide ALL retro CRT elements for modern look */
         [data-theme="phosphor"] .crt-scanlines-overlay,
         [data-theme="phosphor"] .crt-curvature-overlay,
-        [data-theme="phosphor"] .floating-search,
-        [data-theme="phosphor"] .crt-power-led {
-            display: block;
+        [data-theme="phosphor"] .crt-power-led,
+        [data-theme="phosphor"] .crt-boot-overlay {
+            display: none !important;
+        }
+
+        /* Hide external control buttons in phosphor theme - moved to user menu */
+        [data-theme="phosphor"] .bg-animation-toggle[onclick*="toggleWatchpartyPanel"],
+        [data-theme="phosphor"] .bg-animation-toggle[onclick*="toggleEffectsPanel"],
+        [data-theme="phosphor"] div[style*="position: fixed"][style*="top: 20px"][style*="right: 20px"],
+        [data-theme="phosphor"] div[style*="position: fixed"][style*="bottom: 20px"][style*="right: 20px"] {
+            display: none !important;
         }
 
         /* CRT Boot Sequence Overlay */
@@ -4103,7 +4132,416 @@
             }
         }
 
-        /* ============= END PHOSPHOR BURN CRT REDESIGN ============= */
+        /* ============= PHOSPHOR MODERN - FLOATING SEARCH OVERRIDES ============= */
+        [data-theme="phosphor"] .floating-search-btn {
+            width: 56px;
+            height: 56px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 50%;
+            color: var(--text-primary);
+            box-shadow: 0 4px 12px var(--shadow-color);
+            transition: all 0.2s ease;
+        }
+
+        [data-theme="phosphor"] .floating-search-btn:hover {
+            background: var(--primary-color);
+            color: var(--bg-dark);
+            border-color: var(--primary-color);
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px var(--shadow-color);
+        }
+
+        [data-theme="phosphor"] .floating-search-panel {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(20px);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        [data-theme="phosphor"] .floating-search-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            background: transparent;
+        }
+
+        [data-theme="phosphor"] .terminal-prompt,
+        [data-theme="phosphor"] .terminal-cursor {
+            display: none;
+        }
+
+        [data-theme="phosphor"] .floating-search-header::before {
+            content: 'Search';
+            font-family: 'Outfit', sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        [data-theme="phosphor"] .floating-search-close {
+            color: var(--text-secondary);
+            font-size: 24px;
+            transition: color 0.15s ease;
+        }
+
+        [data-theme="phosphor"] .floating-search-close:hover {
+            color: var(--text-primary);
+            text-shadow: none;
+        }
+
+        [data-theme="phosphor"] .floating-search-input-wrapper {
+            padding: 16px 20px;
+            gap: 0;
+        }
+
+        [data-theme="phosphor"] .floating-search-input {
+            font-family: 'Outfit', sans-serif;
+            font-size: 16px;
+            color: var(--text-primary);
+            caret-color: var(--primary-color);
+        }
+
+        [data-theme="phosphor"] .floating-search-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        [data-theme="phosphor"] .floating-search-results {
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        [data-theme="phosphor"] .floating-search-result-item {
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            transition: background 0.15s ease;
+        }
+
+        [data-theme="phosphor"] .floating-search-result-item:hover {
+            background: rgba(245, 166, 35, 0.08);
+        }
+
+        [data-theme="phosphor"] .floating-search-result-item img {
+            border: none;
+            border-radius: 6px;
+        }
+
+        [data-theme="phosphor"] .floating-search-result-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        [data-theme="phosphor"] .floating-search-result-year {
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* ============= PHOSPHOR MODERN - FLOATING WATCHLIST ============= */
+        .floating-watchlist {
+            display: none;
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 100000;
+        }
+
+        .floating-watchlist-btn {
+            width: 56px;
+            height: 56px;
+            background: var(--bg-elevated, #3A352E);
+            border: 1px solid var(--border-subtle, rgba(245, 166, 35, 0.15));
+            border-radius: 50%;
+            color: var(--text-primary, #F5F0E8);
+            box-shadow: 0 4px 12px var(--shadow-color, rgba(0, 0, 0, 0.4));
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: all 0.2s ease;
+        }
+
+        .floating-watchlist-btn:hover {
+            background: var(--primary-color, #F5A623);
+            color: var(--bg-dark, #1A1714);
+            border-color: var(--primary-color, #F5A623);
+            transform: scale(1.05);
+        }
+
+        .floating-watchlist-panel {
+            position: absolute;
+            left: 66px;
+            top: 50%;
+            transform: translateY(-50%) scaleX(0);
+            transform-origin: left center;
+            width: 320px;
+            max-height: 70vh;
+            background: var(--bg-elevated, #3A352E);
+            border: 1px solid var(--border-subtle, rgba(245, 166, 35, 0.15));
+            border-radius: 16px;
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .floating-watchlist-panel.active {
+            transform: translateY(-50%) scaleX(1);
+            opacity: 1;
+        }
+
+        .watchlist-panel-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-subtle, rgba(245, 166, 35, 0.15));
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .watchlist-panel-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary, #F5F0E8);
+        }
+
+        .watchlist-panel-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary, #A39E94);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: all 0.15s ease;
+            line-height: 1;
+        }
+
+        .watchlist-panel-close:hover {
+            background: rgba(245, 166, 35, 0.1);
+            color: var(--text-primary, #F5F0E8);
+        }
+
+        .watchlist-lists {
+            padding: 12px;
+            max-height: calc(70vh - 80px);
+            overflow-y: auto;
+        }
+
+        .watchlist-list-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.15s ease;
+            margin-bottom: 4px;
+        }
+
+        .watchlist-list-item:hover {
+            background: rgba(245, 166, 35, 0.1);
+        }
+
+        .watchlist-list-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-color, #F5A623);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--bg-dark, #1A1714);
+            font-size: 18px;
+        }
+
+        .watchlist-list-info {
+            flex: 1;
+        }
+
+        .watchlist-list-name {
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary, #F5F0E8);
+        }
+
+        .watchlist-list-count {
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            color: var(--text-secondary, #A39E94);
+            margin-top: 2px;
+        }
+
+        .watchlist-items {
+            padding: 12px;
+            max-height: calc(70vh - 80px);
+            overflow-y: auto;
+        }
+
+        .watchlist-back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+            background: none;
+            border: none;
+            color: var(--primary-color, #F5A623);
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.15s ease;
+        }
+
+        .watchlist-back-btn:hover {
+            background: rgba(245, 166, 35, 0.1);
+        }
+
+        .watchlist-content-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.15s ease;
+            margin-bottom: 8px;
+        }
+
+        .watchlist-content-item:hover {
+            background: rgba(245, 166, 35, 0.08);
+        }
+
+        .watchlist-content-poster {
+            width: 60px;
+            height: 90px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: var(--bg-medium, #242019);
+        }
+
+        .watchlist-content-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .watchlist-content-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary, #F5F0E8);
+            margin-bottom: 4px;
+        }
+
+        .watchlist-content-meta {
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            color: var(--text-secondary, #A39E94);
+        }
+
+        .watchlist-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary, #A39E94);
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .watchlist-empty-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        /* Mobile adjustments for floating watchlist */
+        @media (max-width: 768px) {
+            .floating-watchlist {
+                left: 10px;
+            }
+
+            .floating-watchlist-btn {
+                width: 50px;
+                height: 50px;
+            }
+
+            .floating-watchlist-panel {
+                width: calc(100vw - 80px);
+                max-width: 300px;
+                left: 60px;
+            }
+        }
+
+        /* ============= PHOSPHOR MODERN - USER MENU OVERRIDES ============= */
+        [data-theme="phosphor"] .user-menu-dropdown {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(20px);
+            padding: 8px;
+        }
+
+        [data-theme="phosphor"] .user-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px;
+            border: none;
+            transition: background 0.15s ease;
+        }
+
+        [data-theme="phosphor"] .user-menu-item:hover {
+            background: rgba(245, 166, 35, 0.1);
+            border-color: transparent;
+            transform: none;
+        }
+
+        [data-theme="phosphor"] .user-menu-divider {
+            height: 1px;
+            background: var(--border-subtle);
+            margin: 8px 0;
+        }
+
+        [data-theme="phosphor"] .user-menu-username {
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-secondary);
+            font-size: 14px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        [data-theme="phosphor"] .menu-icon {
+            width: 20px;
+            text-align: center;
+            opacity: 0.7;
+        }
+
+        /* ============= PHOSPHOR MODERN - PAGE FADE IN ============= */
+        [data-theme="phosphor"] .container {
+            animation: modernFadeIn 0.5s ease-out;
+        }
+
+        @keyframes modernFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ============= END PHOSPHOR MODERN MINIMALIST REDESIGN ============= */
 
         /* Apply theme colors to existing elements */
         .header {
@@ -4848,6 +5286,30 @@
                 <input type="text" id="floatingSearchInput" class="floating-search-input" placeholder="Enter search query..." autocomplete="off">
             </div>
             <div id="floatingSearchResults" class="floating-search-results"></div>
+        </div>
+    </div>
+
+    <!-- Floating Watchlist (Phosphor Theme Only) -->
+    <div id="floatingWatchlist" class="floating-watchlist">
+        <button class="floating-watchlist-btn" onclick="toggleFloatingWatchlist()">
+            <img src="to-do-list.png" alt="Watchlist" style="width: 28px; height: 28px;">
+        </button>
+        <div class="floating-watchlist-panel" id="floatingWatchlistPanel">
+            <div class="watchlist-panel-header">
+                <span class="watchlist-panel-title" id="watchlistPanelTitle">My Lists</span>
+                <button class="watchlist-panel-close" onclick="toggleFloatingWatchlist()">&times;</button>
+            </div>
+            <div class="watchlist-lists" id="watchlistLists">
+                <!-- Lists populated by JS -->
+            </div>
+            <div class="watchlist-items" id="watchlistItems" style="display: none;">
+                <button class="watchlist-back-btn" onclick="showWatchlistLists()">
+                    &#8592; Back to Lists
+                </button>
+                <div id="watchlistItemsContent">
+                    <!-- Items populated by JS -->
+                </div>
+            </div>
         </div>
     </div>
 
@@ -11569,17 +12031,26 @@
             const curvature = document.getElementById('crtCurvature');
             const powerLed = document.getElementById('crtPowerLed');
             const floatingSearch = document.getElementById('floatingSearch');
+            const floatingWatchlist = document.getElementById('floatingWatchlist');
 
             if (isPhosphor) {
-                if (scanlines) scanlines.style.display = 'block';
-                if (curvature) curvature.style.display = 'block';
-                if (powerLed) powerLed.style.display = 'block';
+                // Modern phosphor theme - hide all CRT effects
+                if (scanlines) scanlines.style.display = 'none';
+                if (curvature) curvature.style.display = 'none';
+                if (powerLed) powerLed.style.display = 'none';
+                // Show modern floating elements
                 if (floatingSearch) floatingSearch.style.display = 'block';
+                if (floatingWatchlist) floatingWatchlist.style.display = 'block';
+                // Render the watchlist lists
+                renderWatchlistLists();
+                // Update auth UI to add menu items
+                updateAuthUI();
             } else {
                 if (scanlines) scanlines.style.display = 'none';
                 if (curvature) curvature.style.display = 'none';
                 if (powerLed) powerLed.style.display = 'none';
                 if (floatingSearch) floatingSearch.style.display = 'none';
+                if (floatingWatchlist) floatingWatchlist.style.display = 'none';
             }
         }
 
@@ -13446,11 +13917,27 @@
                 userMenuIcon.style.height = '20px';
 
                 // Populate dropdown for logged-in user
+                // Check if phosphor theme is active for additional menu items
+                const isPhosphorTheme = document.documentElement.getAttribute('data-theme') === 'phosphor';
+                const phosphorMenuItems = isPhosphorTheme ? `
+                    <div class="user-menu-divider"></div>
+                    <button class="user-menu-item" onclick="toggleThemeSelector(); closeUserMenu();">
+                        <span class="menu-icon">&#9684;</span> Theme
+                    </button>
+                    <button class="user-menu-item" onclick="toggleEffectsPanel(); closeUserMenu();">
+                        <span class="menu-icon">&#10022;</span> Effects
+                    </button>
+                    <button class="user-menu-item" onclick="toggleWatchpartyPanel(); closeUserMenu();">
+                        <span class="menu-icon">&#9654;</span> Watch Party
+                    </button>
+                ` : '';
+
                 userMenuDropdown.innerHTML = `
                     <div class="user-menu-username">@${currentUser.username}</div>
                     <button class="user-menu-item" onclick="showFriendsModal(); closeUserMenu();">
                         <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IArs4c6QAAAHhlWElmTU0AKgAAAAgABAEaAAUAAAABAAAAPgEbAAUAAAABAAAARgEoAAMAAAABAAIAAIdpAAQAAAABAAAATgAAAAAAAABaAAAAAQAAAFoAAAABAAOgAQADAAAAAQABAACgAgAEAAAAAQAAABSgAwAEAAAAAQAAABQAAAAAeyom9gAAAAlwSFlzAAAN1wAADdcBQiibeAAAAWRpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IlhNUCBDb3JlIDYuMC4wIj4KICAgPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4KICAgICAgPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIKICAgICAgICAgICAgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIj4KICAgICAgICAgPHhtcDpDcmVhdG9yVG9vbD53d3cuaW5rc2NhcGUub3JnPC94bXA6Q3JlYXRvclRvb2w+CiAgICAgIDwvcmRmOkRlc2NyaXB0aW9uPgogICA8L3JkZjpSREY+CjwveDp4bXBtZXRhPgqyyWIhAAACrUlEQVQ4EeVSW0tUURT+zmVGR2siK1EyKkwlerBApeghIYssXx2kt0jtIiISEtWTBtZDLxIEXR4KQfCSUC+KRkUlRQgmCg5OWqHOeM3LONOcOWf2aa1xDkww4Q9wDWv2Pnt/+1vrW2sBW86kOMUq7TvJd8adhWlfQf47dpZGazu5PfbNC9+Vkxv8wSRs++x2e21d/c2ylMgnFaFJQFIQiZh40j7dNL+ktzAoPT2jrvrq9RJl/DmwNgUoCoKaabS81ZrDBh4SZEolK87Ozi7Kzc1taLpVjmRTA9YpcckGhAV+ekM1QyOry0jJw7H8vJq7taXAQA+wuEDp2BBaF6p7TjSMz0UWJxbFV5ZslpScRn9/F/CjkhJnBQp5zFJVuC5/AZxl6HjRCLSeACIUVJItBECxzzzw482YsSHZDI5SsteIzE+gODJ+QrJNOQmYeA28GgSE/i8ZYwRlZfIG2AhjUu0NksA3CY2E6AEg4Et4G38Yy5uVx0mIR1h7iTDUqM0syiIzn43/EpgqQSZAFPM/PjqP3tNzWVVROjWr3XZVD0OjrsJGMbgeCgUgssr6Ebi/rze7F0Rz5TOSzaSWGBo6zTDhehTAzIq4k6TgvGoY6HVPBlbJcWBvMqoqspBzKBU+7x88bptB60sfwoYY4NzdsxqynBKunEpGZpoEj0/g6UcNnYM8/3hH/ll1OHB8f4ajwOm0o+fDEi4U70bO4W1YXtHR3TeP/CPbEQjoR+EPITVFRvc3Ha6CJGTukeFdEegZ1VF0UMWqJgq9ywIS1do8e3IXersKqdOx3nM8yxwKLl4aAqYX0HZjBw17AgyV4dz9NfTxHPL8eH4F0XjPQ1OzAbaeRNukyhgeo/n0CzR2BGkuucQWghpPP66pZ15EZ5HfvLeS2WSN8m+C2YrXfwHqzfa7JgSB/AAAAABJRU5ErkJggg==" alt="Friends" style="width: 20px; height: 20px; image-rendering: pixelated; margin-right: 8px;"> Friends
                     </button>
+                    ${phosphorMenuItems}
                     <div class="user-menu-divider"></div>
                     <button class="user-menu-item" onclick="logout(); closeUserMenu();">
                         <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAFKADAAQAAAABAAAAFAAAAACy3fD9AAADg0lEQVQ4EaVVTYgcRRR+r7pqpnvazE7CsEYlJKgx4AYUjGhEMIO5+Ee8mNy8ikTxIMRDLnuRePIgmIPgxYsECYIGPewhS1A8yLpEnEXYRXc37qxuZzIz6253T3dVPV/N7vzsQA6SOnS991XVV/V+G1dX62eyLP3LoBCgEY0xQqNGstZKkAS9gYxoLCCitZ6VkghZc7MbbouUntUajsHa2u/Hdg7d+3dpaf45qbUn+1RH5q9XNBbDvj4+W93tNk7Ubo/jfZ0NEEyW9XVItfcxBuoFSLsdBxJaiUiKRYHK8wBh/dT16dpsbVoPDo0JMs81DjEq2078ZbeDZRK4ybf97Cn9G4S0JYQ+LAA/iaLHxXD/XolfiKLvVLdEBnMUsF9VvXeLB9VFcVBd7cZ4duPZ0/9Akm0AkdlLsVfLmUy4aPVhSyySYJByYXPwimwmYNmtG0KOKfhO5nlwxumDoTlXtDBDEzJOC8N7c0esgECBtTtpEZ18euO2v++L+tk38n+/qj7W+rr6/oBoV3BpJAsjKDERCne5EGLbLJLuZiCkx4mm1l587cxDR6PN1rR4SzdKR4JqdqH9/YSqvNT5qE+BqHCQMg60mgPJ79UFmb155Yfv7l9vygtvv97kJd+0g0/NnQf2hSYBihVkWwkEufiwfaWAlXPRJXfeFYV0me8UN2jXeo+T8VrtyQdVlsRBqg+4pbRZvBNlSmpVRK/iC/8RVfBjX3Qb8jBA1Dsv+XmyMGKz859jFznZqFJ5BfxJI/9uXWYobsTh6R/VZHlqsbFVnaLjYYRXoyX4/ObsE+8B3OwRsreJK2UkKJbtdfEwyPHGElnOabaAIQszF5NKa/tS+9TMueUTN+5rLoafrSw8c/5l2Jvkwwj37mD/G+DGICR5nCFewI6Bnp8nt5t+KbCHnpp71ftzzi7MLBx6pzZGhvwKOSw8ZrQkLFeI0Hae4nQB8uwnj8y37i5r8phsUaerf2ANZlOAWQePDe5PowhaEYAsPm/ztM54GzN6FEsTH1Sv/SIxgYpV3f3+w63dljZ6ckfu+VDt9jMH2ax7WQp5nJxfkUuGMW6A7FP2K3AFafPN3I31u5YfeZwxKyv1qR3+e/8uL/960gXlrib83ytco5FK+aVbt+oH4jjheuNegR4mSYLg2uw2QBAEtLnZoXJ5gn8Sgj1gew/oy9yAKAzDHpZluvQfgFKf8NDtjCEAAAAASUVORK5CYII=" alt="Logout" style="width: 20px; height: 20px; image-rendering: pixelated; margin-right: 8px;"> Logout
