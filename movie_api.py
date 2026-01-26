@@ -887,7 +887,7 @@ def index():
     """Serve the main movie streaming interface"""
     try:
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        return send_file(os.path.join(current_dir, 'movie_tv_player.html'))
+        return send_file(os.path.join(current_dir, 'index.html'))
     except:
         current_dir = os.path.dirname(os.path.abspath(__file__))
         return send_file(os.path.join(current_dir, 'movie_search_player.html'))
