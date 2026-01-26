@@ -3371,6 +3371,232 @@
             text-shadow: none;
         }
 
+        /* ============= HERO HEADER SECTION ============= */
+        .hero-header {
+            text-align: center;
+            padding: 40px 20px 20px;
+            margin-bottom: 20px;
+        }
+
+        .hero-title-section {
+            margin-bottom: 40px;
+        }
+
+        .hero-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 2.8rem;
+            color: var(--primary-color, #F5A623);
+            text-shadow:
+                0 0 20px rgba(245, 166, 35, 0.6),
+                0 0 40px rgba(245, 166, 35, 0.4),
+                0 0 60px rgba(245, 166, 35, 0.2);
+            margin-bottom: 16px;
+            letter-spacing: 0.05em;
+            animation: heroGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes heroGlow {
+            0% { text-shadow: 0 0 20px rgba(245, 166, 35, 0.6), 0 0 40px rgba(245, 166, 35, 0.4); }
+            100% { text-shadow: 0 0 30px rgba(245, 166, 35, 0.8), 0 0 60px rgba(245, 166, 35, 0.5), 0 0 80px rgba(245, 166, 35, 0.3); }
+        }
+
+        .hero-subtitle {
+            font-family: 'VT323', monospace;
+            font-size: 1.4rem;
+            color: rgba(245, 166, 35, 0.7);
+            letter-spacing: 0.15em;
+            text-transform: lowercase;
+        }
+
+        /* Movies & TV Shows Navigation Buttons */
+        .hero-nav-buttons {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 60px;
+            margin-top: 30px;
+            padding: 0 40px;
+        }
+
+        .hero-center-spacer {
+            width: 200px;
+        }
+
+        .hero-nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 20px 30px;
+            background: linear-gradient(145deg, rgba(26, 20, 8, 0.9) 0%, rgba(15, 12, 5, 0.95) 100%);
+            border: 3px solid var(--primary-color, #F5A623);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow:
+                0 0 20px rgba(245, 166, 35, 0.3),
+                inset 0 0 30px rgba(245, 166, 35, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(245, 166, 35, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .hero-nav-btn:hover::before {
+            left: 100%;
+        }
+
+        .hero-nav-btn:hover {
+            transform: translateY(-8px) scale(1.05);
+            border-color: #FFD700;
+            box-shadow:
+                0 0 40px rgba(245, 166, 35, 0.5),
+                0 15px 40px rgba(0, 0, 0, 0.4),
+                inset 0 0 40px rgba(245, 166, 35, 0.1);
+        }
+
+        .hero-nav-btn:active {
+            transform: translateY(-4px) scale(1.02);
+        }
+
+        .hero-nav-icon {
+            width: 64px;
+            height: 64px;
+            filter: drop-shadow(0 0 10px rgba(245, 166, 35, 0.5));
+            transition: all 0.3s ease;
+        }
+
+        .hero-nav-btn:hover .hero-nav-icon {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 20px rgba(245, 166, 35, 0.8));
+        }
+
+        .hero-nav-label {
+            font-family: 'VT323', monospace;
+            font-size: 1.3rem;
+            color: var(--primary-color, #F5A623);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            text-shadow: 0 0 10px rgba(245, 166, 35, 0.5);
+        }
+
+        .hero-nav-btn:hover .hero-nav-label {
+            color: #FFD700;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+        }
+
+        /* Phosphor Theme Specific Hero Overrides */
+        [data-theme="phosphor"] .hero-header {
+            padding: 60px 20px 30px;
+        }
+
+        [data-theme="phosphor"] .hero-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 3.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        [data-theme="phosphor"] .hero-subtitle {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 400;
+            font-size: 1.2rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+        }
+
+        [data-theme="phosphor"] .hero-nav-btn {
+            border-radius: 20px;
+            padding: 24px 36px;
+        }
+
+        [data-theme="phosphor"] .hero-nav-label {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        /* Responsive Hero */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 1.8rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .hero-nav-buttons {
+                gap: 20px;
+                flex-wrap: wrap;
+            }
+
+            .hero-center-spacer {
+                display: none;
+            }
+
+            .hero-nav-btn {
+                padding: 16px 24px;
+            }
+
+            .hero-nav-icon {
+                width: 48px;
+                height: 48px;
+            }
+
+            .hero-nav-label {
+                font-size: 1rem;
+            }
+        }
+        /* ============= END HERO HEADER SECTION ============= */
+
+        /* Section Header Bar */
+        .section-header-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px 24px;
+            margin-bottom: 20px;
+            background: linear-gradient(145deg, rgba(26, 20, 8, 0.8) 0%, rgba(15, 12, 5, 0.9) 100%);
+            border: 2px solid var(--primary-color, #F5A623);
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(245, 166, 35, 0.2);
+        }
+
+        .section-title {
+            font-family: 'VT323', monospace;
+            font-size: 1.5rem;
+            color: var(--primary-color, #F5A623);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            text-shadow: 0 0 10px rgba(245, 166, 35, 0.5);
+            margin: 0;
+        }
+
+        [data-theme="phosphor"] .section-header-bar {
+            background: var(--bg-elevated, #3A352E);
+            border: 1px solid var(--border-subtle, rgba(245, 166, 35, 0.15));
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        [data-theme="phosphor"] .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 1.2rem;
+            letter-spacing: 0.1em;
+            text-shadow: none;
+        }
+
         /* Phosphor Modern - Buttons (Flat, Refined) */
         [data-theme="phosphor"] .btn,
         [data-theme="phosphor"] .nav-btn {
@@ -3418,18 +3644,27 @@
 
         /* Phosphor Modern - Effects buttons */
         [data-theme="phosphor"] .effects-btn {
-            background: var(--bg-elevated);
-            border: 1px solid var(--border-subtle);
-            color: var(--text-primary);
-            font-family: 'Outfit', sans-serif;
+            background: rgba(0, 0, 0, 0.2);
+            border: 2px solid rgba(245, 166, 35, 0.3);
+            color: var(--primary-color, #F5A623);
+            font-family: 'VT323', monospace;
+            font-size: 16px;
             border-radius: 8px;
+            padding: 10px 14px;
+            margin: 4px 8px;
+            transition: all 0.2s ease;
         }
 
-        [data-theme="phosphor"] .effects-btn:hover,
-        [data-theme="phosphor"] .effects-btn.active {
+        [data-theme="phosphor"] .effects-btn:hover {
             background: rgba(245, 166, 35, 0.15);
-            border-color: var(--primary-color);
-            box-shadow: none;
+            border-color: rgba(245, 166, 35, 0.5);
+            transform: translateX(4px);
+        }
+
+        [data-theme="phosphor"] .effects-btn.active {
+            background: rgba(245, 166, 35, 0.2);
+            border-color: var(--primary-color, #F5A623);
+            box-shadow: 0 0 15px rgba(245, 166, 35, 0.3);
         }
 
         /* Phosphor Modern - Content Cards (Clean, Minimal) */
@@ -4244,7 +4479,7 @@
         .watchlist-container {
             display: none;
             position: fixed;
-            top: 80px;
+            top: 100px;
             left: 20px;
             right: auto;
             z-index: 100001;
@@ -4294,13 +4529,13 @@
             left: 0;
             width: 380px;
             max-height: 75vh;
-            background: var(--bg-elevated, #3A352E);
-            border: 1px solid var(--border-subtle, rgba(245, 166, 35, 0.15));
-            border-radius: 20px;
-            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.03);
+            background: linear-gradient(145deg, #1a1408 0%, #0f0c05 100%);
+            border: 3px solid var(--primary-color, #F5A623);
+            border-radius: 12px;
+            box-shadow: 0 0 30px rgba(245, 166, 35, 0.3);
             opacity: 0;
             visibility: hidden;
-            transform: translateY(-12px) scale(0.96);
+            transform: translateX(-100%);
             transform-origin: top left;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             overflow: hidden;
@@ -4311,7 +4546,7 @@
         .watchlist-slide-panel.active {
             opacity: 1;
             visibility: visible;
-            transform: translateY(0) scale(1);
+            transform: translateX(0);
         }
 
         /* Panel Header */
@@ -4622,9 +4857,9 @@
         .live-container {
             display: none;
             position: fixed;
-            top: 130px;
+            top: 20px;
             right: 20px;
-            z-index: 100001;
+            z-index: 100002;
         }
 
         [data-theme="phosphor"] .live-container {
@@ -4634,26 +4869,30 @@
         .live-trigger-btn {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 12px 18px;
-            background: var(--bg-elevated, #3A352E);
-            border: 1px solid var(--border-subtle, rgba(245, 166, 35, 0.15));
+            gap: 12px;
+            padding: 14px 20px;
+            background: var(--primary-color, #F5A623);
+            border: 2px solid var(--primary-color, #F5A623);
             border-radius: 12px;
-            color: var(--text-primary, #F5F0E8);
+            color: var(--bg-dark, #1A1714);
             font-family: 'Outfit', sans-serif;
-            font-size: 15px;
-            font-weight: 500;
+            font-size: 17px;
+            font-weight: 600;
             cursor: pointer;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 0 20px rgba(245, 166, 35, 0.4);
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        .live-trigger-btn img {
+            width: 32px !important;
+            height: 32px !important;
+        }
+
         .live-trigger-btn:hover {
-            background: var(--primary-color, #F5A623);
-            color: var(--bg-dark, #1A1714);
-            border-color: var(--primary-color, #F5A623);
+            background: #FFB938;
+            border-color: #FFB938;
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(245, 166, 35, 0.25);
+            box-shadow: 0 0 30px rgba(245, 166, 35, 0.6);
         }
 
         .live-trigger-btn:hover img {
@@ -4668,14 +4907,14 @@
             position: absolute;
             top: calc(100% + 12px);
             right: 0;
-            width: 280px;
-            background: var(--bg-elevated, #3A352E);
-            border: 1px solid var(--border-subtle, rgba(245, 166, 35, 0.15));
-            border-radius: 20px;
-            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.03);
+            width: 300px;
+            background: linear-gradient(145deg, #1a1408 0%, #0f0c05 100%);
+            border: 3px solid var(--primary-color, #F5A623);
+            border-radius: 12px;
+            box-shadow: 0 0 30px rgba(245, 166, 35, 0.3);
             opacity: 0;
             visibility: hidden;
-            transform: translateY(-12px) scale(0.96);
+            transform: translateX(100%);
             transform-origin: top right;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             overflow: hidden;
@@ -4684,7 +4923,7 @@
         .live-slide-panel.active {
             opacity: 1;
             visibility: visible;
-            transform: translateY(0) scale(1);
+            transform: translateX(0);
         }
 
         .live-slide-header {
@@ -4762,8 +5001,8 @@
 
         /* Icon-only button styles */
         .live-trigger-btn-icon-only {
-            padding: 14px;
-            border-radius: 50%;
+            padding: 16px;
+            border-radius: 12px;
         }
 
         .live-option-btn-icon-only {
@@ -4924,26 +5163,27 @@
 
 
         /* ============= PHOSPHOR MODERN - POPUP PANELS (Theme, Effects, Party) ============= */
-        /* Match the floating search panel design and animation */
+        /* Panels appear next to user menu button and expand outward */
         [data-theme="phosphor"] .theme-selector-panel,
         [data-theme="phosphor"] #bgEffectsPanel,
         [data-theme="phosphor"] #watchpartyPanel {
             position: fixed !important;
-            left: 230px !important;
-            top: 20px !important;
+            left: 20px !important;
             right: auto !important;
+            top: 70px !important;
             bottom: auto !important;
-            width: 300px;
-            background: var(--bg-elevated);
-            border: 1px solid var(--border-subtle);
-            border-radius: 16px;
+            width: 340px;
+            background: linear-gradient(145deg, #1a1408 0%, #0f0c05 100%);
+            border: 3px solid var(--primary-color, #F5A623);
+            border-radius: 12px;
             padding: 0;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 30px rgba(245, 166, 35, 0.3),
+                        inset 0 0 60px rgba(245, 166, 35, 0.03);
             backdrop-filter: blur(20px);
-            transform: scaleX(0);
-            transform-origin: left center;
+            transform: scale(0);
+            transform-origin: top left;
             opacity: 0;
-            transition: transform 0.3s ease, opacity 0.3s ease;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
             z-index: 100003;
             overflow: hidden;
             /* Override base display:none - use visibility for animation */
@@ -4956,7 +5196,7 @@
         [data-theme="phosphor"] .theme-selector-panel.active,
         [data-theme="phosphor"] #bgEffectsPanel.active,
         [data-theme="phosphor"] #watchpartyPanel.active {
-            transform: scaleX(1);
+            transform: scale(1);
             opacity: 1;
             visibility: visible;
             pointer-events: auto;
@@ -4968,39 +5208,41 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border-subtle);
-            background: transparent;
+            padding: 12px 16px;
+            border-bottom: 2px solid rgba(245, 166, 35, 0.3);
+            background: rgba(245, 166, 35, 0.1);
             margin: 0;
         }
 
         [data-theme="phosphor"] .theme-selector-panel .theme-selector-title .title-text,
         [data-theme="phosphor"] .bg-effects-panel .bg-effects-title .title-text {
-            font-family: 'Outfit', sans-serif;
-            font-size: 16px;
+            font-family: 'VT323', monospace;
+            font-size: 18px;
             font-weight: 500;
-            color: var(--text-primary);
-            text-shadow: none;
+            color: var(--primary-color, #F5A623);
+            text-shadow: 0 0 10px rgba(245, 166, 35, 0.5);
         }
 
         [data-theme="phosphor"] .panel-close-btn {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 24px;
+            background: rgba(245, 166, 35, 0.1);
+            border: 2px solid rgba(245, 166, 35, 0.3);
+            color: var(--primary-color, #F5A623);
+            font-size: 20px;
             cursor: pointer;
             padding: 0;
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 8px;
-            transition: color 0.15s ease;
+            border-radius: 6px;
+            transition: all 0.2s ease;
         }
 
         [data-theme="phosphor"] .panel-close-btn:hover {
-            color: var(--text-primary);
+            background: var(--primary-color, #F5A623);
+            color: #0a0800;
+            box-shadow: 0 0 15px rgba(245, 166, 35, 0.5);
         }
 
         /* Theme Options */
@@ -5008,34 +5250,35 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 12px 20px;
-            margin: 0;
-            border: none;
-            border-radius: 0;
-            background: transparent;
-            color: var(--text-primary);
-            font-family: 'Outfit', sans-serif;
+            padding: 12px 16px;
+            margin: 4px 8px;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            color: var(--primary-color, #F5A623);
+            font-family: 'VT323', monospace;
             font-size: 15px;
             cursor: pointer;
             transition: background 0.15s ease;
         }
 
         [data-theme="phosphor"] .theme-selector-panel .theme-option:hover {
-            background: rgba(245, 166, 35, 0.08);
-            border: none;
-            transform: none;
+            background: rgba(245, 166, 35, 0.15);
+            border-color: rgba(245, 166, 35, 0.5);
+            transform: translateX(4px);
         }
 
         [data-theme="phosphor"] .theme-selector-panel .theme-option.active {
-            background: rgba(245, 166, 35, 0.15);
-            border: none;
+            background: rgba(245, 166, 35, 0.2);
+            border-color: var(--primary-color, #F5A623);
+            box-shadow: 0 0 15px rgba(245, 166, 35, 0.3);
         }
 
         [data-theme="phosphor"] .theme-color-preview {
             width: 24px;
             height: 24px;
             border-radius: 50%;
-            border: 2px solid var(--border-subtle);
+            border: 2px solid rgba(245, 166, 35, 0.3);
         }
 
         [data-theme="phosphor"] .theme-name {
@@ -5080,67 +5323,9 @@
             box-shadow: none;
         }
 
-        /* Watchparty Panel */
+        /* Watchparty Panel - wider to fit content */
         [data-theme="phosphor"] #watchpartyPanel {
-            width: 320px;
-        }
-
-        [data-theme="phosphor"] #watchpartyPanel > div:first-child {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border-subtle);
-        }
-
-        [data-theme="phosphor"] #watchpartyPanel input[type="text"] {
-            background: var(--bg-medium);
-            border: 1px solid var(--border-subtle);
-            border-radius: 8px;
-            padding: 12px 16px;
-            color: var(--text-primary);
-            font-family: 'Outfit', sans-serif;
-            font-size: 15px;
-            margin: 8px 20px;
-            width: calc(100% - 40px);
-        }
-
-        [data-theme="phosphor"] #watchpartyPanel input[type="text"]:focus {
-            border-color: var(--primary-color);
-            outline: none;
-        }
-
-        [data-theme="phosphor"] #watchpartyPanel input[type="text"]::placeholder {
-            color: var(--text-secondary);
-        }
-
-        [data-theme="phosphor"] #watchpartyPanel button:not(.panel-close-btn) {
-            background: var(--primary-color);
-            border: none;
-            border-radius: 8px;
-            padding: 12px 20px;
-            color: var(--bg-dark);
-            font-family: 'Outfit', sans-serif;
-            font-size: 15px;
-            font-weight: 500;
-            cursor: pointer;
-            margin: 8px 20px;
-            width: calc(100% - 40px);
-            transition: background 0.15s ease;
-            box-shadow: none;
-        }
-
-        [data-theme="phosphor"] #watchpartyPanel button:not(.panel-close-btn):hover {
-            filter: brightness(1.1);
-            transform: none;
-        }
-
-        [data-theme="phosphor"] #watchpartyPanel label {
-            font-family: 'Outfit', sans-serif !important;
-            color: var(--text-secondary) !important;
-            font-size: 13px !important;
-        }
-
-        [data-theme="phosphor"] #watchpartyPanel div[style*="text-align: center"] {
-            font-family: 'Outfit', sans-serif !important;
-            color: var(--text-secondary) !important;
+            width: 380px;
         }
 
         [data-theme="phosphor"] .theme-options-container {
@@ -5149,74 +5334,77 @@
 
         /* Watchparty Panel Specific */
         [data-theme="phosphor"] #watchpartyPanel {
-            width: 320px;
+            width: 420px;
         }
 
         [data-theme="phosphor"] #watchpartyPanel > div:first-child {
-            padding: 20px 24px 16px;
-            border-bottom: 1px solid var(--border-subtle, rgba(245, 166, 35, 0.1));
-            background: linear-gradient(180deg, rgba(245, 166, 35, 0.04) 0%, transparent 100%);
+            padding: 12px 16px;
+            border-bottom: 2px solid rgba(245, 166, 35, 0.3);
+            background: rgba(245, 166, 35, 0.1);
         }
 
         [data-theme="phosphor"] #watchpartyPanel input[type="text"] {
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid var(--border-subtle, rgba(245, 166, 35, 0.15));
-            border-radius: 12px;
-            padding: 14px 16px;
-            color: var(--text-primary, #F5F0E8);
-            font-family: 'Outfit', sans-serif;
-            font-size: 15px;
-            margin: 8px 24px;
-            width: calc(100% - 48px);
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(245, 166, 35, 0.3);
+            border-radius: 8px;
+            padding: 12px 14px;
+            color: var(--primary-color, #F5A623);
+            font-family: 'VT323', monospace;
+            font-size: 16px;
+            margin: 12px 16px;
+            width: calc(100% - 32px);
             transition: all 0.2s ease;
+            box-sizing: border-box;
         }
 
         [data-theme="phosphor"] #watchpartyPanel input[type="text"]:focus {
             border-color: var(--primary-color, #F5A623);
             outline: none;
-            box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.1);
+            box-shadow: 0 0 15px rgba(245, 166, 35, 0.3);
         }
 
         [data-theme="phosphor"] #watchpartyPanel input[type="text"]::placeholder {
-            color: var(--text-secondary, #A39E93);
+            color: rgba(245, 166, 35, 0.5);
         }
 
         [data-theme="phosphor"] #watchpartyPanel button:not(.panel-close-btn) {
-            background: var(--primary-color, #F5A623);
-            border: none;
-            border-radius: 12px;
-            padding: 14px 20px;
-            color: var(--bg-dark, #1A1814);
-            font-family: 'Outfit', sans-serif;
-            font-size: 15px;
+            background: linear-gradient(145deg, #F5A623 0%, #cc8c00 100%);
+            border: 2px solid #F5A623;
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #0a0800;
+            font-family: 'VT323', monospace;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            margin: 8px 24px;
-            width: calc(100% - 48px);
+            margin: 8px 16px;
+            width: calc(100% - 32px);
             transition: all 0.2s ease;
-            box-shadow: none;
+            box-shadow: 0 0 15px rgba(245, 166, 35, 0.3);
+            box-sizing: border-box;
         }
 
         [data-theme="phosphor"] #watchpartyPanel button:not(.panel-close-btn):hover {
-            background: #FFB938;
-            transform: none;
+            background: linear-gradient(145deg, #FFB938 0%, #e6a020 100%);
+            box-shadow: 0 0 25px rgba(245, 166, 35, 0.5);
+            transform: translateY(-2px);
         }
 
         [data-theme="phosphor"] #watchpartyPanel .party-status,
         [data-theme="phosphor"] #watchpartyPanel .party-info,
         [data-theme="phosphor"] #watchpartyPanel div[style*="text-align: center"] {
-            padding: 16px 24px;
-            color: var(--text-secondary, #A39E93);
-            font-family: 'Outfit', sans-serif;
-            font-size: 14px;
+            padding: 12px 16px;
+            color: var(--primary-color, #F5A623);
+            font-family: 'VT323', monospace;
+            font-size: 16px;
         }
 
         [data-theme="phosphor"] #watchpartyPanel label {
-            font-family: 'Outfit', sans-serif !important;
-            color: var(--text-secondary, #A39E93) !important;
-            font-size: 13px !important;
+            font-family: 'VT323', monospace !important;
+            color: rgba(245, 166, 35, 0.7) !important;
+            font-size: 14px !important;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.1em;
         }
 
 
@@ -6031,8 +6219,9 @@
 
     <!-- Live Section Button & Panel -->
     <div id="liveContainer" class="live-container">
-        <button class="live-trigger-btn live-trigger-btn-icon-only" id="liveTriggerBtn" onclick="toggleLivePanel()">
-            <img src="live-stream.png" alt="Live" class="live-icon" style="width: 28px; height: 28px;">
+        <button class="live-trigger-btn" id="liveTriggerBtn" onclick="toggleLivePanel()">
+            <img src="live-stream.png" alt="Live" class="live-icon" style="width: 32px; height: 32px;">
+            <span class="live-trigger-label">Live</span>
         </button>
 
         <div class="live-slide-panel" id="liveSlidePanel">
@@ -6216,12 +6405,31 @@
     </div>
 
     <div class="container">
-        <div class="header">
-            <div style="flex: 1;">
-                <h1 onclick="location.reload()" style="cursor: pointer;">GlitchBox</h1>
-                <p>your one stop streaming shop</p>
+        <!-- New Hero Header Section -->
+        <div class="hero-header">
+            <div class="hero-title-section">
+                <h1 class="hero-title" onclick="location.reload()" style="cursor: pointer;">GlitchBox</h1>
+                <p class="hero-subtitle">your one stop streaming shop</p>
             </div>
-            <!-- Old auth buttons hidden - now using top-left user menu -->
+
+            <!-- Movies and TV Shows buttons flanking the center -->
+            <div class="hero-nav-buttons">
+                <button class="hero-nav-btn hero-nav-movies" onclick="showTab('movies')">
+                    <img src="Icons/movie.png" alt="Movies" class="hero-nav-icon">
+                    <span class="hero-nav-label">Movies</span>
+                </button>
+
+                <div class="hero-center-spacer"></div>
+
+                <button class="hero-nav-btn hero-nav-shows" onclick="showTab('tv-shows')">
+                    <img src="Icons/tv-show.png" alt="TV Shows" class="hero-nav-icon">
+                    <span class="hero-nav-label">TV Shows</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Old elements hidden -->
+        <div class="header" style="display: none;">
             <div id="authButtons" style="display: none;">
                 <button class="btn" onclick="showLoginModal()" style="padding: 10px 20px;">Login</button>
                 <button class="btn" onclick="showRegisterModal()" style="padding: 10px 20px;">Sign Up</button>
@@ -6237,7 +6445,8 @@
             </div>
         </div>
 
-        <div class="search-section">
+        <!-- Search section hidden - using floating search instead -->
+        <div class="search-section" style="display: none;">
             <div class="search-box">
                 <div class="search-container">
                     <input type="text" id="searchInput" class="search-input"
@@ -6621,7 +6830,13 @@
         </div>
 
         <div class="popular-section">
-            <div class="tabs">
+            <!-- Continue Watching Header -->
+            <div class="section-header-bar">
+                <h2 class="section-title">Continue Watching</h2>
+            </div>
+
+            <!-- Hidden tabs for functionality (Movies/TV Shows now in hero) -->
+            <div class="tabs" style="display: none;">
                 <button class="tab active" onclick="showTab('continue-watching')" id="continueWatchingTab">Continue Watching</button>
                 <button class="tab" onclick="showTab('statistics')" id="statisticsTab">Stats</button>
                 <button class="tab" onclick="showTab('movies')" id="moviesTab">Movies</button>
@@ -14735,6 +14950,9 @@
                         <span class="menu-icon">🎉</span> Party
                     </button>
                     <div class="user-menu-divider"></div>
+                    <button class="user-menu-item" onclick="showTab('statistics'); closeUserMenu();">
+                        <span class="menu-icon">📊</span> Stats
+                    </button>
                     <button class="user-menu-item" onclick="logout(); closeUserMenu();">
                         <img src="${BASE64_IMAGES.LOGOUT_ICON}" alt="Logout" style="width: 20px; height: 20px; image-rendering: pixelated; margin-right: 8px;"> Logout
                     </button>
