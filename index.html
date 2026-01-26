@@ -4244,8 +4244,8 @@
         .watchlist-container {
             display: none;
             position: fixed;
-            top: 80px;
-            left: 20px;
+            top: 70px;
+            right: 20px;
             z-index: 100001;
         }
 
@@ -4615,6 +4615,235 @@
         /* Phosphor theme specific - show watchlist container */
         [data-theme="phosphor"] .watchlist-container {
             display: block;
+        }
+
+        /* ============= LIVE SECTION CONTAINER & PANEL ============= */
+        .live-container {
+            display: none;
+            position: fixed;
+            top: 130px;
+            right: 20px;
+            z-index: 100001;
+        }
+
+        [data-theme="phosphor"] .live-container {
+            display: block;
+        }
+
+        .live-trigger-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 18px;
+            background: var(--bg-elevated, #3A352E);
+            border: 1px solid var(--border-subtle, rgba(245, 166, 35, 0.15));
+            border-radius: 12px;
+            color: var(--text-primary, #F5F0E8);
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .live-trigger-btn:hover {
+            background: var(--primary-color, #F5A623);
+            color: var(--bg-dark, #1A1714);
+            border-color: var(--primary-color, #F5A623);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(245, 166, 35, 0.25);
+        }
+
+        .live-trigger-btn:hover img {
+            filter: brightness(0) !important;
+        }
+
+        .live-trigger-label {
+            letter-spacing: 0.02em;
+        }
+
+        .live-slide-panel {
+            position: absolute;
+            top: calc(100% + 12px);
+            right: 0;
+            width: 280px;
+            background: var(--bg-elevated, #3A352E);
+            border: 1px solid var(--border-subtle, rgba(245, 166, 35, 0.15));
+            border-radius: 20px;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.03);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-12px) scale(0.96);
+            transform-origin: top right;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .live-slide-panel.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        .live-slide-header {
+            padding: 20px 24px 16px;
+            border-bottom: 1px solid var(--border-subtle, rgba(245, 166, 35, 0.1));
+            background: linear-gradient(180deg, rgba(245, 166, 35, 0.04) 0%, transparent 100%);
+        }
+
+        .live-slide-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .live-slide-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary, #F5F0E8);
+            margin: 0;
+            letter-spacing: -0.01em;
+        }
+
+        .live-slide-close {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            border-radius: 10px;
+            color: var(--text-secondary, #A39E93);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .live-slide-close:hover {
+            background: rgba(255, 59, 48, 0.15);
+            color: #FF453A;
+        }
+
+        .live-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 16px;
+        }
+
+        .live-option-btn {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-subtle, rgba(245, 166, 35, 0.1));
+            border-radius: 12px;
+            color: var(--text-primary, #F5F0E8);
+            font-family: 'Outfit', sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .live-option-btn:hover {
+            background: rgba(245, 166, 35, 0.1);
+            border-color: var(--primary-color, #F5A623);
+            transform: translateX(4px);
+        }
+
+        .live-option-btn:hover img {
+            filter: brightness(0) saturate(100%) invert(72%) sepia(47%) saturate(1000%) hue-rotate(358deg) brightness(101%) contrast(94%) !important;
+        }
+
+        /* Icon-only button styles */
+        .live-trigger-btn-icon-only {
+            padding: 14px;
+            border-radius: 50%;
+        }
+
+        .live-option-btn-icon-only {
+            justify-content: center;
+            padding: 20px;
+            flex: 1;
+        }
+
+        .live-options {
+            flex-direction: row !important;
+            justify-content: center;
+            gap: 16px !important;
+        }
+
+        .live-main-options {
+            padding: 20px;
+        }
+
+        /* Category views */
+        .live-categories {
+            padding: 16px;
+        }
+
+        .live-back-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            border-radius: 10px;
+            color: var(--text-secondary, #A39E93);
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 12px;
+        }
+
+        .live-back-btn:hover {
+            background: rgba(245, 166, 35, 0.15);
+            color: var(--primary-color, #F5A623);
+        }
+
+        .live-category-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .live-category-grid.sports-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .live-category-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-subtle, rgba(245, 166, 35, 0.1));
+            border-radius: 10px;
+            color: var(--text-primary, #F5F0E8);
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 50px;
+        }
+
+        .live-category-btn:hover {
+            background: rgba(245, 166, 35, 0.15);
+            border-color: var(--primary-color, #F5A623);
+            transform: scale(1.05);
+        }
+
+        .live-category-btn img {
+            filter: brightness(0) invert(1);
+            transition: filter 0.2s;
+        }
+
+        .live-category-btn:hover img {
+            filter: brightness(0) saturate(100%) invert(72%) sepia(47%) saturate(1000%) hue-rotate(358deg) brightness(101%) contrast(94%);
         }
 
         /* ============= PHOSPHOR MODERN - USER MENU OVERRIDES ============= */
@@ -5432,10 +5661,8 @@
     <!-- Watchlist Button & Panel (Below User Menu) -->
     <div id="watchlistContainer" class="watchlist-container">
         <button class="watchlist-trigger-btn" id="watchlistTriggerBtn" onclick="toggleWatchlistPanel()">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-            </svg>
-            <span class="watchlist-trigger-label">Lists</span>
+            <img src="to-do-list.png" alt="My Lists" style="width: 22px; height: 22px; filter: brightness(0) invert(1);">
+            <span class="watchlist-trigger-label">My Lists</span>
         </button>
 
         <div class="watchlist-slide-panel" id="watchlistSlidePanel">
@@ -5465,6 +5692,96 @@
                 </button>
                 <div class="watchlist-slide-items-grid" id="watchlistSlideItemsGrid">
                     <!-- Items populated by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Section Button & Panel -->
+    <div id="liveContainer" class="live-container">
+        <button class="live-trigger-btn live-trigger-btn-icon-only" id="liveTriggerBtn" onclick="toggleLivePanel()">
+            <img src="live-stream.png" alt="Live" style="width: 28px; height: 28px; filter: brightness(0) invert(1);">
+        </button>
+
+        <div class="live-slide-panel" id="liveSlidePanel">
+            <!-- Main Options View -->
+            <div class="live-main-options" id="liveMainOptions">
+                <div class="live-options">
+                    <button class="live-option-btn live-option-btn-icon-only" onclick="showLiveCategories('channels')" title="Live Channels">
+                        <img src="live-tv.png" alt="Channels" style="width: 48px; height: 48px; filter: brightness(0) invert(1);">
+                    </button>
+                    <button class="live-option-btn live-option-btn-icon-only" onclick="showLiveCategories('sports')" title="Live Sports">
+                        <img src="live-stream.png" alt="Sports" style="width: 48px; height: 48px; filter: brightness(0) invert(1);">
+                    </button>
+                </div>
+            </div>
+
+            <!-- Channels Categories View -->
+            <div class="live-categories" id="liveChannelsCategories" style="display: none;">
+                <button class="live-back-btn" onclick="showLiveMainOptions()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                </button>
+                <div class="live-category-grid">
+                    <button class="live-category-btn" onclick="loadChannelCategory('favourites')" title="Favourites">⭐</button>
+                    <button class="live-category-btn" onclick="loadChannelCategory('all')" title="All Channels">🌐</button>
+                    <button class="live-category-btn" onclick="loadChannelCategory('canada')" title="Canada">🇨🇦</button>
+                    <button class="live-category-btn" onclick="loadChannelCategory('germany')" title="Germany">🇩🇪</button>
+                    <button class="live-category-btn" onclick="loadChannelCategory('lebanon')" title="Lebanon">🇱🇧</button>
+                    <button class="live-category-btn" onclick="loadChannelCategory('saudi')" title="Saudi Arabia">🇸🇦</button>
+                    <button class="live-category-btn" onclick="loadChannelCategory('uae')" title="UAE">🇦🇪</button>
+                    <button class="live-category-btn" onclick="loadChannelCategory('usa')" title="USA">🇺🇸</button>
+                </div>
+            </div>
+
+            <!-- Sports Categories View -->
+            <div class="live-categories" id="liveSportsCategories" style="display: none;">
+                <button class="live-back-btn" onclick="showLiveMainOptions()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                </button>
+                <div class="live-category-grid sports-grid">
+                    <button class="live-category-btn" onclick="loadSportsCategory('football')" title="Football">
+                        <img src="Icons/LiveIcons/soccer.png" alt="Football" style="width: 32px; height: 32px;">
+                    </button>
+                    <button class="live-category-btn" onclick="loadSportsCategory('basketball')" title="Basketball">
+                        <img src="Icons/LiveIcons/basketball.png" alt="Basketball" style="width: 32px; height: 32px;">
+                    </button>
+                    <button class="live-category-btn" onclick="loadSportsCategory('american-football')" title="American Football">
+                        <img src="Icons/LiveIcons/american-football.png" alt="American Football" style="width: 32px; height: 32px;">
+                    </button>
+                    <button class="live-category-btn" onclick="loadSportsCategory('hockey')" title="Hockey">
+                        <img src="Icons/LiveIcons/ice-hockey.png" alt="Hockey" style="width: 32px; height: 32px;">
+                    </button>
+                    <button class="live-category-btn" onclick="loadSportsCategory('baseball')" title="Baseball">
+                        <img src="Icons/LiveIcons/baseball-player.png" alt="Baseball" style="width: 32px; height: 32px;">
+                    </button>
+                    <button class="live-category-btn" onclick="loadSportsCategory('motor-sports')" title="Motor Sports">
+                        <img src="Icons/LiveIcons/f1.png" alt="Motor Sports" style="width: 32px; height: 32px;">
+                    </button>
+                    <button class="live-category-btn" onclick="loadSportsCategory('fight')" title="Fight">
+                        <img src="Icons/LiveIcons/attack.png" alt="Fight" style="width: 32px; height: 32px;">
+                    </button>
+                    <button class="live-category-btn" onclick="loadSportsCategory('tennis')" title="Tennis">
+                        <img src="Icons/LiveIcons/smash.png" alt="Tennis" style="width: 32px; height: 32px;">
+                    </button>
+                    <button class="live-category-btn" onclick="loadSportsCategory('rugby')" title="Rugby">
+                        <img src="Icons/LiveIcons/rugby.png" alt="Rugby" style="width: 32px; height: 32px;">
+                    </button>
+                    <button class="live-category-btn" onclick="loadSportsCategory('golf')" title="Golf">
+                        <img src="Icons/LiveIcons/golf-player.png" alt="Golf" style="width: 32px; height: 32px;">
+                    </button>
+                    <button class="live-category-btn" onclick="loadSportsCategory('cricket')" title="Cricket">
+                        <img src="Icons/LiveIcons/cricket.png" alt="Cricket" style="width: 32px; height: 32px;">
+                    </button>
+                    <button class="live-category-btn" onclick="loadSportsCategory('darts')" title="Darts">
+                        <img src="Icons/LiveIcons/dart.png" alt="Darts" style="width: 32px; height: 32px;">
+                    </button>
+                    <button class="live-category-btn" onclick="loadSportsCategory('other')" title="Other">
+                        <img src="Icons/LiveIcons/other.png" alt="Other" style="width: 32px; height: 32px;">
+                    </button>
                 </div>
             </div>
         </div>
@@ -5849,11 +6166,6 @@
         <button class="bg-animation-toggle" onclick="toggleWatchpartyPanel()">▶ Party</button>
     </div>
 
-    <!-- Bottom-right Control Buttons -->
-    <div style="position: fixed; bottom: 20px; right: 20px; display: flex; gap: 10px; z-index: 100000;">
-        <button class="theme-selector-btn" onclick="toggleThemeSelector()">◆ Theme</button>
-        <button class="bg-animation-toggle" onclick="toggleEffectsPanel()">★ Effects</button>
-    </div>
 
     <!-- Theme Selector Panel -->
     <div id="themeSelectorPanel" class="theme-selector-panel" style="bottom: 70px;">
@@ -6330,13 +6642,9 @@
         <div class="popular-section">
             <div class="tabs">
                 <button class="tab active" onclick="showTab('continue-watching')" id="continueWatchingTab">Continue Watching</button>
-                <button class="tab" onclick="showTab('watchlist')" id="watchlistTab">My Watchlist</button>
                 <button class="tab" onclick="showTab('statistics')" id="statisticsTab">Stats</button>
                 <button class="tab" onclick="showTab('movies')" id="moviesTab">Movies</button>
                 <button class="tab" onclick="showTab('tv-shows')" id="tvShowsTab">TV Shows</button>
-                <button class="tab" onclick="showTab('recommendations')" id="recommendationsTab">Recommendations</button>
-                <button class="tab" onclick="showTab('sports')" id="sportsTab">Live Sports</button>
-                <button class="tab" onclick="showTab('channels')" id="channelsTab">Live Channels</button>
             </div>
 
             <!-- Content Type Filters (shown for Movies/TV Shows tabs) -->
@@ -9384,10 +9692,6 @@
                 document.getElementById('continueWatchingTab').classList.add('active');
                 document.getElementById('continueWatchingDisplay').style.display = 'grid';
                 displayContinueWatchingInResults();
-            } else if (tabName === 'watchlist') {
-                document.getElementById('watchlistTab').classList.add('active');
-                document.getElementById('watchlistDisplay').style.display = 'grid';
-                displayWatchlistInResults();
             } else if (tabName === 'statistics') {
                 document.getElementById('statisticsTab').classList.add('active');
                 document.getElementById('statisticsDisplay').style.display = 'block';
@@ -9395,10 +9699,6 @@
             } else if (tabName === 'search-results') {
                 document.querySelector('.tab').classList.add('active');
                 document.getElementById('contentResults').style.display = 'grid';
-            } else if (tabName === 'recommendations') {
-                document.getElementById('recommendationsTab').classList.add('active');
-                document.getElementById('contentResults').style.display = 'grid';
-                loadRecommendations();
             } else if (tabName === 'movies') {
                 document.getElementById('moviesTab').classList.add('active');
                 document.getElementById('contentResults').style.display = 'grid';
@@ -9439,14 +9739,6 @@
                     loadGenres('tv');
                 }
                 loadPopularTVShows();
-            } else if (tabName === 'sports') {
-                document.getElementById('sportsTab').classList.add('active');
-                document.getElementById('sportsDisplay').style.display = 'block';
-                loadSportsData();
-            } else if (tabName === 'channels') {
-                document.getElementById('channelsTab').classList.add('active');
-                document.getElementById('channelsDisplay').style.display = 'block';
-                loadLiveChannels();
             }
         }
 
@@ -12878,12 +13170,8 @@
             // Close the panel
             toggleWatchlistPanel();
 
-            // Navigate to player
-            if (type === 'movie') {
-                window.location.href = `movie_tv_player.html?type=movie&id=${id}`;
-            } else {
-                window.location.href = `movie_tv_player.html?type=tv&id=${id}&season=1&episode=1`;
-            }
+            // Play content in current page
+            playContent(id, '', type);
         };
 
         // Click outside to close watchlist panel
@@ -12894,6 +13182,100 @@
 
                 if (watchlistPanelOpen && container && !container.contains(event.target)) {
                     toggleWatchlistPanel();
+                }
+            });
+        }
+
+        // ============= LIVE PANEL FUNCTIONS =============
+        let livePanelOpen = false;
+
+        window.toggleLivePanel = function() {
+            const panel = document.getElementById('liveSlidePanel');
+            if (!panel) return;
+
+            livePanelOpen = !livePanelOpen;
+
+            if (livePanelOpen) {
+                panel.classList.add('active');
+                showLiveMainOptions(); // Reset to main view when opening
+            } else {
+                panel.classList.remove('active');
+            }
+        };
+
+        window.showLiveMainOptions = function() {
+            document.getElementById('liveMainOptions').style.display = 'block';
+            document.getElementById('liveChannelsCategories').style.display = 'none';
+            document.getElementById('liveSportsCategories').style.display = 'none';
+        };
+
+        window.showLiveCategories = function(section) {
+            document.getElementById('liveMainOptions').style.display = 'none';
+            if (section === 'channels') {
+                document.getElementById('liveChannelsCategories').style.display = 'block';
+                document.getElementById('liveSportsCategories').style.display = 'none';
+            } else if (section === 'sports') {
+                document.getElementById('liveChannelsCategories').style.display = 'none';
+                document.getElementById('liveSportsCategories').style.display = 'block';
+            }
+        };
+
+        window.loadChannelCategory = function(category) {
+            // Close the live panel
+            toggleLivePanel();
+
+            // Hide all displays first
+            const continueWatching = document.getElementById('continueWatchingDisplay');
+            const statistics = document.getElementById('statisticsDisplay');
+            const contentResults = document.getElementById('contentResults');
+            const sportsDisplay = document.getElementById('sportsDisplay');
+            const channelsDisplay = document.getElementById('channelsDisplay');
+
+            if (continueWatching) continueWatching.style.display = 'none';
+            if (statistics) statistics.style.display = 'none';
+            if (contentResults) contentResults.style.display = 'none';
+            if (sportsDisplay) sportsDisplay.style.display = 'none';
+            if (channelsDisplay) channelsDisplay.style.display = 'block';
+
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+
+            // Load channels with the selected category filter
+            loadLiveChannels(category);
+        };
+
+        window.loadSportsCategory = function(category) {
+            // Close the live panel
+            toggleLivePanel();
+
+            // Hide all displays first
+            const continueWatching = document.getElementById('continueWatchingDisplay');
+            const statistics = document.getElementById('statisticsDisplay');
+            const contentResults = document.getElementById('contentResults');
+            const sportsDisplay = document.getElementById('sportsDisplay');
+            const channelsDisplay = document.getElementById('channelsDisplay');
+
+            if (continueWatching) continueWatching.style.display = 'none';
+            if (statistics) statistics.style.display = 'none';
+            if (contentResults) contentResults.style.display = 'none';
+            if (channelsDisplay) channelsDisplay.style.display = 'none';
+            if (sportsDisplay) sportsDisplay.style.display = 'block';
+
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+
+            // Load sports with the selected category filter
+            loadSportsData(category);
+        };
+
+        // Click outside to close live panel
+        function setupLiveClickOutside() {
+            document.addEventListener('click', function(event) {
+                const container = document.getElementById('liveContainer');
+                const panel = document.getElementById('liveSlidePanel');
+
+                if (livePanelOpen && container && !container.contains(event.target)) {
+                    toggleLivePanel();
                 }
             });
         }
@@ -12914,6 +13296,7 @@
             initFloatingSearch();
             setupFloatingSearchClickOutside();
             setupWatchlistClickOutside();
+            setupLiveClickOutside();
         });
 
         // ============= CLICK OUTSIDE TO CLOSE PANELS =============
@@ -13001,13 +13384,30 @@
         let currentSportsSourceIndex = 0; // Track which source is currently selected
 
         // Load sports data from westream API
-        async function loadSportsData() {
+        async function loadSportsData(category) {
             try {
                 showLoading();
 
+                // Map category to sport type
+                const categoryMap = {
+                    'football': 'Football',
+                    'basketball': 'Basketball',
+                    'american-football': 'American Football',
+                    'hockey': 'Ice Hockey',
+                    'baseball': 'Baseball',
+                    'motor-sports': 'Motorsport',
+                    'fight': 'MMA',
+                    'tennis': 'Tennis',
+                    'rugby': 'Rugby',
+                    'golf': 'Golf',
+                    'cricket': 'Cricket',
+                    'darts': 'Darts',
+                    'other': null // Show all for "other"
+                };
+
                 // Reset filters to default
                 isLiveFilterActive = false;
-                currentSportType = null;
+                currentSportType = category ? categoryMap[category] : null;
 
                 // Clear search input
                 const searchInput = document.getElementById('sportsSearchInput');
@@ -13033,6 +13433,15 @@
 
                 // Populate sport type filter buttons
                 populateSportTypeButtons();
+
+                // If a category was selected, activate the corresponding button
+                if (category && currentSportType) {
+                    document.querySelectorAll('#sportTypeButtons .bg-animation-toggle').forEach(btn => {
+                        if (btn.textContent.includes(currentSportType)) {
+                            btn.classList.add('active');
+                        }
+                    });
+                }
 
                 // Display matches based on current filter
                 filterAndDisplayMatches();
@@ -13573,10 +13982,31 @@
         let selectedCountry = 'All';
 
         // Load live channels
-        function loadLiveChannels() {
+        function loadLiveChannels(category) {
             allChannels = [...allWorldChannels];
-            selectedCountry = 'All';
-            currentDisplayedChannels = [...allChannels];
+
+            // Map category to country name
+            const categoryMap = {
+                'favourites': 'Favourites',
+                'all': 'All',
+                'canada': 'Canada',
+                'germany': 'Germany',
+                'lebanon': 'Lebanon',
+                'saudi': 'Saudi Arabia',
+                'uae': 'UAE',
+                'usa': 'USA'
+            };
+
+            selectedCountry = category ? (categoryMap[category] || 'All') : 'All';
+
+            if (selectedCountry === 'Favourites') {
+                currentDisplayedChannels = channelFavourites;
+            } else if (selectedCountry === 'All') {
+                currentDisplayedChannels = [...allChannels];
+            } else {
+                currentDisplayedChannels = allChannels.filter(ch => ch.country === selectedCountry);
+            }
+
             displayLiveChannels(currentDisplayedChannels);
             populateCountryFilter();
         }
