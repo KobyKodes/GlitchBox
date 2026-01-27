@@ -7661,6 +7661,7 @@
 
             activeContentSection = null;
             activeContentFilter = null;
+            window.currentTab = null; // Reset currentTab
             updateButtonActiveStates();
             updateRadialOptionStates();
         }
@@ -7737,6 +7738,7 @@
             window.currentMediaType = 'movie';
             window.currentContentFilter = filter;
             window.currentPage = 1;
+            window.currentTab = null; // Clear currentTab when switching to movies
 
             // Hide other sections first
             document.getElementById('continueWatchingDisplay').style.display = 'none';
@@ -7790,6 +7792,7 @@
             window.currentMediaType = 'tv';
             window.currentContentFilter = filter;
             window.currentPage = 1;
+            window.currentTab = null; // Clear currentTab when switching to TV shows
 
             // Hide other sections first
             document.getElementById('continueWatchingDisplay').style.display = 'none';
@@ -7832,6 +7835,7 @@
             // Check if Continue Watching is already active - if so, toggle off
             if (activeContentSection === 'continue-watching') {
                 hideAllContentSections();
+                window.currentTab = null; // Reset currentTab
                 return;
             }
 
@@ -7841,6 +7845,7 @@
             // Set current state
             activeContentSection = 'continue-watching';
             activeContentFilter = null;
+            window.currentTab = 'continue-watching'; // Set currentTab for displayContinueWatchingInResults
 
             // Hide other sections
             const contentResults = document.getElementById('contentResults');
