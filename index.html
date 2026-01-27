@@ -8349,6 +8349,14 @@
 
         // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
+            // Fix layout order: ensure popular-section (filters) appears before player-section
+            const layoutContainer = document.querySelector('.container');
+            const popularSection = layoutContainer && layoutContainer.querySelector('.popular-section');
+            const playerSection = layoutContainer && layoutContainer.querySelector('.player-section');
+            if (layoutContainer && popularSection && playerSection) {
+                layoutContainer.insertBefore(popularSection, playerSection);
+            }
+
             // Don't load any content by default - wait for user to click a tab
             // Hide all content sections initially
             document.getElementById('contentResults').style.display = 'none';
