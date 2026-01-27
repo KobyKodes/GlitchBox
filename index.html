@@ -3198,26 +3198,6 @@
             color: #000;
             box-shadow: 0 0 15px rgba(255, 0, 255, 0.6);
         }
-        [data-theme="jspecial"] #popularFilterBtn {
-            background: linear-gradient(135deg, #ff00ff, #d946ef);
-            border-color: #ff00ff;
-            color: #000;
-        }
-        [data-theme="jspecial"] #trendingFilterBtn {
-            background: linear-gradient(135deg, #7fff00, #65d900);
-            border-color: #7fff00;
-            color: #000;
-        }
-        [data-theme="jspecial"] #nowPlayingFilterBtn {
-            background: linear-gradient(135deg, #ff1493, #ff69b4);
-            border-color: #ff1493;
-            color: #000;
-        }
-        [data-theme="jspecial"] #upcomingFilterBtn {
-            background: linear-gradient(135deg, #00d9ff, #00bfff);
-            border-color: #00d9ff;
-            color: #000;
-        }
         [data-theme="jspecial"] #genreFilterBtn {
             background: linear-gradient(135deg, #ffd700, #ffb700);
             border-color: #ffd700;
@@ -3580,6 +3560,155 @@
         .hero-nav-btn:hover .hero-nav-label {
             color: #FFD700;
             text-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+        }
+
+        /* ============= RADIAL MENU SYSTEM ============= */
+        .radial-menu-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .radial-menu {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .radial-menu.active {
+            pointer-events: auto;
+        }
+
+        .radial-option {
+            position: absolute;
+            width: 90px;
+            height: 90px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(145deg, rgba(15, 15, 30, 0.95) 0%, rgba(26, 26, 46, 0.98) 100%);
+            border: 2px solid var(--accent-color, #00d9ff);
+            border-radius: 50%;
+            cursor: pointer;
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0);
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow:
+                0 0 20px rgba(0, 217, 255, 0.3),
+                inset 0 0 15px rgba(0, 217, 255, 0.1);
+            text-decoration: none;
+        }
+
+        .radial-option:hover {
+            border-color: #00ff9f;
+            transform: translate(-50%, -50%) scale(1.15) !important;
+            box-shadow:
+                0 0 30px rgba(0, 255, 159, 0.5),
+                inset 0 0 20px rgba(0, 255, 159, 0.2);
+        }
+
+        .radial-option:active {
+            transform: translate(-50%, -50%) scale(1.05) !important;
+        }
+
+        .radial-option-icon {
+            width: 32px;
+            height: 32px;
+            margin-bottom: 4px;
+            filter: drop-shadow(0 0 6px rgba(0, 217, 255, 0.5));
+            transition: all 0.3s ease;
+        }
+
+        .radial-option:hover .radial-option-icon {
+            transform: scale(1.15);
+            filter: drop-shadow(0 0 10px rgba(0, 255, 159, 0.7));
+        }
+
+        .radial-option-label {
+            font-family: 'VT323', monospace;
+            font-size: 11px;
+            color: #00d9ff;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            text-align: center;
+            line-height: 1.2;
+            text-shadow: 0 0 8px rgba(0, 217, 255, 0.5);
+        }
+
+        .radial-option:hover .radial-option-label {
+            color: #00ff9f;
+            text-shadow: 0 0 12px rgba(0, 255, 159, 0.7);
+        }
+
+        /* Radial positions for Movies (3 options) - triangle layout */
+        .radial-menu.active .radial-option:nth-child(1) {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+            top: -140px;
+            left: 0;
+            transition-delay: 0s;
+        }
+        .radial-menu.active .radial-option:nth-child(2) {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+            top: 70px;
+            left: -130px;
+            transition-delay: 0.05s;
+        }
+        .radial-menu.active .radial-option:nth-child(3) {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+            top: 70px;
+            left: 130px;
+            transition-delay: 0.1s;
+        }
+
+        /* TV Shows has 3 options - triangle layout */
+        .radial-menu.tv-menu.active .radial-option:nth-child(1) {
+            top: -140px;
+            left: 0;
+        }
+        .radial-menu.tv-menu.active .radial-option:nth-child(2) {
+            top: 70px;
+            left: -130px;
+        }
+        .radial-menu.tv-menu.active .radial-option:nth-child(3) {
+            top: 70px;
+            left: 130px;
+        }
+
+        /* Backdrop overlay when menu is open */
+        .radial-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .radial-backdrop.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Pulse animation for active button */
+        .hero-nav-btn.menu-open {
+            animation: radialPulse 1.5s infinite;
+            z-index: 1001;
+        }
+
+        @keyframes radialPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 217, 255, 0.4); }
+            50% { box-shadow: 0 0 40px rgba(0, 217, 255, 0.8), 0 0 60px rgba(255, 0, 255, 0.3); }
         }
 
         /* Phosphor Theme Specific Hero Overrides */
@@ -6704,20 +6833,55 @@
                 <p class="hero-subtitle">your one stop streaming shop</p>
             </div>
 
-            <!-- Movies and TV Shows buttons flanking the center -->
+            <!-- Movies and TV Shows buttons with radial menus -->
             <div class="hero-nav-buttons">
-                <button class="hero-nav-btn hero-nav-movies" onclick="showTab('movies')">
-                    <img src="Icons/movie.png" alt="Movies" class="hero-nav-icon">
-                    <span class="hero-nav-label">Movies</span>
-                </button>
+                <div class="radial-menu-container">
+                    <button class="hero-nav-btn hero-nav-movies" id="moviesRadialBtn" onclick="toggleRadialMenu('movies')">
+                        <img src="Icons/movie.png" alt="Movies" class="hero-nav-icon">
+                        <span class="hero-nav-label">Movies</span>
+                    </button>
+                    <div class="radial-menu" id="moviesRadialMenu">
+                        <div class="radial-option" onclick="selectMovieFilter('popular')">
+                            <img src="Icons/popular.png" alt="Popular" class="radial-option-icon">
+                            <span class="radial-option-label">Popular</span>
+                        </div>
+                        <div class="radial-option" onclick="selectMovieFilter('trending')">
+                            <img src="Icons/trending.png" alt="Trending" class="radial-option-icon">
+                            <span class="radial-option-label">Trending</span>
+                        </div>
+                        <div class="radial-option" onclick="selectMovieFilter('upcoming')">
+                            <img src="Icons/upcoming.png" alt="Upcoming" class="radial-option-icon">
+                            <span class="radial-option-label">Upcoming</span>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="hero-center-spacer"></div>
 
-                <button class="hero-nav-btn hero-nav-shows" onclick="showTab('tv-shows')">
-                    <img src="Icons/tv-show.png" alt="TV Shows" class="hero-nav-icon">
-                    <span class="hero-nav-label">TV Shows</span>
-                </button>
+                <div class="radial-menu-container">
+                    <button class="hero-nav-btn hero-nav-shows" id="tvShowsRadialBtn" onclick="toggleRadialMenu('tv-shows')">
+                        <img src="Icons/tv-show.png" alt="TV Shows" class="hero-nav-icon">
+                        <span class="hero-nav-label">TV Shows</span>
+                    </button>
+                    <div class="radial-menu tv-menu" id="tvShowsRadialMenu">
+                        <div class="radial-option" onclick="selectTvFilter('popular')">
+                            <img src="Icons/popular.png" alt="Popular" class="radial-option-icon">
+                            <span class="radial-option-label">Popular</span>
+                        </div>
+                        <div class="radial-option" onclick="selectTvFilter('trending')">
+                            <img src="Icons/trending.png" alt="Trending" class="radial-option-icon">
+                            <span class="radial-option-label">Trending</span>
+                        </div>
+                        <div class="radial-option" onclick="selectTvFilter('now-playing')">
+                            <img src="Icons/live-now.png" alt="On Air" class="radial-option-icon">
+                            <span class="radial-option-label">On Air</span>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+            <!-- Radial menu backdrop -->
+            <div class="radial-backdrop" id="radialBackdrop" onclick="closeAllRadialMenus()"></div>
         </div>
 
         <!-- Old elements hidden -->
@@ -7135,20 +7299,8 @@
                 <button class="tab" onclick="showTab('tv-shows')" id="tvShowsTab">TV Shows</button>
             </div>
 
-            <!-- Content Type Filters (shown for Movies/TV Shows tabs) -->
+            <!-- Content Type Filters (shown for Movies/TV Shows tabs) - Only Genre and Language filters remain -->
             <div id="contentTypeFilters" style="display: none; margin-top: 16px; text-align: center; gap: 12px; justify-content: center; flex-wrap: wrap;">
-                <button class="bg-animation-toggle active" onclick="setContentFilter('popular')" id="popularFilterBtn">
-                    ◆ Popular
-                </button>
-                <button class="bg-animation-toggle" onclick="setContentFilter('trending')" id="trendingFilterBtn">
-                    ◆ Trending
-                </button>
-                <button class="bg-animation-toggle" onclick="setContentFilter('now-playing')" id="nowPlayingFilterBtn">
-                    ◆ Now Playing
-                </button>
-                <button class="bg-animation-toggle" onclick="setContentFilter('upcoming')" id="upcomingFilterBtn" style="display: none;">
-                    ◆ Upcoming
-                </button>
                 <button class="bg-animation-toggle" onclick="toggleGenreModal()" id="genreFilterBtn">
                     ◆ Filter by Genre
                 </button>
@@ -7370,6 +7522,148 @@
         window.logout = function() { console.log('logout called but not initialized'); };
         window.searchContent = function() { console.log('searchContent called but not initialized'); };
         window.showFriendsModal = function() { console.log('showFriendsModal called but not initialized'); };
+
+        // ============= RADIAL MENU SYSTEM =============
+        let activeRadialMenu = null;
+
+        window.toggleRadialMenu = function(menuType) {
+            const moviesMenu = document.getElementById('moviesRadialMenu');
+            const tvMenu = document.getElementById('tvShowsRadialMenu');
+            const moviesBtn = document.getElementById('moviesRadialBtn');
+            const tvBtn = document.getElementById('tvShowsRadialBtn');
+            const backdrop = document.getElementById('radialBackdrop');
+
+            if (menuType === 'movies') {
+                if (moviesMenu.classList.contains('active')) {
+                    // Close movies menu
+                    closeAllRadialMenus();
+                } else {
+                    // Close any open menu first
+                    closeAllRadialMenus();
+                    // Open movies menu
+                    moviesMenu.classList.add('active');
+                    moviesBtn.classList.add('menu-open');
+                    backdrop.classList.add('active');
+                    activeRadialMenu = 'movies';
+                }
+            } else if (menuType === 'tv-shows') {
+                if (tvMenu.classList.contains('active')) {
+                    // Close TV menu
+                    closeAllRadialMenus();
+                } else {
+                    // Close any open menu first
+                    closeAllRadialMenus();
+                    // Open TV menu
+                    tvMenu.classList.add('active');
+                    tvBtn.classList.add('menu-open');
+                    backdrop.classList.add('active');
+                    activeRadialMenu = 'tv-shows';
+                }
+            }
+        };
+
+        window.closeAllRadialMenus = function() {
+            const moviesMenu = document.getElementById('moviesRadialMenu');
+            const tvMenu = document.getElementById('tvShowsRadialMenu');
+            const moviesBtn = document.getElementById('moviesRadialBtn');
+            const tvBtn = document.getElementById('tvShowsRadialBtn');
+            const backdrop = document.getElementById('radialBackdrop');
+
+            if (moviesMenu) moviesMenu.classList.remove('active');
+            if (tvMenu) tvMenu.classList.remove('active');
+            if (moviesBtn) moviesBtn.classList.remove('menu-open');
+            if (tvBtn) tvBtn.classList.remove('menu-open');
+            if (backdrop) backdrop.classList.remove('active');
+            activeRadialMenu = null;
+        };
+
+        window.selectMovieFilter = function(filter) {
+            closeAllRadialMenus();
+            // Set current media type to movies and load the selected filter
+            window.currentMediaType = 'movie';
+            window.currentContentFilter = filter;
+            window.currentPage = 1;
+
+            // Show the content results area
+            const contentResults = document.getElementById('contentResults');
+            if (contentResults) contentResults.style.display = 'grid';
+
+            // Hide other sections
+            document.getElementById('continueWatchingDisplay').style.display = 'none';
+            document.getElementById('watchlistDisplay').style.display = 'none';
+            document.getElementById('statisticsDisplay').style.display = 'none';
+            const sportsDisplay = document.getElementById('sportsDisplay');
+            const channelsDisplay = document.getElementById('channelsDisplay');
+            if (sportsDisplay) sportsDisplay.style.display = 'none';
+            if (channelsDisplay) channelsDisplay.style.display = 'none';
+
+            // Show content type filters (only genre and language)
+            const contentTypeFilters = document.getElementById('contentTypeFilters');
+            if (contentTypeFilters) {
+                contentTypeFilters.style.display = 'flex';
+                // Load genres for movies
+                if (typeof loadGenres === 'function') {
+                    loadGenres('movie');
+                }
+            }
+
+            // Load the appropriate content
+            if (filter === 'popular' && typeof loadPopularMovies === 'function') {
+                loadPopularMovies();
+            } else if (filter === 'trending' && typeof loadTrendingMovies === 'function') {
+                loadTrendingMovies();
+            } else if (filter === 'upcoming' && typeof loadUpcomingMovies === 'function') {
+                loadUpcomingMovies();
+            }
+        };
+
+        window.selectTvFilter = function(filter) {
+            closeAllRadialMenus();
+            // Set current media type to TV and load the selected filter
+            window.currentMediaType = 'tv';
+            window.currentContentFilter = filter;
+            window.currentPage = 1;
+
+            // Show the content results area
+            const contentResults = document.getElementById('contentResults');
+            if (contentResults) contentResults.style.display = 'grid';
+
+            // Hide other sections
+            document.getElementById('continueWatchingDisplay').style.display = 'none';
+            document.getElementById('watchlistDisplay').style.display = 'none';
+            document.getElementById('statisticsDisplay').style.display = 'none';
+            const sportsDisplay = document.getElementById('sportsDisplay');
+            const channelsDisplay = document.getElementById('channelsDisplay');
+            if (sportsDisplay) sportsDisplay.style.display = 'none';
+            if (channelsDisplay) channelsDisplay.style.display = 'none';
+
+            // Show content type filters (only genre and language)
+            const contentTypeFilters = document.getElementById('contentTypeFilters');
+            if (contentTypeFilters) {
+                contentTypeFilters.style.display = 'flex';
+                // Load genres for TV
+                if (typeof loadGenres === 'function') {
+                    loadGenres('tv');
+                }
+            }
+
+            // Load the appropriate content
+            if (filter === 'popular' && typeof loadPopularTVShows === 'function') {
+                loadPopularTVShows();
+            } else if (filter === 'trending' && typeof loadTrendingTVShows === 'function') {
+                loadTrendingTVShows();
+            } else if (filter === 'now-playing' && typeof loadNowPlayingTVShows === 'function') {
+                loadNowPlayingTVShows();
+            }
+        };
+
+        // Close radial menu on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && activeRadialMenu) {
+                closeAllRadialMenus();
+            }
+        });
+        // ============= END RADIAL MENU SYSTEM =============
 
         const API_BASE_URL = `${window.location.origin}/api`;
         let currentContentUrl = '';
@@ -10184,17 +10478,10 @@
                 currentMediaType = 'movie';
                 currentContentFilter = 'popular'; // Default to popular
 
-                // Show content type filters
+                // Show content type filters (only genre and language)
                 const contentTypeFilters = document.getElementById('contentTypeFilters');
                 if (contentTypeFilters) {
                     contentTypeFilters.style.display = 'flex';
-                    // Show Upcoming button for movies
-                    document.getElementById('upcomingFilterBtn').style.display = 'inline-block';
-                    // Reset filter buttons
-                    document.querySelectorAll('#contentTypeFilters .bg-animation-toggle').forEach(btn => {
-                        btn.classList.remove('active');
-                    });
-                    document.getElementById('popularFilterBtn').classList.add('active');
                     loadGenres('movie');
                 }
                 loadPopularMovies();
@@ -10204,17 +10491,10 @@
                 currentMediaType = 'tv';
                 currentContentFilter = 'popular'; // Default to popular
 
-                // Show content type filters
+                // Show content type filters (only genre and language)
                 const contentTypeFilters = document.getElementById('contentTypeFilters');
                 if (contentTypeFilters) {
                     contentTypeFilters.style.display = 'flex';
-                    // Hide Upcoming button for TV shows
-                    document.getElementById('upcomingFilterBtn').style.display = 'none';
-                    // Reset filter buttons
-                    document.querySelectorAll('#contentTypeFilters .bg-animation-toggle').forEach(btn => {
-                        btn.classList.remove('active');
-                    });
-                    document.getElementById('popularFilterBtn').classList.add('active');
                     loadGenres('tv');
                 }
                 loadPopularTVShows();
@@ -10222,26 +10502,11 @@
         }
 
         // Set content filter (Popular/Trending/Now Playing/Upcoming)
+        // Set content filter (called from radial menu)
         function setContentFilter(filter) {
             currentContentFilter = filter;
             currentGenreId = null; // Reset genre filter
             currentPage = 1; // Reset page
-
-            // Update filter button states
-            document.querySelectorAll('#contentTypeFilters .bg-animation-toggle').forEach(btn => {
-                btn.classList.remove('active');
-            });
-
-            // Activate the selected filter button
-            if (filter === 'popular') {
-                document.getElementById('popularFilterBtn').classList.add('active');
-            } else if (filter === 'trending') {
-                document.getElementById('trendingFilterBtn').classList.add('active');
-            } else if (filter === 'now-playing') {
-                document.getElementById('nowPlayingFilterBtn').classList.add('active');
-            } else if (filter === 'upcoming') {
-                document.getElementById('upcomingFilterBtn').classList.add('active');
-            }
 
             // Load content based on media type and filter
             if (currentMediaType === 'movie') {
@@ -10249,8 +10514,6 @@
                     loadPopularMovies();
                 } else if (filter === 'trending') {
                     loadTrendingMovies();
-                } else if (filter === 'now-playing') {
-                    loadNowPlayingMovies();
                 } else if (filter === 'upcoming') {
                     loadUpcomingMovies();
                 }
