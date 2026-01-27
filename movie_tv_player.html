@@ -5875,13 +5875,13 @@
     <!-- Theme Selector Button -->
     <!-- Top-right Control Button -->
     <div style="position: fixed; top: 20px; right: 20px; z-index: 100001;">
-        <button class="bg-animation-toggle" onclick="toggleWatchpartyPanel()">▶ Party</button>
+        <button class="bg-animation-toggle" onclick="toggleWatchpartyPanel()"><img src="Icons/party.png" alt="Party" style="width: 16px; height: 16px; margin-right: 4px; vertical-align: middle;"> Party</button>
     </div>
 
     <!-- Bottom-right Control Buttons -->
     <div style="position: fixed; bottom: 20px; right: 20px; display: flex; gap: 10px; z-index: 100000;">
-        <button class="theme-selector-btn" onclick="toggleThemeSelector()">◆ Theme</button>
-        <button class="bg-animation-toggle" onclick="toggleEffectsPanel()">★ Effects</button>
+        <button class="theme-selector-btn" onclick="toggleThemeSelector()"><img src="Icons/theme.png" alt="Theme" style="width: 16px; height: 16px; margin-right: 4px; vertical-align: middle;"> Theme</button>
+        <button class="bg-animation-toggle" onclick="toggleEffectsPanel()"><img src="Icons/effect.png" alt="Effects" style="width: 16px; height: 16px; margin-right: 4px; vertical-align: middle;"> Effects</button>
     </div>
 
     <!-- Theme Selector Panel -->
@@ -6065,14 +6065,14 @@
             </div>
 
             <div class="player-controls">
-                <button onclick="playNextEpisode()" class="btn" id="nextEpisodeBtn" style="display: none;">Next Episode</button>
-                <button onclick="toggleFullscreen()" class="btn btn-secondary">Fullscreen</button>
+                <button onclick="playNextEpisode()" class="btn" id="nextEpisodeBtn" style="display: none;"><img src="Icons/next-episode.png" alt="Next" style="width: 18px; height: 18px; margin-right: 6px; vertical-align: middle;"> Next Episode</button>
+                <button onclick="toggleFullscreen()" class="btn btn-secondary"><img src="Icons/fullscreen.png" alt="Fullscreen" style="width: 18px; height: 18px; margin-right: 6px; vertical-align: middle;"> Fullscreen</button>
                 <button id="sportsSourceBtn" class="btn btn-secondary" onclick="switchSportsSource()" style="display: none;" title="Switch between available sources">
                     <span id="sportsSourceBtnText">Source 1</span> 🔄
                 </button>
-                <button onclick="toggleComments()" class="btn btn-secondary" id="commentsBtn" style="display: none;">💬 Comments</button>
+                <button onclick="toggleComments()" class="btn btn-secondary" id="commentsBtn" style="display: none;"><img src="Icons/comments.png" alt="Comments" style="width: 18px; height: 18px; margin-right: 6px; vertical-align: middle;"> Comments</button>
                 <button onclick="copyCurrentUrl()" class="btn btn-secondary">Copy URL</button>
-                <button onclick="stopPlayback()" class="btn btn-secondary" id="stopBtn" style="display: none;">Stop</button>
+                <button onclick="stopPlayback()" class="btn btn-secondary" id="stopBtn" style="display: none;"><img src="Icons/stop-sign.png" alt="Stop" style="width: 18px; height: 18px; margin-right: 6px; vertical-align: middle;"> Stop</button>
 
                 <!-- Source Dropdown Menu -->
                 <div class="source-menu-container" id="sourceMenuContainer" style="display: none;">
@@ -6502,11 +6502,10 @@
                 </div>
 
                 <!-- Sports Filters -->
-                <div id="sportsFilters" style="margin-bottom: 24px; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
-                    <button class="bg-animation-toggle" onclick="toggleLiveFilter()" id="liveSportsBtn">
-                        ◆ Live Now
+                <div id="sportsFilters" style="margin-bottom: 24px; display: flex; justify-content: center;">
+                    <button onclick="toggleLiveFilter()" id="liveSportsBtn" style="padding: 0; margin: 0; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 12px; transition: box-shadow 0.3s ease, filter 0.3s ease;">
+                        <img src="Icons/live-now.png" alt="Live Now" style="width: 100px; height: 100px; display: block; border-radius: 12px;">
                     </button>
-                    <div id="sportTypeButtons" style="display: contents;"></div>
                 </div>
 
                 <!-- Sports Matches Grid -->
@@ -12990,10 +12989,6 @@
                 const liveBtn = document.getElementById('liveSportsBtn');
                 if (liveBtn) liveBtn.classList.remove('active');
 
-                document.querySelectorAll('#sportTypeButtons .bg-animation-toggle').forEach(btn => {
-                    btn.classList.remove('active');
-                });
-
                 // Fetch available sports
                 const sportsResponse = await fetch(`${WESTREAM_BASE_URL}/sports`);
                 availableSports = await sportsResponse.json();
@@ -13001,9 +12996,6 @@
                 // Fetch all matches
                 const matchesResponse = await fetch(`${WESTREAM_BASE_URL}/matches`);
                 allSportsMatches = await matchesResponse.json();
-
-                // Populate sport type filter buttons
-                populateSportTypeButtons();
 
                 // Display matches based on current filter
                 filterAndDisplayMatches();
@@ -13016,20 +13008,6 @@
             }
         }
 
-        // Populate sport type filter buttons
-        function populateSportTypeButtons() {
-            const buttonContainer = document.getElementById('sportTypeButtons');
-            buttonContainer.innerHTML = '';
-
-            availableSports.forEach(sport => {
-                const button = document.createElement('button');
-                button.className = 'bg-animation-toggle';
-                button.textContent = `◆ ${sport.name || sport}`;
-                button.onclick = () => setSportType(sport.id || sport);
-                buttonContainer.appendChild(button);
-            });
-        }
-
         // Toggle live filter on/off
         function toggleLiveFilter() {
             // Toggle the live filter state
@@ -13039,37 +13017,19 @@
             const searchInput = document.getElementById('sportsSearchInput');
             if (searchInput) searchInput.value = '';
 
-            // Update button state
+            // Update button state with red glow when active
             const liveBtn = document.getElementById('liveSportsBtn');
             if (liveBtn) {
                 if (isLiveFilterActive) {
-                    liveBtn.classList.add('active');
+                    liveBtn.style.boxShadow = '0 0 20px 5px rgba(255, 0, 0, 0.7)';
+                    liveBtn.style.filter = 'drop-shadow(0 0 10px rgba(255, 0, 0, 0.5))';
                 } else {
-                    liveBtn.classList.remove('active');
+                    liveBtn.style.boxShadow = 'none';
+                    liveBtn.style.filter = 'none';
                 }
             }
 
-            // Keep sport type buttons state unchanged
-            filterAndDisplayMatches();
-        }
-
-        // Set sport type filter
-        function setSportType(sportType) {
-            currentSportType = sportType;
-            // Keep currentSportsFilter - don't reset the all/live filter
-
-            // Clear search input when changing filters
-            const searchInput = document.getElementById('sportsSearchInput');
-            if (searchInput) searchInput.value = '';
-
-            // Update sport type button states only
-            document.querySelectorAll('#sportTypeButtons .bg-animation-toggle').forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.textContent.includes(sportType)) {
-                    btn.classList.add('active');
-                }
-            });
-
+            // Filter matches based on live status and selected sport
             filterAndDisplayMatches();
         }
 
