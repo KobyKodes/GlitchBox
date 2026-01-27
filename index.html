@@ -1336,9 +1336,10 @@
         }
 
         #continueWatchingDisplay {
-            max-width: 580px;
-            margin-left: auto;
-            margin-right: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 24px;
+            margin: 24px 0;
         }
 
         @media (min-width: 1400px) {
@@ -3708,9 +3709,10 @@
 
         /* J's Special - Continue Watching Display Layout */
         [data-theme="jspecial"] #continueWatchingDisplay {
-            max-width: 580px;
-            margin-left: auto;
-            margin-right: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 24px;
+            margin: 24px 0;
         }
 
         /* Phosphor Modern - Buttons (Flat, Refined) */
@@ -6602,7 +6604,7 @@
     <!-- User Menu Dropdown -->
     <div class="user-menu-container">
         <button class="user-menu-btn" id="userMenuBtn" onclick="toggleUserMenu()">
-            <img id="userMenuIcon" src="" alt="User" style="width: 30px; height: 30px;">
+            <img id="userMenuIcon" src="Icons/user.png" alt="User" style="width: 30px; height: 30px;">
             <span id="userMenuText" style="display: none;"></span>
         </button>
         <div class="user-menu-dropdown" id="userMenuDropdown">
@@ -16739,8 +16741,8 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             const userMenuIcon = document.getElementById('userMenuIcon');
-            if (userMenuIcon && typeof BASE64_IMAGES !== 'undefined') {
-                userMenuIcon.src = BASE64_IMAGES.USER_ICON;
+            if (userMenuIcon) {
+                userMenuIcon.src = 'Icons/user.png';
             }
         });
     </script>
