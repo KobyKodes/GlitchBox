@@ -3330,6 +3330,87 @@
             100% { background-position: 0% 50%; }
         }
 
+        /* J's Special - User Menu Dropdown */
+        [data-theme="jspecial"] .user-menu-dropdown {
+            background: linear-gradient(145deg, rgba(15, 15, 30, 0.98), rgba(30, 15, 45, 0.98));
+            border: 3px solid #ff1493;
+            box-shadow: 0 0 30px rgba(255, 20, 147, 0.5), 0 0 60px rgba(0, 191, 255, 0.3);
+        }
+
+        [data-theme="jspecial"] .user-menu-item {
+            color: #fff;
+        }
+
+        [data-theme="jspecial"] .user-menu-item:hover {
+            background: linear-gradient(135deg, rgba(255, 20, 147, 0.3), rgba(0, 191, 255, 0.3));
+            border-color: #00bfff;
+        }
+
+        [data-theme="jspecial"] .user-menu-divider {
+            background: linear-gradient(90deg, #ff1493, #00bfff, #ffd700);
+            opacity: 0.6;
+        }
+
+        [data-theme="jspecial"] .user-menu-username {
+            color: #ffd700;
+            border-bottom-color: rgba(255, 215, 0, 0.4);
+        }
+
+        /* J's Special - Popup Panels (Theme, Effects, Party) positioned near user menu */
+        [data-theme="jspecial"] .theme-selector-panel,
+        [data-theme="jspecial"] #bgEffectsPanel,
+        [data-theme="jspecial"] #watchpartyPanel {
+            position: fixed !important;
+            left: 20px !important;
+            right: auto !important;
+            top: 70px !important;
+            bottom: auto !important;
+            width: 340px;
+            background: linear-gradient(145deg, rgba(15, 15, 30, 0.98), rgba(30, 15, 45, 0.98));
+            border: 3px solid #ff1493;
+            border-radius: 12px;
+            padding: 0;
+            box-shadow: 0 0 30px rgba(255, 20, 147, 0.5), 0 0 60px rgba(0, 191, 255, 0.3);
+            backdrop-filter: blur(20px);
+            transform: scale(0);
+            transform-origin: top left;
+            opacity: 0;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
+            z-index: 100003;
+            overflow: hidden;
+            display: flex !important;
+            flex-direction: column;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        [data-theme="jspecial"] .theme-selector-panel.active,
+        [data-theme="jspecial"] #bgEffectsPanel.active,
+        [data-theme="jspecial"] #watchpartyPanel.active {
+            transform: scale(1);
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        /* J's Special - Panel Headers */
+        [data-theme="jspecial"] .theme-selector-panel .theme-selector-title,
+        [data-theme="jspecial"] .bg-effects-panel .bg-effects-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 2px solid rgba(255, 20, 147, 0.4);
+            background: linear-gradient(135deg, rgba(255, 20, 147, 0.2), rgba(0, 191, 255, 0.2));
+            margin: 0;
+        }
+
+        [data-theme="jspecial"] .theme-selector-title .title-text,
+        [data-theme="jspecial"] .bg-effects-title .title-text {
+            color: #ffd700;
+            font-weight: 600;
+        }
+
         /* Theme: Phosphor Burn - Modern Minimalist Warm Amber */
         [data-theme="phosphor"] {
             --primary-color: #F5A623;
@@ -3610,6 +3691,26 @@
             font-size: 1.2rem;
             letter-spacing: 0.1em;
             text-shadow: none;
+        }
+
+        /* J's Special - Section Header Layout (same as Phosphor) */
+        [data-theme="jspecial"] .section-header-bar {
+            max-width: 580px;
+            margin-left: auto;
+            margin-right: auto;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+
+        [data-theme="jspecial"] .section-header-bar:hover {
+            transform: translateY(-2px);
+        }
+
+        /* J's Special - Continue Watching Display Layout */
+        [data-theme="jspecial"] #continueWatchingDisplay {
+            max-width: 580px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         /* Phosphor Modern - Buttons (Flat, Refined) */
@@ -4881,6 +4982,97 @@
             display: block;
         }
 
+        /* J's Special - Show watchlist container (My Lists) */
+        [data-theme="jspecial"] .watchlist-container {
+            display: block;
+        }
+
+        /* J's Special - Show live container */
+        [data-theme="jspecial"] .live-container {
+            display: block;
+        }
+
+        /* J's Special - Hide the Party button in top-right */
+        [data-theme="jspecial"] .bg-animation-toggle[onclick*="toggleWatchpartyPanel"] {
+            display: none;
+        }
+
+        /* J's Special - Colorful Live Button */
+        [data-theme="jspecial"] .live-trigger-btn {
+            background: linear-gradient(135deg, #ff1493, #ff69b4);
+            border: 3px solid #ff1493;
+            color: #000;
+            box-shadow: 0 0 20px rgba(255, 20, 147, 0.6);
+        }
+
+        [data-theme="jspecial"] .live-trigger-btn:hover {
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            box-shadow: 0 0 30px rgba(255, 20, 147, 0.8);
+            transform: translateY(-3px) scale(1.05);
+        }
+
+        /* J's Special - Colorful Watchlist Button */
+        [data-theme="jspecial"] .watchlist-trigger-btn {
+            background: linear-gradient(135deg, #00bfff, #1e90ff);
+            border: 3px solid #00bfff;
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 191, 255, 0.6);
+        }
+
+        [data-theme="jspecial"] .watchlist-trigger-btn:hover {
+            background: linear-gradient(135deg, #1e90ff, #00bfff);
+            box-shadow: 0 0 30px rgba(0, 191, 255, 0.8);
+            transform: translateY(-3px) scale(1.05);
+        }
+
+        /* J's Special - Colorful icons (show original colors) */
+        [data-theme="jspecial"] .live-icon,
+        [data-theme="jspecial"] .watchlist-icon,
+        [data-theme="jspecial"] .live-trigger-btn img,
+        [data-theme="jspecial"] .watchlist-trigger-btn img {
+            filter: none !important;
+        }
+
+        /* J's Special - Live Panel styling */
+        [data-theme="jspecial"] .live-panel {
+            background: linear-gradient(145deg, rgba(15, 15, 30, 0.98), rgba(30, 15, 45, 0.98));
+            border: 3px solid #ff1493;
+            box-shadow: 0 0 30px rgba(255, 20, 147, 0.5);
+        }
+
+        /* J's Special - Watchlist Slide Panel styling */
+        [data-theme="jspecial"] .watchlist-slide-panel {
+            background: linear-gradient(145deg, rgba(15, 15, 30, 0.98), rgba(30, 15, 45, 0.98));
+            border: 3px solid #00bfff;
+            box-shadow: 0 0 30px rgba(0, 191, 255, 0.5);
+        }
+
+        [data-theme="jspecial"] .watchlist-slide-header {
+            border-bottom-color: rgba(0, 191, 255, 0.4);
+            background: linear-gradient(135deg, rgba(0, 191, 255, 0.2), rgba(30, 144, 255, 0.2));
+        }
+
+        [data-theme="jspecial"] .watchlist-slide-title {
+            color: #ffd700;
+        }
+
+        [data-theme="jspecial"] .watchlist-slide-list-card {
+            border-color: rgba(0, 191, 255, 0.3);
+        }
+
+        [data-theme="jspecial"] .watchlist-slide-list-card:hover {
+            border-color: #00bfff;
+            background: rgba(0, 191, 255, 0.15);
+        }
+
+        [data-theme="jspecial"] .watchlist-slide-list-name {
+            color: #fff;
+        }
+
+        [data-theme="jspecial"] .watchlist-slide-list-count {
+            color: #00bfff;
+        }
+
         .live-trigger-btn {
             display: flex;
             align-items: center;
@@ -5125,6 +5317,26 @@
         }
 
         [data-theme="phosphor"] .watchlist-trigger-btn img {
+            filter: none !important;
+        }
+
+        /* ============= J'S SPECIAL - SHOW ORIGINAL COLORED ICONS ============= */
+        [data-theme="jspecial"] .live-category-btn img,
+        [data-theme="jspecial"] .live-icon,
+        [data-theme="jspecial"] .watchlist-icon {
+            filter: none !important;
+        }
+
+        [data-theme="jspecial"] .live-category-btn:hover img {
+            filter: brightness(1.2) !important;
+        }
+
+        [data-theme="jspecial"] .live-trigger-btn img,
+        [data-theme="jspecial"] .live-option-btn img {
+            filter: none !important;
+        }
+
+        [data-theme="jspecial"] .watchlist-trigger-btn img {
             filter: none !important;
         }
 
@@ -6247,7 +6459,7 @@
                         <img src="live-tv.png" alt="Channels" class="live-icon" style="width: 48px; height: 48px;">
                     </button>
                     <button class="live-option-btn live-option-btn-icon-only" onclick="showLiveCategories('sports')" title="Live Sports">
-                        <img src="live-stream.png" alt="Sports" class="live-icon" style="width: 48px; height: 48px;">
+                        <img src="Icons/LiveIcons/sports.png" alt="Sports" class="live-icon" style="width: 48px; height: 48px;">
                     </button>
                 </div>
             </div>
