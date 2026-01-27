@@ -57,6 +57,11 @@
         .container > .search-section { order: 3; }
         .container > .popular-section { order: 4; }
         .container > .player-section { order: 5; }
+        .container > #contentResults { order: 6; }
+        .container > #continueWatchingDisplay { order: 6; }
+        .container > #watchlistDisplay { order: 6; }
+        .container > #statisticsDisplay { order: 6; }
+        .container > #loadingIndicator { order: 6; }
         .container > #sportsDisplay { order: 6; }
         .container > #channelsDisplay { order: 6; }
         .container > #loginModal { order: 7; }
@@ -7621,13 +7626,14 @@
                 </div>
             </div>
 
-            <div id="contentResults" class="content-results"></div>
-            <div id="continueWatchingDisplay" class="horizontal-scroll-container" style="display: none;"></div>
-            <div id="watchlistDisplay" class="horizontal-scroll-container" style="display: none;"></div>
-            <div id="statisticsDisplay" style="display: none; padding: 20px;"></div>
-            <div id="loadingIndicator" class="loading" style="display: none;">
-                <div>Loading content...</div>
-            </div>
+        </div>
+
+        <div id="contentResults" class="content-results"></div>
+        <div id="continueWatchingDisplay" class="horizontal-scroll-container" style="display: none;"></div>
+        <div id="watchlistDisplay" class="horizontal-scroll-container" style="display: none;"></div>
+        <div id="statisticsDisplay" style="display: none; padding: 20px;"></div>
+        <div id="loadingIndicator" class="loading" style="display: none;">
+            <div>Loading content...</div>
         </div>
 
         <div id="sportsDisplay" style="display: none; padding: 20px;">
