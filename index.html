@@ -6505,9 +6505,8 @@
 
     <!-- Live Section Button & Panel -->
     <div id="liveContainer" class="live-container">
-        <button class="live-trigger-btn" id="liveTriggerBtn" onclick="toggleLivePanel()">
-            <img src="live-stream.png" alt="Live" class="live-icon" style="width: 32px; height: 32px;">
-            <span class="live-trigger-label">Live</span>
+        <button id="liveTriggerBtn" onclick="toggleLivePanel()" style="padding: 0; margin: 0; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+            <img src="live-stream.png" alt="Live" class="live-icon" style="width: 48px; height: 48px; display: block;">
         </button>
 
         <div class="live-slide-panel" id="liveSlidePanel">
@@ -13275,6 +13274,7 @@
 
                 const bootMessages = [
                     'INITIALIZING GLITCHBOX v2.0...',
+                    'LOADING #1 STREAMING WEBSITE WORLDWIDE BY KOBYKODES...',
                     'LOADING PHOSPHOR DISPLAY DRIVER...',
                     'CALIBRATING CRT BEAM...',
                     'SYSTEM READY'
