@@ -3536,6 +3536,25 @@
             transform: translateY(-4px) scale(1.02);
         }
 
+        /* Active/Selected state for Movies/Shows buttons */
+        .hero-nav-btn.active {
+            border-color: #FFD700;
+            background: linear-gradient(145deg, rgba(40, 32, 10, 0.95) 0%, rgba(25, 20, 8, 0.98) 100%);
+            box-shadow:
+                0 0 40px rgba(255, 215, 0, 0.5),
+                0 10px 30px rgba(0, 0, 0, 0.4),
+                inset 0 0 40px rgba(255, 215, 0, 0.15);
+        }
+
+        .hero-nav-btn.active .hero-nav-icon {
+            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+        }
+
+        .hero-nav-btn.active .hero-nav-label {
+            color: #FFD700;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+        }
+
         .hero-nav-icon {
             width: 64px;
             height: 64px;
@@ -3612,6 +3631,24 @@
 
         .radial-option:active {
             transform: translate(-50%, -50%) scale(1.05) !important;
+        }
+
+        /* Active/Selected state for radial menu options */
+        .radial-option.selected {
+            border-color: #FFD700;
+            background: linear-gradient(145deg, rgba(40, 32, 10, 0.95) 0%, rgba(25, 20, 8, 0.98) 100%);
+            box-shadow:
+                0 0 30px rgba(255, 215, 0, 0.5),
+                inset 0 0 20px rgba(255, 215, 0, 0.2);
+        }
+
+        .radial-option.selected .radial-option-icon {
+            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8));
+        }
+
+        .radial-option.selected .radial-option-label {
+            color: #FFD700;
+            text-shadow: 0 0 12px rgba(255, 215, 0, 0.7);
         }
 
         .radial-option-icon {
@@ -3794,8 +3831,32 @@
         }
 
         .section-header-bar:hover {
-            box-shadow: 0 0 30px rgba(245, 166, 35, 0.4);
-            transform: translateY(-2px);
+            transform: translateY(-4px) scale(1.02);
+            border-color: #FFD700;
+            box-shadow:
+                0 0 40px rgba(245, 166, 35, 0.5),
+                0 10px 30px rgba(0, 0, 0, 0.4),
+                inset 0 0 30px rgba(245, 166, 35, 0.1);
+        }
+
+        .section-header-bar:hover .section-title {
+            color: #FFD700;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+        }
+
+        /* Active state for Continue Watching */
+        .section-header-bar.active {
+            border-color: #FFD700;
+            background: linear-gradient(145deg, rgba(40, 32, 10, 0.9) 0%, rgba(25, 20, 8, 0.95) 100%);
+            box-shadow:
+                0 0 40px rgba(255, 215, 0, 0.5),
+                0 10px 30px rgba(0, 0, 0, 0.4),
+                inset 0 0 30px rgba(255, 215, 0, 0.15);
+        }
+
+        .section-header-bar.active .section-title {
+            color: #FFD700;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
         }
 
         .section-title {
@@ -7287,7 +7348,7 @@
 
         <div class="popular-section">
             <!-- Continue Watching Header -->
-            <div class="section-header-bar" onclick="showTab('continue-watching')" style="cursor: pointer;">
+            <div class="section-header-bar" id="continueWatchingBar" onclick="toggleContinueWatching()" style="cursor: pointer;">
                 <h2 class="section-title">Continue Watching</h2>
             </div>
 
@@ -7525,6 +7586,84 @@
 
         // ============= RADIAL MENU SYSTEM =============
         let activeRadialMenu = null;
+        let activeContentSection = null; // 'movies', 'tv-shows', or 'continue-watching'
+        let activeContentFilter = null; // 'popular', 'trending', 'upcoming', 'now-playing'
+
+        // Update all button active states
+        function updateButtonActiveStates() {
+            const moviesBtn = document.getElementById('moviesRadialBtn');
+            const tvBtn = document.getElementById('tvShowsRadialBtn');
+            const continueWatchingBar = document.getElementById('continueWatchingBar');
+
+            // Reset all buttons
+            if (moviesBtn) moviesBtn.classList.remove('active');
+            if (tvBtn) tvBtn.classList.remove('active');
+            if (continueWatchingBar) continueWatchingBar.classList.remove('active');
+
+            // Set active based on current section
+            if (activeContentSection === 'movies' && moviesBtn) {
+                moviesBtn.classList.add('active');
+            } else if (activeContentSection === 'tv-shows' && tvBtn) {
+                tvBtn.classList.add('active');
+            } else if (activeContentSection === 'continue-watching' && continueWatchingBar) {
+                continueWatchingBar.classList.add('active');
+            }
+        }
+
+        // Update radial menu option selected states
+        function updateRadialOptionStates() {
+            // Clear all selected states
+            document.querySelectorAll('.radial-option').forEach(opt => opt.classList.remove('selected'));
+
+            // Set selected state for current filter
+            if (activeContentSection === 'movies' && activeContentFilter) {
+                const moviesMenu = document.getElementById('moviesRadialMenu');
+                if (moviesMenu) {
+                    const options = moviesMenu.querySelectorAll('.radial-option');
+                    options.forEach(opt => {
+                        const onclick = opt.getAttribute('onclick');
+                        if (onclick && onclick.includes(`'${activeContentFilter}'`)) {
+                            opt.classList.add('selected');
+                        }
+                    });
+                }
+            } else if (activeContentSection === 'tv-shows' && activeContentFilter) {
+                const tvMenu = document.getElementById('tvShowsRadialMenu');
+                if (tvMenu) {
+                    const options = tvMenu.querySelectorAll('.radial-option');
+                    options.forEach(opt => {
+                        const onclick = opt.getAttribute('onclick');
+                        if (onclick && onclick.includes(`'${activeContentFilter}'`)) {
+                            opt.classList.add('selected');
+                        }
+                    });
+                }
+            }
+        }
+
+        // Hide all content sections
+        function hideAllContentSections() {
+            const contentResults = document.getElementById('contentResults');
+            const continueWatchingDisplay = document.getElementById('continueWatchingDisplay');
+            const watchlistDisplay = document.getElementById('watchlistDisplay');
+            const statisticsDisplay = document.getElementById('statisticsDisplay');
+            const sportsDisplay = document.getElementById('sportsDisplay');
+            const channelsDisplay = document.getElementById('channelsDisplay');
+            const contentTypeFilters = document.getElementById('contentTypeFilters');
+
+            if (contentResults) contentResults.style.display = 'none';
+            if (continueWatchingDisplay) continueWatchingDisplay.style.display = 'none';
+            if (watchlistDisplay) watchlistDisplay.style.display = 'none';
+            if (statisticsDisplay) statisticsDisplay.style.display = 'none';
+            if (sportsDisplay) sportsDisplay.style.display = 'none';
+            if (channelsDisplay) channelsDisplay.style.display = 'none';
+            if (contentTypeFilters) contentTypeFilters.style.display = 'none';
+
+            activeContentSection = null;
+            activeContentFilter = null;
+            updateButtonActiveStates();
+            updateRadialOptionStates();
+        }
 
         window.toggleRadialMenu = function(menuType) {
             const moviesMenu = document.getElementById('moviesRadialMenu');
@@ -7532,6 +7671,9 @@
             const moviesBtn = document.getElementById('moviesRadialBtn');
             const tvBtn = document.getElementById('tvShowsRadialBtn');
             const backdrop = document.getElementById('radialBackdrop');
+
+            // Update radial option states before showing menu
+            updateRadialOptionStates();
 
             if (menuType === 'movies') {
                 if (moviesMenu.classList.contains('active')) {
@@ -7545,6 +7687,7 @@
                     moviesBtn.classList.add('menu-open');
                     backdrop.classList.add('active');
                     activeRadialMenu = 'movies';
+                    updateRadialOptionStates();
                 }
             } else if (menuType === 'tv-shows') {
                 if (tvMenu.classList.contains('active')) {
@@ -7558,6 +7701,7 @@
                     tvBtn.classList.add('menu-open');
                     backdrop.classList.add('active');
                     activeRadialMenu = 'tv-shows';
+                    updateRadialOptionStates();
                 }
             }
         };
@@ -7578,17 +7722,23 @@
         };
 
         window.selectMovieFilter = function(filter) {
+            // Check if this filter is already active - if so, toggle off
+            if (activeContentSection === 'movies' && activeContentFilter === filter) {
+                closeAllRadialMenus();
+                hideAllContentSections();
+                return;
+            }
+
             closeAllRadialMenus();
-            // Set current media type to movies and load the selected filter
+
+            // Set current state
+            activeContentSection = 'movies';
+            activeContentFilter = filter;
             window.currentMediaType = 'movie';
             window.currentContentFilter = filter;
             window.currentPage = 1;
 
-            // Show the content results area
-            const contentResults = document.getElementById('contentResults');
-            if (contentResults) contentResults.style.display = 'grid';
-
-            // Hide other sections
+            // Hide other sections first
             document.getElementById('continueWatchingDisplay').style.display = 'none';
             document.getElementById('watchlistDisplay').style.display = 'none';
             document.getElementById('statisticsDisplay').style.display = 'none';
@@ -7597,15 +7747,22 @@
             if (sportsDisplay) sportsDisplay.style.display = 'none';
             if (channelsDisplay) channelsDisplay.style.display = 'none';
 
+            // Show the content results area
+            const contentResults = document.getElementById('contentResults');
+            if (contentResults) contentResults.style.display = 'grid';
+
             // Show content type filters (only genre and language)
             const contentTypeFilters = document.getElementById('contentTypeFilters');
             if (contentTypeFilters) {
                 contentTypeFilters.style.display = 'flex';
-                // Load genres for movies
                 if (typeof loadGenres === 'function') {
                     loadGenres('movie');
                 }
             }
+
+            // Update button states
+            updateButtonActiveStates();
+            updateRadialOptionStates();
 
             // Load the appropriate content
             if (filter === 'popular' && typeof loadPopularMovies === 'function') {
@@ -7618,17 +7775,23 @@
         };
 
         window.selectTvFilter = function(filter) {
+            // Check if this filter is already active - if so, toggle off
+            if (activeContentSection === 'tv-shows' && activeContentFilter === filter) {
+                closeAllRadialMenus();
+                hideAllContentSections();
+                return;
+            }
+
             closeAllRadialMenus();
-            // Set current media type to TV and load the selected filter
+
+            // Set current state
+            activeContentSection = 'tv-shows';
+            activeContentFilter = filter;
             window.currentMediaType = 'tv';
             window.currentContentFilter = filter;
             window.currentPage = 1;
 
-            // Show the content results area
-            const contentResults = document.getElementById('contentResults');
-            if (contentResults) contentResults.style.display = 'grid';
-
-            // Hide other sections
+            // Hide other sections first
             document.getElementById('continueWatchingDisplay').style.display = 'none';
             document.getElementById('watchlistDisplay').style.display = 'none';
             document.getElementById('statisticsDisplay').style.display = 'none';
@@ -7637,15 +7800,22 @@
             if (sportsDisplay) sportsDisplay.style.display = 'none';
             if (channelsDisplay) channelsDisplay.style.display = 'none';
 
+            // Show the content results area
+            const contentResults = document.getElementById('contentResults');
+            if (contentResults) contentResults.style.display = 'grid';
+
             // Show content type filters (only genre and language)
             const contentTypeFilters = document.getElementById('contentTypeFilters');
             if (contentTypeFilters) {
                 contentTypeFilters.style.display = 'flex';
-                // Load genres for TV
                 if (typeof loadGenres === 'function') {
                     loadGenres('tv');
                 }
             }
+
+            // Update button states
+            updateButtonActiveStates();
+            updateRadialOptionStates();
 
             // Load the appropriate content
             if (filter === 'popular' && typeof loadPopularTVShows === 'function') {
@@ -7654,6 +7824,52 @@
                 loadTrendingTVShows();
             } else if (filter === 'now-playing' && typeof loadNowPlayingTVShows === 'function') {
                 loadNowPlayingTVShows();
+            }
+        };
+
+        // Toggle Continue Watching section
+        window.toggleContinueWatching = function() {
+            // Check if Continue Watching is already active - if so, toggle off
+            if (activeContentSection === 'continue-watching') {
+                hideAllContentSections();
+                return;
+            }
+
+            // Close any open radial menus
+            closeAllRadialMenus();
+
+            // Set current state
+            activeContentSection = 'continue-watching';
+            activeContentFilter = null;
+
+            // Hide other sections
+            const contentResults = document.getElementById('contentResults');
+            const watchlistDisplay = document.getElementById('watchlistDisplay');
+            const statisticsDisplay = document.getElementById('statisticsDisplay');
+            const sportsDisplay = document.getElementById('sportsDisplay');
+            const channelsDisplay = document.getElementById('channelsDisplay');
+            const contentTypeFilters = document.getElementById('contentTypeFilters');
+
+            if (contentResults) contentResults.style.display = 'none';
+            if (watchlistDisplay) watchlistDisplay.style.display = 'none';
+            if (statisticsDisplay) statisticsDisplay.style.display = 'none';
+            if (sportsDisplay) sportsDisplay.style.display = 'none';
+            if (channelsDisplay) channelsDisplay.style.display = 'none';
+            if (contentTypeFilters) contentTypeFilters.style.display = 'none';
+
+            // Show Continue Watching display
+            const continueWatchingDisplay = document.getElementById('continueWatchingDisplay');
+            if (continueWatchingDisplay) {
+                continueWatchingDisplay.style.display = 'grid';
+            }
+
+            // Update button states
+            updateButtonActiveStates();
+            updateRadialOptionStates();
+
+            // Load continue watching content if function exists
+            if (typeof displayContinueWatchingInResults === 'function') {
+                displayContinueWatchingInResults();
             }
         };
 
