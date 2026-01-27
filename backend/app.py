@@ -336,11 +336,35 @@ def add_to_favorites():
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/api/favorites/<channel_id>', methods=['DELETE'])
+@app.route('/api/favorites/<path:channel_id>', methods=['DELETE'])
 @jwt_required()
 def remove_from_favorites(channel_id):
     try:
         user_id = get_jwt_identity()
+
+        result = favorites_collection.delete_one({
+            'user_id': ObjectId(user_id),
+            'channel_id': channel_id
+        })
+
+        if result.deleted_count == 0:
+            return jsonify({'error': 'Channel not found in favorites'}), 404
+
+        return jsonify({'message': 'Removed from favorites'}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/favorites/remove', methods=['POST'])
+@jwt_required()
+def remove_from_favorites_post():
+    try:
+        user_id = get_jwt_identity()
+        data = request.get_json()
+        channel_id = data.get('channel_id')
+
+        if not channel_id:
+            return jsonify({'error': 'channel_id is required'}), 400
 
         result = favorites_collection.delete_one({
             'user_id': ObjectId(user_id),

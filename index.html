@@ -23,6 +23,10 @@
             cursor: var(--custom-cursor), auto !important;
         }
 
+        html, body {
+            overflow-x: hidden;
+        }
+
         body {
             font-family: 'VT323', monospace;
             background: #1a1a2e;
@@ -34,6 +38,7 @@
             line-height: 1.6;
             font-weight: 400;
             min-height: 100vh;
+            position: relative;
             image-rendering: pixelated;
             image-rendering: -moz-crisp-edges;
             image-rendering: crisp-edges;
@@ -43,7 +48,20 @@
             max-width: 1400px;
             margin: 0 auto;
             padding: 32px 20px;
+            display: flex;
+            flex-direction: column;
         }
+
+        .container > .hero-header { order: 1; }
+        .container > .header { order: 2; }
+        .container > .search-section { order: 3; }
+        .container > .popular-section { order: 4; }
+        .container > .player-section { order: 5; }
+        .container > #sportsDisplay { order: 6; }
+        .container > #channelsDisplay { order: 6; }
+        .container > #loginModal { order: 7; }
+        .container > #registerModal { order: 8; }
+        .container > #friendsModal { order: 9; }
 
         .header {
             display: flex;
@@ -3198,16 +3216,7 @@
             color: #000;
             box-shadow: 0 0 15px rgba(255, 0, 255, 0.6);
         }
-        [data-theme="jspecial"] #genreFilterBtn {
-            background: linear-gradient(135deg, #ffd700, #ffb700);
-            border-color: #ffd700;
-            color: #000;
-        }
-        [data-theme="jspecial"] #languageFilterBtn {
-            background: linear-gradient(135deg, #ff6b35, #ff8c42);
-            border-color: #ff6b35;
-            color: #000;
-        }
+        /* genre/language filter chip theme overrides moved to .filter-chip section */
 
         /* J's Special - Party and Effects buttons */
         [data-theme="jspecial"] .bg-animation-toggle[onclick*="toggleWatchpartyPanel"] {
@@ -3602,8 +3611,8 @@
 
         .radial-option {
             position: absolute;
-            width: 90px;
-            height: 90px;
+            width: 110px;
+            height: 110px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -3652,8 +3661,8 @@
         }
 
         .radial-option-icon {
-            width: 32px;
-            height: 32px;
+            width: 40px;
+            height: 40px;
             margin-bottom: 4px;
             filter: drop-shadow(0 0 6px rgba(0, 217, 255, 0.5));
             transition: all 0.3s ease;
@@ -3680,41 +3689,41 @@
             text-shadow: 0 0 12px rgba(0, 255, 159, 0.7);
         }
 
-        /* Radial positions for Movies (3 options) - triangle layout */
+        /* Radial positions for Movies (3 options) - triangle layout, ~0.7cm gap from button */
         .radial-menu.active .radial-option:nth-child(1) {
             opacity: 1;
             transform: translate(-50%, -50%) scale(1);
-            top: -140px;
+            top: -150px;
             left: 0;
             transition-delay: 0s;
         }
         .radial-menu.active .radial-option:nth-child(2) {
             opacity: 1;
             transform: translate(-50%, -50%) scale(1);
-            top: 70px;
-            left: -130px;
+            top: 80px;
+            left: -140px;
             transition-delay: 0.05s;
         }
         .radial-menu.active .radial-option:nth-child(3) {
             opacity: 1;
             transform: translate(-50%, -50%) scale(1);
-            top: 70px;
-            left: 130px;
+            top: 80px;
+            left: 140px;
             transition-delay: 0.1s;
         }
 
-        /* TV Shows has 3 options - triangle layout */
+        /* TV Shows has 3 options - triangle layout, ~0.7cm gap from button */
         .radial-menu.tv-menu.active .radial-option:nth-child(1) {
-            top: -140px;
+            top: -150px;
             left: 0;
         }
         .radial-menu.tv-menu.active .radial-option:nth-child(2) {
-            top: 70px;
-            left: -130px;
+            top: 80px;
+            left: -140px;
         }
         .radial-menu.tv-menu.active .radial-option:nth-child(3) {
-            top: 70px;
-            left: 130px;
+            top: 80px;
+            left: 140px;
         }
 
         /* Backdrop overlay when menu is open */
@@ -4786,7 +4795,7 @@
         /* ============= WATCHLIST CONTAINER & PANEL (PHOSPHOR MODERN) ============= */
         .watchlist-container {
             display: none;
-            position: fixed;
+            position: absolute;
             top: 100px;
             left: 20px;
             right: auto;
@@ -5164,7 +5173,7 @@
         /* ============= LIVE SECTION CONTAINER & PANEL ============= */
         .live-container {
             display: none;
-            position: fixed;
+            position: absolute;
             top: 20px;
             right: 20px;
             z-index: 100002;
@@ -5365,7 +5374,7 @@
             position: absolute;
             top: calc(100% + 12px);
             right: 0;
-            width: 300px;
+            width: 360px;
             background: linear-gradient(145deg, #1a1408 0%, #0f0c05 100%);
             border: 3px solid var(--primary-color, #F5A623);
             border-radius: 12px;
@@ -5507,11 +5516,12 @@
         .live-category-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
+            gap: 10px;
         }
 
         .live-category-grid.sports-grid {
             grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
         }
 
         .live-category-btn {
@@ -6089,6 +6099,155 @@
             font-weight: 600;
         }
 
+        /* ============= FILTER CHIP BUTTONS ============= */
+        .filter-chip {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 22px 10px 18px;
+            font-family: 'VT323', monospace;
+            font-size: 22px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            border: none;
+            border-radius: 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            overflow: hidden;
+            clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+        }
+
+        .filter-chip::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .filter-chip:hover::before {
+            opacity: 1;
+        }
+
+        .filter-chip:active {
+            transform: scale(0.96);
+        }
+
+        .filter-chip .filter-chip-icon-img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 4px currentColor);
+            flex-shrink: 0;
+        }
+
+        .filter-chip .filter-chip-text {
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+        }
+
+        /* Genre chip — cyan/teal blade */
+        #genreFilterBtn.filter-chip {
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.15) 0%, rgba(0, 255, 159, 0.1) 100%);
+            color: #00d9ff;
+            box-shadow:
+                inset 0 0 20px rgba(0, 217, 255, 0.1),
+                0 0 12px rgba(0, 217, 255, 0.25),
+                0 2px 8px rgba(0, 0, 0, 0.4);
+            border-left: 3px solid #00d9ff;
+            border-right: 3px solid rgba(0, 255, 159, 0.5);
+        }
+
+        #genreFilterBtn.filter-chip:hover {
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.3) 0%, rgba(0, 255, 159, 0.2) 100%);
+            color: #fff;
+            box-shadow:
+                inset 0 0 30px rgba(0, 217, 255, 0.15),
+                0 0 24px rgba(0, 217, 255, 0.4),
+                0 4px 16px rgba(0, 0, 0, 0.5);
+        }
+
+        #genreFilterBtn.filter-chip::before {
+            background: linear-gradient(90deg, transparent, rgba(0, 217, 255, 0.08), transparent);
+        }
+
+        /* Language chip — magenta/pink blade */
+        #languageFilterBtn.filter-chip {
+            background: linear-gradient(135deg, rgba(255, 0, 255, 0.15) 0%, rgba(217, 70, 239, 0.1) 100%);
+            color: #ff00ff;
+            box-shadow:
+                inset 0 0 20px rgba(255, 0, 255, 0.1),
+                0 0 12px rgba(255, 0, 255, 0.25),
+                0 2px 8px rgba(0, 0, 0, 0.4);
+            border-left: 3px solid #ff00ff;
+            border-right: 3px solid rgba(217, 70, 239, 0.5);
+        }
+
+        #languageFilterBtn.filter-chip:hover {
+            background: linear-gradient(135deg, rgba(255, 0, 255, 0.3) 0%, rgba(217, 70, 239, 0.2) 100%);
+            color: #fff;
+            box-shadow:
+                inset 0 0 30px rgba(255, 0, 255, 0.15),
+                0 0 24px rgba(255, 0, 255, 0.4),
+                0 4px 16px rgba(0, 0, 0, 0.5);
+        }
+
+        #languageFilterBtn.filter-chip::before {
+            background: linear-gradient(90deg, transparent, rgba(255, 0, 255, 0.08), transparent);
+        }
+
+        /* J's Special theme overrides for filter chips */
+        [data-theme="jspecial"] #genreFilterBtn.filter-chip {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 183, 0, 0.12) 100%);
+            color: #ffd700;
+            box-shadow:
+                inset 0 0 20px rgba(255, 215, 0, 0.1),
+                0 0 12px rgba(255, 215, 0, 0.3),
+                0 2px 8px rgba(0, 0, 0, 0.4);
+            border-left: 3px solid #ffd700;
+            border-right: 3px solid rgba(255, 183, 0, 0.5);
+        }
+
+        [data-theme="jspecial"] #genreFilterBtn.filter-chip:hover {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.35) 0%, rgba(255, 183, 0, 0.25) 100%);
+            color: #fff;
+            box-shadow:
+                inset 0 0 30px rgba(255, 215, 0, 0.15),
+                0 0 24px rgba(255, 215, 0, 0.5),
+                0 4px 16px rgba(0, 0, 0, 0.5);
+        }
+
+        [data-theme="jspecial"] #languageFilterBtn.filter-chip {
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.2) 0%, rgba(255, 140, 66, 0.12) 100%);
+            color: #ff6b35;
+            box-shadow:
+                inset 0 0 20px rgba(255, 107, 53, 0.1),
+                0 0 12px rgba(255, 107, 53, 0.3),
+                0 2px 8px rgba(0, 0, 0, 0.4);
+            border-left: 3px solid #ff6b35;
+            border-right: 3px solid rgba(255, 140, 66, 0.5);
+        }
+
+        [data-theme="jspecial"] #languageFilterBtn.filter-chip:hover {
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.35) 0%, rgba(255, 140, 66, 0.25) 100%);
+            color: #fff;
+            box-shadow:
+                inset 0 0 30px rgba(255, 107, 53, 0.15),
+                0 0 24px rgba(255, 107, 53, 0.5),
+                0 4px 16px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Filter chips container */
+        #contentTypeFilters {
+            display: none;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
         /* Background Effects Panel */
         .bg-effects-panel {
             position: fixed;
@@ -6239,7 +6398,7 @@
 
         /* ============= USER MENU DROPDOWN ============= */
         .user-menu-container {
-            position: fixed;
+            position: absolute;
             top: 20px;
             left: 20px;
             z-index: 100002;
@@ -6698,7 +6857,7 @@
     <!-- Live Section Button & Panel -->
     <div id="liveContainer" class="live-container">
         <button id="liveTriggerBtn" onclick="toggleLivePanel()" style="padding: 0; margin: 0; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center;">
-            <img src="live-stream.png" alt="Live" class="live-icon" style="width: 48px; height: 48px; display: block;">
+            <img src="live-stream.png" alt="Live" class="live-icon" style="width: 64px; height: 64px; display: block;">
         </button>
 
         <div class="live-slide-panel" id="liveSlidePanel">
@@ -6742,43 +6901,43 @@
                 </button>
                 <div class="live-category-grid sports-grid">
                     <button class="live-category-btn" onclick="loadSportsCategory('football')" title="Football">
-                        <img src="Icons/LiveIcons/soccer.png" alt="Football" style="width: 32px; height: 32px;">
+                        <img src="Icons/LiveIcons/soccer.png" alt="Football" style="width: 48px; height: 48px;">
                     </button>
                     <button class="live-category-btn" onclick="loadSportsCategory('basketball')" title="Basketball">
-                        <img src="Icons/LiveIcons/basketball.png" alt="Basketball" style="width: 32px; height: 32px;">
+                        <img src="Icons/LiveIcons/basketball.png" alt="Basketball" style="width: 48px; height: 48px;">
                     </button>
                     <button class="live-category-btn" onclick="loadSportsCategory('american-football')" title="American Football">
-                        <img src="Icons/LiveIcons/american-football.png" alt="American Football" style="width: 32px; height: 32px;">
+                        <img src="Icons/LiveIcons/american-football.png" alt="American Football" style="width: 48px; height: 48px;">
                     </button>
                     <button class="live-category-btn" onclick="loadSportsCategory('hockey')" title="Hockey">
-                        <img src="Icons/LiveIcons/ice-hockey.png" alt="Hockey" style="width: 32px; height: 32px;">
+                        <img src="Icons/LiveIcons/ice-hockey.png" alt="Hockey" style="width: 48px; height: 48px;">
                     </button>
                     <button class="live-category-btn" onclick="loadSportsCategory('baseball')" title="Baseball">
-                        <img src="Icons/LiveIcons/baseball-player.png" alt="Baseball" style="width: 32px; height: 32px;">
+                        <img src="Icons/LiveIcons/baseball-player.png" alt="Baseball" style="width: 48px; height: 48px;">
                     </button>
                     <button class="live-category-btn" onclick="loadSportsCategory('motor-sports')" title="Motor Sports">
-                        <img src="Icons/LiveIcons/f1.png" alt="Motor Sports" style="width: 32px; height: 32px;">
+                        <img src="Icons/LiveIcons/f1.png" alt="Motor Sports" style="width: 48px; height: 48px;">
                     </button>
                     <button class="live-category-btn" onclick="loadSportsCategory('fight')" title="Fight">
-                        <img src="Icons/LiveIcons/wrestling.png" alt="Fight" style="width: 32px; height: 32px;">
+                        <img src="Icons/LiveIcons/wrestling.png" alt="Fight" style="width: 48px; height: 48px;">
                     </button>
                     <button class="live-category-btn" onclick="loadSportsCategory('tennis')" title="Tennis">
-                        <img src="Icons/LiveIcons/smash.png" alt="Tennis" style="width: 32px; height: 32px;">
+                        <img src="Icons/LiveIcons/smash.png" alt="Tennis" style="width: 48px; height: 48px;">
                     </button>
                     <button class="live-category-btn" onclick="loadSportsCategory('rugby')" title="Rugby">
-                        <img src="Icons/LiveIcons/rugby.png" alt="Rugby" style="width: 32px; height: 32px;">
+                        <img src="Icons/LiveIcons/rugby.png" alt="Rugby" style="width: 48px; height: 48px;">
                     </button>
                     <button class="live-category-btn" onclick="loadSportsCategory('golf')" title="Golf">
-                        <img src="Icons/LiveIcons/golf-player.png" alt="Golf" style="width: 32px; height: 32px;">
+                        <img src="Icons/LiveIcons/golf-player.png" alt="Golf" style="width: 48px; height: 48px;">
                     </button>
                     <button class="live-category-btn" onclick="loadSportsCategory('cricket')" title="Cricket">
-                        <img src="Icons/LiveIcons/cricket.png" alt="Cricket" style="width: 32px; height: 32px;">
+                        <img src="Icons/LiveIcons/cricket.png" alt="Cricket" style="width: 48px; height: 48px;">
                     </button>
                     <button class="live-category-btn" onclick="loadSportsCategory('darts')" title="Darts">
-                        <img src="Icons/LiveIcons/dart.png" alt="Darts" style="width: 32px; height: 32px;">
+                        <img src="Icons/LiveIcons/dart.png" alt="Darts" style="width: 48px; height: 48px;">
                     </button>
                     <button class="live-category-btn" onclick="loadSportsCategory('other')" title="Other">
-                        <img src="Icons/LiveIcons/other.png" alt="Other" style="width: 32px; height: 32px;">
+                        <img src="Icons/LiveIcons/other.png" alt="Other" style="width: 48px; height: 48px;">
                     </button>
                 </div>
             </div>
@@ -6799,17 +6958,17 @@
         </button>
         <div class="user-menu-dropdown" id="userMenuDropdown">
             <button class="user-menu-item" onclick="showLoginModal(); closeUserMenu();">
-                <span style="margin-right: 8px;">👤</span> Login
+                <span style="font-size: 28px; margin-right: 10px;">👤</span> Login
             </button>
             <button class="user-menu-item" onclick="showRegisterModal(); closeUserMenu();">
-                <span style="margin-right: 8px;">✨</span> Sign Up
+                <span style="font-size: 28px; margin-right: 10px;">✨</span> Sign Up
             </button>
         </div>
     </div>
 
     <!-- Theme Selector Button -->
     <!-- Top-right Control Button -->
-    <div style="position: fixed; top: 20px; right: 20px; z-index: 100001;">
+    <div style="position: absolute; top: 20px; right: 20px; z-index: 100001;">
         <button class="bg-animation-toggle" onclick="toggleWatchpartyPanel()">▶ Party</button>
     </div>
 
@@ -7056,13 +7215,12 @@
 
             <div class="player-controls">
                 <button onclick="playNextEpisode()" class="btn" id="nextEpisodeBtn" style="display: none;"><img src="Icons/next-episode.png" alt="Next" style="width: 18px; height: 18px; margin-right: 6px; vertical-align: middle;"> Next Episode</button>
-                <button onclick="toggleFullscreen()" class="btn btn-secondary"><img src="Icons/fullscreen.png" alt="Fullscreen" style="width: 18px; height: 18px; margin-right: 6px; vertical-align: middle;"> Fullscreen</button>
+                <button onclick="toggleFullscreen()" class="btn btn-secondary"><img src="Icons/fullscreen.png" alt="Fullscreen" style="width: 38px; height: 38px; vertical-align: middle;"></button>
                 <button id="sportsSourceBtn" class="btn btn-secondary" onclick="switchSportsSource()" style="display: none;">
                     <span id="sportsSourceBtnText">Source 1</span>
                 </button>
                 <button onclick="toggleComments()" class="btn btn-secondary" id="commentsBtn" style="display: none;"><img src="Icons/comments.png" alt="Comments" style="width: 18px; height: 18px; margin-right: 6px; vertical-align: middle;"> Comments</button>
-                <button onclick="copyCurrentUrl()" class="btn btn-secondary">Copy URL</button>
-                <button onclick="stopPlayback()" class="btn btn-secondary" id="stopBtn" style="display: none;"><img src="Icons/stop-sign.png" alt="Stop" style="width: 18px; height: 18px; margin-right: 6px; vertical-align: middle;"> Stop</button>
+                <button onclick="stopPlayback()" class="btn btn-secondary" id="stopBtn" style="display: none;"><img src="Icons/stop-sign.png" alt="Stop" style="width: 38px; height: 38px; vertical-align: middle;"></button>
 
                 <!-- Source Dropdown Menu -->
                 <div class="source-menu-container" id="sourceMenuContainer" style="display: none;">
@@ -7360,13 +7518,15 @@
                 <button class="tab" onclick="showTab('tv-shows')" id="tvShowsTab">TV Shows</button>
             </div>
 
-            <!-- Content Type Filters (shown for Movies/TV Shows tabs) - Only Genre and Language filters remain -->
-            <div id="contentTypeFilters" style="display: none; margin-top: 16px; text-align: center; gap: 12px; justify-content: center; flex-wrap: wrap;">
-                <button class="bg-animation-toggle" onclick="toggleGenreModal()" id="genreFilterBtn">
-                    ◆ Filter by Genre
+            <!-- Content Type Filters (shown for Movies/TV Shows tabs) -->
+            <div id="contentTypeFilters">
+                <button class="filter-chip" onclick="toggleGenreModal()" id="genreFilterBtn">
+                    <img src="Icons/genre.png" alt="Genre" class="filter-chip-icon-img">
+                    <span class="filter-chip-text">Genre</span>
                 </button>
-                <button class="bg-animation-toggle" onclick="toggleLanguageModal()" id="languageFilterBtn">
-                    ◆ Filter by Language
+                <button class="filter-chip" onclick="toggleLanguageModal()" id="languageFilterBtn">
+                    <img src="Icons/language.png" alt="Language" class="filter-chip-icon-img">
+                    <span class="filter-chip-text">Language</span>
                 </button>
             </div>
 
@@ -7465,54 +7625,55 @@
             <div id="continueWatchingDisplay" class="horizontal-scroll-container" style="display: none;"></div>
             <div id="watchlistDisplay" class="horizontal-scroll-container" style="display: none;"></div>
             <div id="statisticsDisplay" style="display: none; padding: 20px;"></div>
-            <div id="sportsDisplay" style="display: none; padding: 20px;">
-                <!-- Sports Search -->
-                <div style="margin-bottom: 24px;">
-                    <div style="position: relative; display: flex; gap: 8px; align-items: center;">
-                        <input type="text" id="sportsSearchInput" class="search-input"
-                               placeholder="Search matches, teams, sports..."
-                               autocomplete="off"
-                               oninput="searchSportsMatches()"
-                               onkeypress="if(event.key === 'Enter') searchSportsMatches()"
-                               style="flex: 1;">
-                        <button onclick="clearSportsSearch()" class="btn btn-secondary" style="padding: 12px 24px; font-size: 20px; display: none; white-space: nowrap;" id="clearSportsSearchBtn">
-                            Clear
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Sports Filters -->
-                <div id="sportsFilters" style="margin-bottom: 24px; display: flex; justify-content: center;">
-                    <button onclick="toggleLiveFilter()" id="liveSportsBtn" style="padding: 0; margin: 0; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 12px; transition: box-shadow 0.3s ease, filter 0.3s ease;">
-                        <img src="Icons/live-now.png" alt="Live Now" style="width: 100px; height: 100px; display: block; border-radius: 12px;">
-                    </button>
-                </div>
-
-                <!-- Sports Matches Grid -->
-                <div id="sportsMatches" style="margin-top: 24px;"></div>
-            </div>
-            <div id="channelsDisplay" style="display: none; padding: 20px;">
-                <!-- Channels Search -->
-                <div style="margin-bottom: 24px;">
-                    <div style="position: relative; display: flex; gap: 8px; align-items: center;">
-                        <input type="text" id="channelsSearchInput" class="search-input"
-                               placeholder="Search channels..."
-                               autocomplete="off"
-                               oninput="searchChannels()"
-                               onkeypress="if(event.key === 'Enter') searchChannels()"
-                               style="flex: 1;">
-                        <button onclick="clearChannelsSearch()" class="btn btn-secondary" style="padding: 12px 24px; font-size: 20px; display: none; white-space: nowrap;" id="clearChannelsSearchBtn">
-                            Clear
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Channels Grid -->
-                <div id="liveChannels" style="margin-top: 24px;"></div>
-            </div>
             <div id="loadingIndicator" class="loading" style="display: none;">
                 <div>Loading content...</div>
             </div>
+        </div>
+
+        <div id="sportsDisplay" style="display: none; padding: 20px;">
+            <!-- Sports Search -->
+            <div style="margin-bottom: 24px;">
+                <div style="position: relative; display: flex; gap: 8px; align-items: center;">
+                    <input type="text" id="sportsSearchInput" class="search-input"
+                           placeholder="Search matches, teams, sports..."
+                           autocomplete="off"
+                           oninput="searchSportsMatches()"
+                           onkeypress="if(event.key === 'Enter') searchSportsMatches()"
+                           style="flex: 1;">
+                    <button onclick="clearSportsSearch()" class="btn btn-secondary" style="padding: 12px 24px; font-size: 20px; display: none; white-space: nowrap;" id="clearSportsSearchBtn">
+                        Clear
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sports Filters -->
+            <div id="sportsFilters" style="margin-bottom: 24px; display: flex; justify-content: center;">
+                <button onclick="toggleLiveFilter()" id="liveSportsBtn" style="padding: 0; margin: 0; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 12px; transition: box-shadow 0.3s ease, filter 0.3s ease;">
+                    <img src="Icons/live-now.png" alt="Live Now" style="width: 100px; height: 100px; display: block; border-radius: 12px;">
+                </button>
+            </div>
+
+            <!-- Sports Matches Grid -->
+            <div id="sportsMatches" style="margin-top: 24px;"></div>
+        </div>
+        <div id="channelsDisplay" style="display: none; padding: 20px;">
+            <!-- Channels Search -->
+            <div style="margin-bottom: 24px;">
+                <div style="position: relative; display: flex; gap: 8px; align-items: center;">
+                    <input type="text" id="channelsSearchInput" class="search-input"
+                           placeholder="Search channels..."
+                           autocomplete="off"
+                           oninput="searchChannels()"
+                           onkeypress="if(event.key === 'Enter') searchChannels()"
+                           style="flex: 1;">
+                    <button onclick="clearChannelsSearch()" class="btn btn-secondary" style="padding: 12px 24px; font-size: 20px; display: none; white-space: nowrap;" id="clearChannelsSearchBtn">
+                        Clear
+                    </button>
+                </div>
+            </div>
+
+            <!-- Channels Grid -->
+            <div id="liveChannels" style="margin-top: 24px;"></div>
         </div>
     </div>
 
@@ -14747,7 +14908,7 @@
                         align-items: center;
                         justify-content: center;
                     ">
-                        <img src="${sportIconPath}" alt="${sportDisplay}" style="width: 32px; height: 32px; object-fit: contain;">
+                        <img src="${sportIconPath}" alt="${sportDisplay}" style="width: 48px; height: 48px; object-fit: contain;">
                     </div>
 
                     <!-- Teams/Match -->
@@ -15847,23 +16008,23 @@
                 userMenuDropdown.innerHTML = `
                     <div class="user-menu-username">@${currentUser.username}</div>
                     <button class="user-menu-item" onclick="showFriendsModal(); closeUserMenu();">
-                        ${friendsIcon ? `<img src="${friendsIcon}" alt="Friends" style="width: 20px; height: 20px; image-rendering: pixelated; margin-right: 8px;">` : '<span style="margin-right: 8px;">👥</span>'} Friends
+                        ${friendsIcon ? `<img src="${friendsIcon}" alt="Friends" style="width: 32px; height: 32px; image-rendering: pixelated; margin-right: 10px;">` : '<span style="font-size: 28px; margin-right: 10px;">👥</span>'} Friends
                     </button>
                     <button class="user-menu-item" onclick="toggleThemeSelector(); closeUserMenu();">
-                        <img src="Icons/theme.png" alt="Theme" style="width: 20px; height: 20px; margin-right: 8px;"> Theme
+                        <img src="Icons/theme.png" alt="Theme" style="width: 32px; height: 32px; margin-right: 10px;"> Theme
                     </button>
                     <button class="user-menu-item" onclick="toggleEffectsPanel(); closeUserMenu();">
-                        <img src="Icons/effect.png" alt="Effects" style="width: 20px; height: 20px; margin-right: 8px;"> Effects
+                        <img src="Icons/effect.png" alt="Effects" style="width: 32px; height: 32px; margin-right: 10px;"> Effects
                     </button>
                     <button class="user-menu-item" onclick="toggleWatchpartyPanel(); closeUserMenu();">
-                        <img src="Icons/party.png" alt="Party" style="width: 20px; height: 20px; margin-right: 8px;"> Party
+                        <img src="Icons/party.png" alt="Party" style="width: 32px; height: 32px; margin-right: 10px;"> Party
                     </button>
                     <div class="user-menu-divider"></div>
                     <button class="user-menu-item" onclick="showTab('statistics'); closeUserMenu();">
-                        <img src="Icons/stats.png" alt="Stats" style="width: 20px; height: 20px; margin-right: 8px;"> Stats
+                        <img src="Icons/stats.png" alt="Stats" style="width: 32px; height: 32px; margin-right: 10px;"> Stats
                     </button>
-                    <button class="user-menu-item" onclick="logout(); closeUserMenu();">
-                        ${logoutIcon ? `<img src="${logoutIcon}" alt="Logout" style="width: 20px; height: 20px; image-rendering: pixelated; margin-right: 8px;">` : '<span style="margin-right: 8px;">🚪</span>'} Logout
+                    <button class="user-menu-item" onclick="logout(); closeUserMenu();" style="justify-content: center; padding: 0;">
+                        <img src="Icons/logout.png" alt="Logout" style="width: 120px; height: 100px; display: block;">
                     </button>
                 `;
             } else {
@@ -15883,10 +16044,10 @@
                 // Populate dropdown for guest user
                 userMenuDropdown.innerHTML = `
                     <button class="user-menu-item" onclick="showLoginModal(); closeUserMenu();">
-                        ${userIcon ? `<img src="${userIcon}" alt="Login" style="width: 20px; height: 20px; image-rendering: pixelated; margin-right: 8px;">` : '<span style="margin-right: 8px;">👤</span>'} Login
+                        ${userIcon ? `<img src="${userIcon}" alt="Login" style="width: 32px; height: 32px; image-rendering: pixelated; margin-right: 10px;">` : '<span style="font-size: 28px; margin-right: 10px;">👤</span>'} Login
                     </button>
                     <button class="user-menu-item" onclick="showRegisterModal(); closeUserMenu();">
-                        <span style="margin-right: 8px;">✨</span> Sign Up
+                        <span style="font-size: 28px; margin-right: 10px;">✨</span> Sign Up
                     </button>
                 `;
             }
@@ -16184,11 +16345,23 @@
             if (!authToken) return;
 
             try {
-                await apiRequest(`/favorites/${channelId}`, { method: 'DELETE' });
+                await apiRequest('/favorites/' + encodeURIComponent(channelId), {
+                    method: 'DELETE'
+                });
                 showStatus('Removed from favorites');
                 await loadFavorites();
             } catch (error) {
-                showError(error.message);
+                // Fallback: try POST route
+                try {
+                    await apiRequest('/favorites/remove', {
+                        method: 'POST',
+                        body: JSON.stringify({ channel_id: channelId })
+                    });
+                    showStatus('Removed from favorites');
+                    await loadFavorites();
+                } catch (e2) {
+                    showError(e2.message);
+                }
             }
         }
 
