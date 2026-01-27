@@ -4992,6 +4992,65 @@
             display: block;
         }
 
+        /* J's Special - Show floating search */
+        [data-theme="jspecial"] .floating-search {
+            display: block;
+        }
+
+        /* J's Special - Floating Search Button */
+        [data-theme="jspecial"] .floating-search-btn {
+            background: linear-gradient(135deg, #ffd700, #ffb700);
+            border: 3px solid #ffd700;
+            color: #000;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+        }
+
+        [data-theme="jspecial"] .floating-search-btn:hover {
+            background: linear-gradient(135deg, #ffb700, #ffd700);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+            transform: translateY(-3px) scale(1.1);
+        }
+
+        /* J's Special - Floating Search Panel */
+        [data-theme="jspecial"] .floating-search-panel {
+            background: linear-gradient(145deg, rgba(15, 15, 30, 0.98), rgba(30, 15, 45, 0.98));
+            border: 3px solid #ffd700;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+        }
+
+        [data-theme="jspecial"] .floating-search-header {
+            border-bottom: 2px solid rgba(255, 215, 0, 0.4);
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 183, 0, 0.2));
+            color: #ffd700;
+        }
+
+        [data-theme="jspecial"] .floating-search-input {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 215, 0, 0.4);
+            color: #fff;
+        }
+
+        [data-theme="jspecial"] .floating-search-input:focus {
+            border-color: #ffd700;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+
+        [data-theme="jspecial"] .floating-search-result-item {
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        [data-theme="jspecial"] .floating-search-result-item:hover {
+            background: rgba(255, 215, 0, 0.15);
+        }
+
+        [data-theme="jspecial"] .floating-search-result-title {
+            color: #fff;
+        }
+
+        [data-theme="jspecial"] .floating-search-result-year {
+            color: #ffd700;
+        }
+
         /* J's Special - Hide the Party button in top-right */
         [data-theme="jspecial"] .bg-animation-toggle[onclick*="toggleWatchpartyPanel"] {
             display: none;
@@ -12898,20 +12957,21 @@
                 }
             });
 
-            // Handle phosphor theme specific elements
-            updatePhosphorElements(themeName === 'phosphor');
+            // Handle phosphor/jspecial theme specific elements
+            updateModernThemeElements(themeName);
         }
 
-        // Show/hide phosphor-specific UI elements
-        function updatePhosphorElements(isPhosphor) {
+        // Show/hide modern theme UI elements (phosphor and jspecial)
+        function updateModernThemeElements(themeName) {
+            const isModernTheme = themeName === 'phosphor' || themeName === 'jspecial';
             const scanlines = document.getElementById('crtScanlines');
             const curvature = document.getElementById('crtCurvature');
             const powerLed = document.getElementById('crtPowerLed');
             const floatingSearch = document.getElementById('floatingSearch');
             const watchlistContainer = document.getElementById('watchlistContainer');
 
-            if (isPhosphor) {
-                // Modern phosphor theme - hide all CRT effects
+            if (isModernTheme) {
+                // Modern themes - hide all CRT effects
                 if (scanlines) scanlines.style.display = 'none';
                 if (curvature) curvature.style.display = 'none';
                 if (powerLed) powerLed.style.display = 'none';
