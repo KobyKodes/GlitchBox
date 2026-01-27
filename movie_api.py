@@ -8,7 +8,7 @@ Provides REST API for movie search and streaming URL generation
 import eventlet
 eventlet.monkey_patch()
 
-from flask import Flask, request, jsonify, render_template_string, send_file, Response
+from flask import Flask, request, jsonify, render_template_string, send_file, Response, send_from_directory
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room, leave_room, rooms
 import requests
@@ -896,6 +896,12 @@ def index():
 def favicon():
     """Return empty response for favicon to prevent 404 errors"""
     return '', 204
+
+@app.route('/<path:filename>')
+def serve_static(filename):
+    """Serve static files (images, JS, CSS) from the root directory"""
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    return send_from_directory(current_dir, filename)
 
 @app.route('/api/search')
 def search_movies():

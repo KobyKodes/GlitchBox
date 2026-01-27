@@ -1335,6 +1335,12 @@
             margin: 24px 0;
         }
 
+        #continueWatchingDisplay {
+            max-width: 580px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
         @media (min-width: 1400px) {
             .horizontal-scroll-container {
                 grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -3566,10 +3572,19 @@
             align-items: center;
             padding: 16px 24px;
             margin-bottom: 20px;
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 580px;
             background: linear-gradient(145deg, rgba(26, 20, 8, 0.8) 0%, rgba(15, 12, 5, 0.9) 100%);
             border: 2px solid var(--primary-color, #F5A623);
             border-radius: 12px;
             box-shadow: 0 0 20px rgba(245, 166, 35, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .section-header-bar:hover {
+            box-shadow: 0 0 30px rgba(245, 166, 35, 0.4);
+            transform: translateY(-2px);
         }
 
         .section-title {
@@ -6321,7 +6336,12 @@
             <span id="userMenuText" style="display: none;"></span>
         </button>
         <div class="user-menu-dropdown" id="userMenuDropdown">
-            <!-- Content dynamically populated by updateAuthUI() -->
+            <button class="user-menu-item" onclick="showLoginModal(); closeUserMenu();">
+                <span style="margin-right: 8px;">👤</span> Login
+            </button>
+            <button class="user-menu-item" onclick="showRegisterModal(); closeUserMenu();">
+                <span style="margin-right: 8px;">✨</span> Sign Up
+            </button>
         </div>
     </div>
 
@@ -6831,7 +6851,7 @@
 
         <div class="popular-section">
             <!-- Continue Watching Header -->
-            <div class="section-header-bar">
+            <div class="section-header-bar" onclick="showTab('continue-watching')" style="cursor: pointer;">
                 <h2 class="section-title">Continue Watching</h2>
             </div>
 
@@ -14919,6 +14939,11 @@
             const userMenuText = document.getElementById('userMenuText');
             const userMenuIcon = document.getElementById('userMenuIcon');
 
+            // Get icon sources with fallback
+            const userIcon = (typeof BASE64_IMAGES !== 'undefined' && BASE64_IMAGES.USER_ICON) ? BASE64_IMAGES.USER_ICON : '';
+            const friendsIcon = (typeof BASE64_IMAGES !== 'undefined' && BASE64_IMAGES.FRIENDS_ICON) ? BASE64_IMAGES.FRIENDS_ICON : '';
+            const logoutIcon = (typeof BASE64_IMAGES !== 'undefined' && BASE64_IMAGES.LOGOUT_ICON) ? BASE64_IMAGES.LOGOUT_ICON : '';
+
             if (authToken && currentUser) {
                 // Hide old buttons
                 authButtons.style.display = 'none';
@@ -14938,7 +14963,7 @@
                 userMenuDropdown.innerHTML = `
                     <div class="user-menu-username">@${currentUser.username}</div>
                     <button class="user-menu-item" onclick="showFriendsModal(); closeUserMenu();">
-                        <img src="${BASE64_IMAGES.FRIENDS_ICON}" alt="Friends" style="width: 20px; height: 20px; image-rendering: pixelated; margin-right: 8px;"> Friends
+                        ${friendsIcon ? `<img src="${friendsIcon}" alt="Friends" style="width: 20px; height: 20px; image-rendering: pixelated; margin-right: 8px;">` : '<span style="margin-right: 8px;">👥</span>'} Friends
                     </button>
                     <button class="user-menu-item" onclick="toggleThemeSelector(); closeUserMenu();">
                         <span class="menu-icon">🎨</span> Theme
@@ -14954,7 +14979,7 @@
                         <span class="menu-icon">📊</span> Stats
                     </button>
                     <button class="user-menu-item" onclick="logout(); closeUserMenu();">
-                        <img src="${BASE64_IMAGES.LOGOUT_ICON}" alt="Logout" style="width: 20px; height: 20px; image-rendering: pixelated; margin-right: 8px;"> Logout
+                        ${logoutIcon ? `<img src="${logoutIcon}" alt="Logout" style="width: 20px; height: 20px; image-rendering: pixelated; margin-right: 8px;">` : '<span style="margin-right: 8px;">🚪</span>'} Logout
                     </button>
                 `;
             } else {
@@ -14974,10 +14999,10 @@
                 // Populate dropdown for guest user
                 userMenuDropdown.innerHTML = `
                     <button class="user-menu-item" onclick="showLoginModal(); closeUserMenu();">
-                        <img src="${BASE64_IMAGES.USER_ICON}" alt="Login" style="width: 20px; height: 20px; image-rendering: pixelated; margin-right: 8px;"> Login
+                        ${userIcon ? `<img src="${userIcon}" alt="Login" style="width: 20px; height: 20px; image-rendering: pixelated; margin-right: 8px;">` : '<span style="margin-right: 8px;">👤</span>'} Login
                     </button>
                     <button class="user-menu-item" onclick="showRegisterModal(); closeUserMenu();">
-                        <span>✨</span> Sign Up
+                        <span style="margin-right: 8px;">✨</span> Sign Up
                     </button>
                 `;
             }
