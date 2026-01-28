@@ -3795,6 +3795,11 @@
 
         /* Responsive Hero */
         @media (max-width: 768px) {
+            .hero-header {
+                padding: 24px 12px 16px;
+                margin-bottom: 12px;
+            }
+
             .hero-title {
                 font-size: 1.8rem;
             }
@@ -3804,8 +3809,9 @@
             }
 
             .hero-nav-buttons {
-                gap: 20px;
+                gap: 16px;
                 flex-wrap: wrap;
+                padding: 0 12px;
             }
 
             .hero-center-spacer {
@@ -3813,16 +3819,462 @@
             }
 
             .hero-nav-btn {
-                padding: 16px 24px;
+                padding: 14px 20px;
+                gap: 8px;
             }
 
             .hero-nav-icon {
-                width: 48px;
-                height: 48px;
+                width: 44px;
+                height: 44px;
             }
 
             .hero-nav-label {
                 font-size: 1rem;
+            }
+
+            /* Radial menu options - tablet */
+            .radial-option {
+                width: 85px;
+                height: 85px;
+            }
+
+            .radial-option-icon {
+                width: 32px;
+                height: 32px;
+            }
+
+            .radial-option-label {
+                font-size: 10px;
+            }
+
+            .radial-menu.active .radial-option:nth-child(1) {
+                top: -120px;
+                left: 0;
+            }
+
+            .radial-menu.active .radial-option:nth-child(2) {
+                top: 60px;
+                left: -110px;
+            }
+
+            .radial-menu.active .radial-option:nth-child(3) {
+                top: 60px;
+                left: 110px;
+            }
+
+            .radial-menu.tv-menu.active .radial-option:nth-child(1) {
+                top: -120px;
+                left: 0;
+            }
+
+            .radial-menu.tv-menu.active .radial-option:nth-child(2) {
+                top: 60px;
+                left: -110px;
+            }
+
+            .radial-menu.tv-menu.active .radial-option:nth-child(3) {
+                top: 60px;
+                left: 110px;
+            }
+
+            /* Section header bar - tablet */
+            .section-header-bar {
+                max-width: 440px;
+                padding: 12px 20px;
+                margin-bottom: 14px;
+            }
+
+            .section-title {
+                font-size: 1.2rem;
+            }
+
+            /* Filter chips - tablet */
+            #contentTypeFilters {
+                gap: 8px;
+            }
+
+            .filter-chip {
+                padding: 8px 16px 8px 14px;
+                font-size: 18px;
+            }
+
+            .filter-chip .filter-chip-icon-img {
+                width: 20px;
+                height: 20px;
+            }
+
+            /* User menu - tablet */
+            .user-menu-container {
+                top: 12px;
+                left: 12px;
+            }
+
+            .user-menu-btn {
+                padding: 10px 12px;
+                font-size: 20px;
+            }
+
+            .user-menu-btn img {
+                width: 24px !important;
+                height: 24px !important;
+            }
+
+            /* Watchlist container - tablet */
+            .watchlist-container {
+                top: 72px;
+                left: 12px;
+            }
+
+            .watchlist-trigger-btn {
+                padding: 10px 16px;
+                font-size: 15px;
+            }
+
+            .watchlist-trigger-btn img {
+                width: 18px !important;
+                height: 18px !important;
+            }
+
+            .watchlist-slide-panel {
+                width: calc(100vw - 40px);
+                max-width: 340px;
+            }
+
+            /* Live container - tablet */
+            .live-container {
+                top: 12px;
+                right: 12px;
+            }
+
+            #liveTriggerBtn img {
+                width: 48px !important;
+                height: 48px !important;
+            }
+
+            .live-slide-panel {
+                width: calc(100vw - 40px);
+                max-width: 320px;
+            }
+
+            /* Content grid - tablet */
+            .content-results {
+                gap: 16px;
+            }
+
+            #continueWatchingDisplay,
+            .horizontal-scroll-container {
+                gap: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-header {
+                padding: 16px 8px 12px;
+                margin-bottom: 8px;
+            }
+
+            .hero-title {
+                font-size: 1.4rem;
+            }
+
+            .hero-subtitle {
+                font-size: 0.85rem;
+                letter-spacing: 0.1em;
+            }
+
+            .hero-nav-buttons {
+                gap: 12px;
+                padding: 0 8px;
+            }
+
+            .hero-nav-btn {
+                padding: 12px 16px;
+                gap: 6px;
+                border-width: 2px;
+                border-radius: 12px;
+            }
+
+            .hero-nav-icon {
+                width: 36px;
+                height: 36px;
+            }
+
+            .hero-nav-label {
+                font-size: 0.85rem;
+            }
+
+            /* Radial menu options - mobile */
+            .radial-option {
+                width: 72px;
+                height: 72px;
+                border-width: 2px;
+            }
+
+            .radial-option-icon {
+                width: 26px;
+                height: 26px;
+                margin-bottom: 2px;
+            }
+
+            .radial-option-label {
+                font-size: 9px;
+            }
+
+            .radial-menu.active .radial-option:nth-child(1) {
+                top: -100px;
+                left: 0;
+            }
+
+            .radial-menu.active .radial-option:nth-child(2) {
+                top: 50px;
+                left: -88px;
+            }
+
+            .radial-menu.active .radial-option:nth-child(3) {
+                top: 50px;
+                left: 88px;
+            }
+
+            .radial-menu.tv-menu.active .radial-option:nth-child(1) {
+                top: -100px;
+                left: 0;
+            }
+
+            .radial-menu.tv-menu.active .radial-option:nth-child(2) {
+                top: 50px;
+                left: -88px;
+            }
+
+            .radial-menu.tv-menu.active .radial-option:nth-child(3) {
+                top: 50px;
+                left: 88px;
+            }
+
+            /* Section header bar - mobile */
+            .section-header-bar {
+                max-width: 100%;
+                padding: 10px 16px;
+                margin-bottom: 12px;
+                margin-left: 8px;
+                margin-right: 8px;
+                border-radius: 10px;
+            }
+
+            .section-title {
+                font-size: 1.05rem;
+                letter-spacing: 0.1em;
+            }
+
+            /* Filter chips - mobile */
+            #contentTypeFilters {
+                gap: 6px;
+            }
+
+            .filter-chip {
+                padding: 6px 14px 6px 10px;
+                font-size: 16px;
+                gap: 6px;
+            }
+
+            .filter-chip .filter-chip-icon-img {
+                width: 18px;
+                height: 18px;
+            }
+
+            /* User menu - mobile */
+            .user-menu-container {
+                top: 8px;
+                left: 8px;
+            }
+
+            .user-menu-btn {
+                padding: 8px 10px;
+                font-size: 18px;
+                border-radius: 8px;
+                gap: 6px;
+            }
+
+            .user-menu-btn img {
+                width: 22px !important;
+                height: 22px !important;
+            }
+
+            .user-menu-dropdown {
+                min-width: 170px;
+            }
+
+            .user-menu-item {
+                padding: 10px 12px;
+                font-size: 17px;
+            }
+
+            /* Watchlist container - mobile */
+            .watchlist-container {
+                top: 58px;
+                left: 8px;
+            }
+
+            .watchlist-trigger-btn {
+                padding: 8px 12px;
+                font-size: 14px;
+                border-radius: 8px;
+                gap: 6px;
+            }
+
+            .watchlist-trigger-btn img {
+                width: 16px !important;
+                height: 16px !important;
+            }
+
+            .watchlist-slide-panel {
+                width: calc(100vw - 24px);
+                max-width: none;
+                left: -8px;
+            }
+
+            /* Live container - mobile */
+            .live-container {
+                top: 8px;
+                right: 8px;
+            }
+
+            #liveTriggerBtn img {
+                width: 40px !important;
+                height: 40px !important;
+            }
+
+            .live-slide-panel {
+                width: calc(100vw - 24px);
+                max-width: none;
+                right: -8px;
+            }
+
+            .live-option-btn.live-option-btn-icon-only img {
+                width: 40px !important;
+                height: 40px !important;
+            }
+
+            /* Content grid - mobile */
+            .content-results {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 12px;
+            }
+
+            #continueWatchingDisplay,
+            .horizontal-scroll-container {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 12px;
+                margin: 12px 0;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .hero-title {
+                font-size: 1.2rem;
+            }
+
+            .hero-nav-buttons {
+                gap: 10px;
+                padding: 0 4px;
+            }
+
+            .hero-nav-btn {
+                padding: 10px 14px;
+                gap: 5px;
+            }
+
+            .hero-nav-icon {
+                width: 30px;
+                height: 30px;
+            }
+
+            .hero-nav-label {
+                font-size: 0.75rem;
+            }
+
+            /* Radial menu - very small screens */
+            .radial-option {
+                width: 62px;
+                height: 62px;
+            }
+
+            .radial-option-icon {
+                width: 22px;
+                height: 22px;
+                margin-bottom: 1px;
+            }
+
+            .radial-option-label {
+                font-size: 8px;
+            }
+
+            .radial-menu.active .radial-option:nth-child(1) {
+                top: -85px;
+                left: 0;
+            }
+
+            .radial-menu.active .radial-option:nth-child(2) {
+                top: 42px;
+                left: -75px;
+            }
+
+            .radial-menu.active .radial-option:nth-child(3) {
+                top: 42px;
+                left: 75px;
+            }
+
+            .radial-menu.tv-menu.active .radial-option:nth-child(1) {
+                top: -85px;
+                left: 0;
+            }
+
+            .radial-menu.tv-menu.active .radial-option:nth-child(2) {
+                top: 42px;
+                left: -75px;
+            }
+
+            .radial-menu.tv-menu.active .radial-option:nth-child(3) {
+                top: 42px;
+                left: 75px;
+            }
+
+            .section-header-bar {
+                padding: 8px 12px;
+            }
+
+            .section-title {
+                font-size: 0.95rem;
+            }
+
+            .user-menu-btn {
+                padding: 6px 8px;
+                font-size: 16px;
+            }
+
+            .user-menu-btn img {
+                width: 20px !important;
+                height: 20px !important;
+            }
+
+            .watchlist-container {
+                top: 50px;
+            }
+
+            .watchlist-trigger-btn {
+                padding: 6px 10px;
+                font-size: 13px;
+            }
+
+            #liveTriggerBtn img {
+                width: 34px !important;
+                height: 34px !important;
+            }
+
+            .content-results,
+            #continueWatchingDisplay,
+            .horizontal-scroll-container {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 10px;
             }
         }
         /* ============= END HERO HEADER SECTION ============= */
@@ -5152,22 +5604,6 @@
             font-size: 15px;
             color: var(--text-secondary, #A39E94);
             line-height: 1.5;
-        }
-
-        /* Mobile adjustments */
-            .watchlist-slide-panel {
-                width: calc(100vw - 40px);
-                max-width: 340px;
-            }
-
-            .watchlist-slide-list-card {
-                padding: 14px;
-            }
-
-            .watchlist-item-poster {
-                width: 56px;
-                height: 84px;
-            }
         }
 
         /* Phosphor theme specific - show watchlist container */
@@ -7828,7 +8264,7 @@
 
             activeContentSection = null;
             activeContentFilter = null;
-            window.currentTab = null; // Reset currentTab
+            currentTab = null; // Reset currentTab
             updateButtonActiveStates();
             updateRadialOptionStates();
         }
@@ -7905,7 +8341,7 @@
             window.currentMediaType = 'movie';
             window.currentContentFilter = filter;
             window.currentPage = 1;
-            window.currentTab = null; // Clear currentTab when switching to movies
+            currentTab = null; // Clear currentTab when switching to movies
 
             // Hide other sections first
             document.getElementById('continueWatchingDisplay').style.display = 'none';
@@ -7959,7 +8395,7 @@
             window.currentMediaType = 'tv';
             window.currentContentFilter = filter;
             window.currentPage = 1;
-            window.currentTab = null; // Clear currentTab when switching to TV shows
+            currentTab = null; // Clear currentTab when switching to TV shows
 
             // Hide other sections first
             document.getElementById('continueWatchingDisplay').style.display = 'none';
@@ -8002,7 +8438,7 @@
             // Check if Continue Watching is already active - if so, toggle off
             if (activeContentSection === 'continue-watching') {
                 hideAllContentSections();
-                window.currentTab = null; // Reset currentTab
+                currentTab = null; // Reset currentTab
                 return;
             }
 
@@ -8012,7 +8448,7 @@
             // Set current state
             activeContentSection = 'continue-watching';
             activeContentFilter = null;
-            window.currentTab = 'continue-watching'; // Set currentTab for displayContinueWatchingInResults
+            currentTab = 'continue-watching'; // Set currentTab for displayContinueWatchingInResults
 
             // Hide other sections
             const contentResults = document.getElementById('contentResults');
