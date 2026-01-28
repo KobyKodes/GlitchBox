@@ -1587,131 +1587,222 @@
             }
         }
 
+        /* Tablet breakpoint */
+        @media (max-width: 768px) {
+            .current-content {
+                padding: 14px;
+                gap: 14px;
+            }
+
+            .current-content-poster {
+                width: 120px;
+                height: 180px;
+            }
+
+            .current-content-info h3 {
+                font-size: 1.5rem;
+            }
+
+            .current-content-info p {
+                font-size: 20px;
+            }
+
+            .ratings-container {
+                gap: 10px;
+            }
+
+            .rating-item {
+                padding: 8px 14px;
+                min-width: 80px;
+            }
+
+            .rating-source {
+                font-size: 13px;
+            }
+
+            .rating-value {
+                font-size: 22px;
+            }
+
+            .player-container {
+                height: 400px;
+            }
+
+            .tv-controls {
+                display: grid;
+                grid-template-columns: auto 1fr;
+                gap: 10px;
+                padding: 14px;
+            }
+
+            #seasonButton {
+                width: auto;
+                min-width: 120px !important;
+                margin: 0 !important;
+            }
+
+            #episodeButton {
+                width: 100%;
+                min-width: unset !important;
+                margin: 0 !important;
+            }
+
+            .episode-description {
+                grid-column: 1 / -1;
+            }
+        }
+
         @media (max-width: 480px) {
             .current-content {
-                padding: 8px;
-                gap: 8px;
-                grid-template-columns: 1fr;
+                padding: 12px;
+                gap: 12px;
+                grid-template-columns: auto 1fr;
+                grid-template-rows: auto auto;
             }
 
             .poster-container {
                 grid-column: 1 !important;
                 grid-row: 1 !important;
-                justify-self: center;
+                justify-self: start;
+                align-self: start;
                 order: 1;
             }
 
             .current-content-info {
-                grid-column: 1 !important;
-                grid-row: 2 !important;
+                grid-column: 2 !important;
+                grid-row: 1 !important;
                 order: 2;
-                gap: 8px;
+                gap: 6px;
                 width: 100%;
+                min-width: 0;
+            }
+
+            /* Title and year next to poster */
+            .current-content-info h3 {
+                font-size: 1.1rem;
+                text-align: left;
+                margin: 0;
+                line-height: 1.2;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+            }
+
+            .current-content-info > p:first-of-type {
+                text-align: left;
+                font-size: 16px;
+                margin: 0;
             }
 
             .current-content-poster {
-                width: 100px;
-                height: 150px;
+                width: 90px;
+                height: 135px;
             }
 
-            .omdb-details,
-            .cast-section,
-            .episode-description,
-            .tv-controls {
-                width: 100%;
-                box-sizing: border-box;
-            }
-
-            .omdb-details,
-            .cast-section,
-            .episode-description {
-                padding: 8px;
-            }
-
-            .current-content-info h3 {
-                font-size: 1.3rem;
-                text-align: center;
-            }
-
-            .current-content-info p {
-                text-align: center;
-                font-size: 18px;
+            /* Ratings inline with title area */
+            .omdb-ratings {
+                margin-top: 8px;
             }
 
             .ratings-container {
+                display: flex;
+                flex-wrap: wrap;
                 gap: 6px;
+                justify-content: flex-start;
             }
 
             .rating-item {
-                padding: 6px 12px;
+                padding: 4px 10px;
+                min-width: auto;
+                flex-direction: row;
+                gap: 6px;
             }
 
             .rating-source {
-                font-size: 12px;
+                font-size: 11px;
+                margin-bottom: 0;
             }
 
             .rating-value {
-                font-size: 20px;
+                font-size: 16px;
             }
 
-            .cast-grid {
-                grid-template-columns: repeat(auto-fit, minmax(75px, 1fr));
-                gap: 10px;
+            /* Overview spans full width below */
+            #currentOverview {
+                grid-column: 1 / -1;
+                font-size: 16px;
+                line-height: 1.5;
+                text-align: left;
+                margin-top: 4px;
             }
 
-            .cast-member {
-                padding: 3px;
+            /* Details section - full width below poster/info */
+            .omdb-details {
+                grid-column: 1 / -1;
+                width: 100%;
+                box-sizing: border-box;
+                padding: 10px;
+                margin-top: 8px;
             }
 
-            .cast-member-image {
-                width: 50px;
-                height: 50px;
+            .cast-section {
+                width: 100%;
+                box-sizing: border-box;
+                padding: 10px;
             }
 
-            .cast-member-name {
-                font-size: 14px;
-            }
-
-            .cast-member-character {
-                font-size: 12px;
-            }
-
-            #currentOverview,
-            #episodeDescriptionText {
-                font-size: 18px;
-                line-height: 1.4;
+            .episode-description {
+                width: 100%;
+                box-sizing: border-box;
+                padding: 10px;
             }
 
             .detail-item {
                 font-size: 14px;
                 margin-bottom: 4px;
+                display: flex;
+                flex-wrap: wrap;
             }
 
+            .detail-item strong {
+                margin-right: 4px;
+            }
+
+            /* Cast grid compact */
+            .cast-grid {
+                grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+                gap: 8px;
+            }
+
+            .cast-member {
+                padding: 4px;
+            }
+
+            .cast-member-image {
+                width: 45px;
+                height: 45px;
+            }
+
+            .cast-member-name {
+                font-size: 12px;
+            }
+
+            .cast-member-character {
+                font-size: 11px;
+            }
+
+            #episodeDescriptionText {
+                font-size: 15px;
+                line-height: 1.4;
+            }
+
+            /* TV Controls - horizontal on mobile */
             .tv-controls {
                 padding: 10px;
-                margin: 0;
-                display: flex;
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .season-selector,
-            .episode-selector {
+                margin: 8px 0 0 0;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
                 width: 100%;
-                max-width: 100%;
-                min-width: unset;
-                padding: 8px 12px;
-                font-size: 18px;
-                margin: 4px 0;
-            }
-
-            .bg-animation-toggle {
-                padding: 8px 14px;
-                font-size: 18px;
-                width: 100%;
-                max-width: 100%;
-                min-width: unset;
-                margin: 4px 0;
                 box-sizing: border-box;
             }
 
@@ -1720,8 +1811,105 @@
                 width: 100%;
                 max-width: 100%;
                 min-width: unset !important;
-                margin: 4px 0 !important;
+                margin: 0 !important;
+                padding: 10px 12px;
+                font-size: 14px;
+                text-align: center;
+            }
+
+            #episodeButton {
+                grid-column: 1 / -1;
                 text-align: left;
+            }
+
+            .episode-description {
+                grid-column: 1 / -1;
+                margin-top: 8px;
+            }
+
+            /* Player controls compact */
+            .player-controls {
+                flex-wrap: wrap;
+                gap: 8px;
+                padding: 12px;
+            }
+
+            .player-controls .btn {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+
+            /* Player container height */
+            .player-container {
+                height: 220px;
+            }
+
+            /* User rating pill compact */
+            .rating-item.user-pill {
+                flex-wrap: wrap;
+                padding: 6px 10px;
+                gap: 6px;
+            }
+
+            .rating-item.user-pill input[type="number"] {
+                width: 60px;
+                padding: 4px 6px;
+            }
+
+            .rating-item.user-pill .post-btn {
+                padding: 4px 8px;
+                font-size: 14px;
+                margin: 0;
+            }
+
+            .friends-ratings {
+                gap: 4px;
+            }
+
+            .friend-pill {
+                padding: 2px 6px;
+                font-size: 12px;
+            }
+        }
+
+        /* Extra small screens */
+        @media (max-width: 360px) {
+            .current-content {
+                padding: 10px;
+                gap: 10px;
+            }
+
+            .current-content-poster {
+                width: 75px;
+                height: 112px;
+            }
+
+            .current-content-info h3 {
+                font-size: 1rem;
+            }
+
+            .rating-item {
+                padding: 3px 8px;
+            }
+
+            .rating-source {
+                font-size: 10px;
+            }
+
+            .rating-value {
+                font-size: 14px;
+            }
+
+            .player-container {
+                height: 180px;
+            }
+
+            .tv-controls {
+                grid-template-columns: 1fr;
+            }
+
+            #seasonButton {
+                grid-column: 1;
             }
         }
 
