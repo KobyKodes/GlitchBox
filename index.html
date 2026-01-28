@@ -14370,8 +14370,8 @@
                 overlay.classList.add('active');
 
                 const bootMessages = [
-                    'INITIALIZING GLITCHBOX v2.0...',
                     'LOADING #1 STREAMING WEBSITE WORLDWIDE BY KOBYKODES...',
+                    'INITIALIZING GLITCHBOX v2.0...',
                     'LOADING PHOSPHOR DISPLAY DRIVER...',
                     'CALIBRATING CRT BEAM...',
                     'SYSTEM READY'
@@ -17212,18 +17212,29 @@
             const comments = await loadComments(contentId);
             const commentsList = document.getElementById('commentsList');
 
-            // Preserve scroll position, open reply boxes, AND textarea values
+            // Preserve scroll position, open reply boxes, textarea values, AND focus state
             const scrollPos = commentsList.scrollTop;
             const openReplyBoxes = [];
             const textareaValues = {};
+            let focusedTextareaId = null;
+            let focusedSelectionStart = 0;
+            let focusedSelectionEnd = 0;
             document.querySelectorAll('[id^="reply-box-"]').forEach(box => {
                 if (box.style.display !== 'none') {
                     const commentId = box.id.replace('reply-box-', '');
                     openReplyBoxes.push(commentId);
                     // Also preserve the textarea value
                     const textarea = document.getElementById(`reply-textarea-${commentId}`);
-                    if (textarea && textarea.value) {
-                        textareaValues[commentId] = textarea.value;
+                    if (textarea) {
+                        if (textarea.value) {
+                            textareaValues[commentId] = textarea.value;
+                        }
+                        // Track if this textarea is focused
+                        if (document.activeElement === textarea) {
+                            focusedTextareaId = `reply-textarea-${commentId}`;
+                            focusedSelectionStart = textarea.selectionStart;
+                            focusedSelectionEnd = textarea.selectionEnd;
+                        }
                     }
                 }
             });
@@ -17305,6 +17316,14 @@
                         }
                     }
                 });
+                // Restore focus and cursor position
+                if (focusedTextareaId) {
+                    const textarea = document.getElementById(focusedTextareaId);
+                    if (textarea) {
+                        textarea.focus();
+                        textarea.setSelectionRange(focusedSelectionStart, focusedSelectionEnd);
+                    }
+                }
             }
         }
 
