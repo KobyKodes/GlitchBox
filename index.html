@@ -3680,7 +3680,7 @@
 
         .radial-option-label {
             font-family: 'VT323', monospace;
-            font-size: 11px;
+            font-size: 16px;
             color: #00d9ff;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -3917,6 +3917,22 @@
             .user-menu-btn img {
                 width: 24px !important;
                 height: 24px !important;
+            }
+
+            /* Friend request icon - tablet */
+            .friend-request-notification-left {
+                margin-right: 8px;
+            }
+
+            .friend-request-notification-left img {
+                width: 28px;
+                height: 28px;
+            }
+
+            .friend-request-notification-left .request-count-badge {
+                min-width: 16px;
+                height: 16px;
+                font-size: 10px;
             }
 
             /* Watchlist container - tablet */
@@ -4798,7 +4814,7 @@
         .terminal-prompt {
             font-family: 'VT323', monospace;
             color: #33ff66;
-            font-size: 18px;
+            font-size: 24px;
             text-shadow: 0 0 8px rgba(51, 255, 102, 0.5);
         }
 
@@ -4806,11 +4822,12 @@
             background: none;
             border: none;
             color: #ffb000;
-            font-size: 24px;
+            font-size: 32px;
             cursor: pointer;
-            padding: 0;
+            padding: 12px 16px;
             line-height: 1;
             transition: all 0.2s;
+            margin: -8px -12px -8px 0;
         }
 
         .floating-search-close:hover {
@@ -4821,14 +4838,14 @@
         .floating-search-input-wrapper {
             display: flex;
             align-items: center;
-            padding: 16px;
+            padding: 20px;
             gap: 12px;
         }
 
         .terminal-cursor {
             font-family: 'VT323', monospace;
             color: #33ff66;
-            font-size: 24px;
+            font-size: 28px;
             animation: cursorBlink 1s step-end infinite;
         }
 
@@ -4843,9 +4860,10 @@
             border: none;
             color: #ffb000;
             font-family: 'VT323', monospace;
-            font-size: 22px;
+            font-size: 28px;
             outline: none;
             caret-color: #33ff66;
+            padding: 8px 0;
         }
 
         .floating-search-input::placeholder {
@@ -4898,13 +4916,13 @@
         .floating-search-result-title {
             color: #ffb000;
             font-family: 'VT323', monospace;
-            font-size: 18px;
+            font-size: 22px;
         }
 
         .floating-search-result-year {
             color: rgba(51, 255, 102, 0.7);
             font-family: 'VT323', monospace;
-            font-size: 14px;
+            font-size: 18px;
         }
 
         /* Power LED Indicator */
@@ -5609,6 +5627,337 @@
         /* Phosphor theme specific - show watchlist container */
         [data-theme="phosphor"] .watchlist-container {
             display: block;
+        }
+
+        /* ============= FRIEND REQUEST NOTIFICATION ICON (Left side, beside user menu) ============= */
+        .friend-request-notification-left {
+            display: none;
+            position: relative;
+            cursor: pointer;
+            margin-right: 12px;
+            animation: friendRequestPulse 2s ease-in-out infinite;
+        }
+
+        .friend-request-notification-left.has-requests {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .friend-request-notification-left img {
+            width: 36px;
+            height: 36px;
+            filter: drop-shadow(0 0 8px rgba(255, 0, 255, 0.6));
+            transition: all 0.3s ease;
+        }
+
+        .friend-request-notification-left:hover img {
+            transform: scale(1.15);
+            filter: drop-shadow(0 0 15px rgba(255, 0, 255, 0.9));
+        }
+
+        .friend-request-notification-left .request-count-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: linear-gradient(135deg, #ff00ff, #ff0066);
+            color: #fff;
+            font-family: 'VT323', monospace;
+            font-size: 12px;
+            font-weight: bold;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.8);
+            border: 2px solid #0f0f1e;
+        }
+
+        @keyframes friendRequestPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        [data-theme="phosphor"] .friend-request-notification-left,
+        [data-theme="jspecial"] .friend-request-notification-left {
+            display: none;
+        }
+
+        [data-theme="phosphor"] .friend-request-notification-left.has-requests,
+        [data-theme="jspecial"] .friend-request-notification-left.has-requests {
+            display: flex;
+        }
+
+        /* ============= CREATE NEW LIST MODAL ============= */
+        @keyframes createListModalIn {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        @keyframes createListShine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .create-list-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 100010;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .create-list-modal-overlay.active {
+            display: flex;
+        }
+
+        .create-list-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 450px;
+            background: linear-gradient(145deg, rgba(10, 10, 25, 0.98), rgba(15, 15, 35, 0.98));
+            border: none;
+            padding: 0;
+            z-index: 100011;
+            overflow: hidden;
+            clip-path: polygon(0 0, calc(100% - 25px) 0, 100% 25px, 100% 100%, 25px 100%, 0 calc(100% - 25px));
+            animation: createListModalIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .create-list-modal::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                linear-gradient(90deg, rgba(0, 255, 159, 0.05) 1px, transparent 1px),
+                linear-gradient(rgba(0, 255, 159, 0.05) 1px, transparent 1px);
+            background-size: 15px 15px;
+            pointer-events: none;
+        }
+
+        .create-list-header {
+            background: linear-gradient(90deg, rgba(0, 255, 159, 0.2), rgba(0, 217, 255, 0.1), transparent);
+            padding: 20px 25px;
+            border-bottom: 2px solid;
+            border-image: linear-gradient(90deg, #00ff9f, #00d9ff) 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .create-list-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            color: #00ff9f;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-shadow: 0 0 10px rgba(0, 255, 159, 0.5);
+        }
+
+        .create-list-title::before {
+            content: '◈';
+            font-size: 16px;
+            color: #00d9ff;
+            animation: statusBlink 1.5s ease-in-out infinite;
+        }
+
+        .create-list-close {
+            width: 36px;
+            height: 36px;
+            background: transparent;
+            border: 2px solid #ff00ff;
+            color: #ff00ff;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            clip-path: polygon(15% 0%, 100% 0%, 100% 85%, 85% 100%, 0% 100%, 0% 15%);
+        }
+
+        .create-list-close:hover {
+            background: #ff00ff;
+            color: #0f0f1e;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.6);
+        }
+
+        .create-list-body {
+            padding: 30px 25px;
+            position: relative;
+        }
+
+        .create-list-description {
+            font-family: 'VT323', monospace;
+            font-size: 18px;
+            color: #00d9ff;
+            margin-bottom: 24px;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .create-list-input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .create-list-input-label {
+            position: absolute;
+            top: -10px;
+            left: 16px;
+            background: #0a0a19;
+            padding: 0 10px;
+            font-family: 'VT323', monospace;
+            font-size: 12px;
+            color: #00ff9f;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .create-list-input {
+            width: 100%;
+            padding: 18px 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(0, 255, 159, 0.3);
+            color: #00ff9f;
+            font-family: 'VT323', monospace;
+            font-size: 22px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .create-list-input::placeholder {
+            color: rgba(0, 255, 159, 0.3);
+        }
+
+        .create-list-input:focus {
+            border-color: #00ff9f;
+            box-shadow: 0 0 20px rgba(0, 255, 159, 0.3), inset 0 0 30px rgba(0, 255, 159, 0.05);
+        }
+
+        .create-list-input.error {
+            border-color: #ff4444;
+            box-shadow: 0 0 20px rgba(255, 68, 68, 0.3);
+        }
+
+        .create-list-error {
+            color: #ff4444;
+            font-family: 'VT323', monospace;
+            font-size: 16px;
+            margin-top: 10px;
+            display: none;
+            text-align: center;
+        }
+
+        .create-list-error.visible {
+            display: block;
+        }
+
+        .create-list-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .create-list-btn {
+            flex: 1;
+            padding: 16px 24px;
+            font-family: 'VT323', monospace;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .create-list-btn.primary {
+            background: linear-gradient(135deg, #00ff9f, #00d9ff);
+            border: none;
+            color: #0f0f1e;
+            clip-path: polygon(8% 0%, 100% 0%, 92% 100%, 0% 100%);
+        }
+
+        .create-list-btn.primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .create-list-btn.primary:hover::before {
+            left: 100%;
+        }
+
+        .create-list-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 30px rgba(0, 255, 159, 0.5);
+        }
+
+        .create-list-btn.secondary {
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: #888;
+            clip-path: polygon(8% 0%, 100% 0%, 92% 100%, 0% 100%);
+        }
+
+        .create-list-btn.secondary:hover {
+            border-color: #ff00ff;
+            color: #ff00ff;
+        }
+
+        /* ============= CREATE NEW LIST BUTTON ============= */
+        .watchlist-slide-create-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 14px 20px;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, rgba(0, 255, 159, 0.15), rgba(0, 217, 255, 0.15));
+            border: 2px dashed var(--primary-color, #00ff9f);
+            border-radius: 12px;
+            color: var(--primary-color, #00ff9f);
+            font-family: 'VT323', monospace;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .watchlist-slide-create-btn:hover {
+            background: linear-gradient(135deg, rgba(0, 255, 159, 0.25), rgba(0, 217, 255, 0.25));
+            border-style: solid;
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(0, 255, 159, 0.4);
+        }
+
+        .watchlist-slide-create-btn svg {
+            width: 20px;
+            height: 20px;
         }
 
         /* ============= LIVE SECTION CONTAINER & PANEL ============= */
@@ -6843,6 +7192,8 @@
             top: 20px;
             left: 20px;
             z-index: 100002;
+            display: flex;
+            align-items: center;
         }
 
         .user-menu-btn {
@@ -7197,6 +7548,1262 @@
             }
         }
         /* ============= END SOURCE TOOLTIP ARROW ============= */
+
+        /* ============================================================
+           GLITCHBOX PREMIUM REDESIGNS - UNIQUE & MEMORABLE
+           ============================================================ */
+
+        /* ============= 1. FRIENDS PANEL - "NETWORK TERMINAL" ============= */
+        @keyframes networkScan {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 0% 100%; }
+        }
+
+        @keyframes glitchText {
+            0%, 100% { text-shadow: 0 0 10px #00ff9f, 2px 2px 0 #ff00ff, -2px -2px 0 #00d9ff; transform: translate(0); }
+            25% { text-shadow: -2px 0 10px #ff00ff, 0 2px 0 #00ff9f; transform: translate(-2px, 1px); }
+            50% { text-shadow: 2px -1px 10px #00d9ff, -1px 0 0 #ff00ff; transform: translate(1px, -1px); }
+            75% { text-shadow: 0 2px 10px #00ff9f, 1px -2px 0 #00d9ff; transform: translate(2px, 1px); }
+        }
+
+        @keyframes holoPulse {
+            0%, 100% { opacity: 0.8; box-shadow: 0 0 20px rgba(0, 255, 159, 0.3), inset 0 0 30px rgba(0, 255, 159, 0.05); }
+            50% { opacity: 1; box-shadow: 0 0 40px rgba(0, 255, 159, 0.5), inset 0 0 50px rgba(0, 255, 159, 0.1); }
+        }
+
+        @keyframes statusBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        @keyframes dataStream {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 20px; }
+        }
+
+        #friendsModal {
+            backdrop-filter: blur(10px);
+        }
+
+        .friends-terminal {
+            max-width: 800px;
+            margin: 20px auto;
+            background: linear-gradient(145deg, rgba(10, 10, 20, 0.98), rgba(15, 15, 35, 0.98));
+            border: none;
+            border-radius: 0;
+            position: relative;
+            overflow: hidden;
+            clip-path: polygon(0 0, calc(100% - 30px) 0, 100% 30px, 100% 100%, 30px 100%, 0 calc(100% - 30px));
+        }
+
+        .friends-terminal::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 255, 159, 0.03) 2px,
+                rgba(0, 255, 159, 0.03) 4px
+            );
+            pointer-events: none;
+            animation: dataStream 1s linear infinite;
+        }
+
+        .friends-terminal::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            background: linear-gradient(180deg,
+                rgba(0, 255, 159, 0.1) 0%,
+                transparent 10%,
+                transparent 90%,
+                rgba(0, 217, 255, 0.1) 100%
+            );
+            pointer-events: none;
+        }
+
+        .friends-terminal-header {
+            background: linear-gradient(90deg, rgba(0, 255, 159, 0.15), rgba(0, 217, 255, 0.1), rgba(255, 0, 255, 0.1));
+            padding: 20px 30px;
+            border-bottom: 2px solid;
+            border-image: linear-gradient(90deg, #00ff9f, #00d9ff, #ff00ff) 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .friends-terminal-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 16px;
+            color: #00ff9f;
+            animation: glitchText 3s ease-in-out infinite;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .friends-terminal-title::before {
+            content: '◈';
+            font-size: 20px;
+            color: #ff00ff;
+            animation: statusBlink 1s ease-in-out infinite;
+        }
+
+        .friends-terminal-close {
+            width: 40px;
+            height: 40px;
+            background: transparent;
+            border: 2px solid #ff00ff;
+            color: #ff00ff;
+            font-size: 28px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            clip-path: polygon(15% 0%, 100% 0%, 100% 85%, 85% 100%, 0% 100%, 0% 15%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .friends-terminal-close:hover {
+            background: #ff00ff;
+            color: #0f0f1e;
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.8);
+            transform: scale(1.1);
+        }
+
+        .friends-terminal-body {
+            padding: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .friends-section {
+            margin-bottom: 30px;
+        }
+
+        .friends-section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0, 217, 255, 0.3);
+        }
+
+        .friends-section-icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #00d9ff, #00ff9f);
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+        }
+
+        .friends-section-title {
+            font-family: 'VT323', monospace;
+            font-size: 22px;
+            color: #00d9ff;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        /* Friend Request Cards - Holographic Style */
+        .friend-request-card {
+            background: linear-gradient(135deg, rgba(255, 0, 255, 0.1), rgba(0, 217, 255, 0.05));
+            border: 1px solid rgba(255, 0, 255, 0.4);
+            border-left: 4px solid #ff00ff;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            animation: holoPulse 3s ease-in-out infinite;
+            transition: all 0.3s ease;
+        }
+
+        .friend-request-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 40%,
+                rgba(255, 0, 255, 0.1) 50%,
+                transparent 60%
+            );
+            animation: networkScan 3s linear infinite;
+        }
+
+        .friend-request-card:hover {
+            border-color: #ff00ff;
+            transform: translateX(5px);
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.4);
+        }
+
+        .friend-request-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .friend-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #1a1a2e, #0f0f1e);
+            border: 2px solid #00d9ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00d9ff;
+            font-family: 'VT323', monospace;
+            font-size: 22px;
+            position: relative;
+        }
+
+        .friend-avatar::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border: 2px solid transparent;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00ff9f, #00d9ff, #ff00ff) border-box;
+            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            animation: statusBlink 2s ease-in-out infinite;
+        }
+
+        .friend-username {
+            font-family: 'VT323', monospace;
+            font-size: 20px;
+            color: #fff;
+        }
+
+        .friend-request-actions {
+            display: flex;
+            gap: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .friend-btn-accept {
+            padding: 10px 20px;
+            background: transparent;
+            border: 2px solid #00ff9f;
+            color: #00ff9f;
+            font-family: 'VT323', monospace;
+            font-size: 16px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%);
+        }
+
+        .friend-btn-accept:hover {
+            background: #00ff9f;
+            color: #0f0f1e;
+            box-shadow: 0 0 20px rgba(0, 255, 159, 0.6);
+        }
+
+        .friend-btn-reject {
+            padding: 10px 20px;
+            background: transparent;
+            border: 2px solid #ff4444;
+            color: #ff4444;
+            font-family: 'VT323', monospace;
+            font-size: 16px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%);
+        }
+
+        .friend-btn-reject:hover {
+            background: #ff4444;
+            color: #fff;
+            box-shadow: 0 0 20px rgba(255, 68, 68, 0.6);
+        }
+
+        /* Search Input - Terminal Scanner */
+        .friends-search-wrapper {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .friends-search-label {
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: #0f0f1e;
+            padding: 0 10px;
+            font-family: 'VT323', monospace;
+            font-size: 14px;
+            color: #00ff9f;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .friends-search-input {
+            width: 100%;
+            padding: 18px 20px 18px 50px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(0, 255, 159, 0.3);
+            color: #00ff9f;
+            font-family: 'VT323', monospace;
+            font-size: 20px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .friends-search-input::placeholder {
+            color: rgba(0, 255, 159, 0.4);
+        }
+
+        .friends-search-input:focus {
+            border-color: #00ff9f;
+            box-shadow: 0 0 20px rgba(0, 255, 159, 0.3), inset 0 0 30px rgba(0, 255, 159, 0.05);
+        }
+
+        .friends-search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #00ff9f;
+            font-size: 20px;
+        }
+
+        /* Friend Card - Online/Offline Status */
+        .friend-card {
+            background: rgba(0, 217, 255, 0.05);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            padding: 14px 18px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+
+        .friend-card:hover {
+            background: rgba(0, 217, 255, 0.1);
+            border-color: #00d9ff;
+            transform: translateX(5px);
+        }
+
+        .friend-card .friend-avatar {
+            width: 42px;
+            height: 42px;
+            font-size: 18px;
+        }
+
+        .friend-status-online::before {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            background: #00ff9f;
+            border-radius: 50%;
+            border: 2px solid #0f0f1e;
+            animation: statusBlink 1.5s ease-in-out infinite;
+        }
+
+        .friend-status-offline::before {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            background: #666;
+            border-radius: 50%;
+            border: 2px solid #0f0f1e;
+        }
+
+        .friends-empty-state {
+            text-align: center;
+            padding: 40px;
+            color: rgba(0, 217, 255, 0.5);
+            font-family: 'VT323', monospace;
+            font-size: 18px;
+        }
+
+        /* ============= 2. WATCHPARTY PANEL - "SYNC CHAMBER" ============= */
+        @keyframes syncPulse {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.5); opacity: 0; }
+        }
+
+        @keyframes connectionLine {
+            0% { stroke-dashoffset: 100; }
+            100% { stroke-dashoffset: 0; }
+        }
+
+        @keyframes frequencyGlow {
+            0%, 100% { text-shadow: 0 0 5px #00ff9f, 0 0 10px #00ff9f; }
+            50% { text-shadow: 0 0 20px #00ff9f, 0 0 40px #00ff9f, 0 0 60px #00ff9f; }
+        }
+
+        #watchpartyPanel.sync-chamber {
+            background: linear-gradient(180deg, rgba(10, 10, 25, 0.98), rgba(5, 5, 15, 0.98));
+            border: none;
+            border-radius: 0;
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%);
+            box-shadow:
+                0 0 50px rgba(0, 255, 159, 0.2),
+                inset 0 0 100px rgba(0, 255, 159, 0.03);
+            overflow: visible;
+            min-width: 380px;
+        }
+
+        #watchpartyPanel.sync-chamber::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                linear-gradient(90deg, rgba(0, 255, 159, 0.1) 1px, transparent 1px),
+                linear-gradient(rgba(0, 255, 159, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .sync-chamber-header {
+            background: linear-gradient(90deg, rgba(0, 255, 159, 0.2), transparent);
+            padding: 20px 24px;
+            border-bottom: 2px solid #00ff9f;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .sync-chamber-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            color: #00ff9f;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sync-icon {
+            width: 30px;
+            height: 30px;
+            position: relative;
+        }
+
+        .sync-icon::before,
+        .sync-icon::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid #00ff9f;
+            border-radius: 50%;
+        }
+
+        .sync-icon::before {
+            width: 10px;
+            height: 10px;
+            background: #00ff9f;
+        }
+
+        .sync-icon::after {
+            width: 25px;
+            height: 25px;
+            animation: syncPulse 2s ease-out infinite;
+        }
+
+        .sync-chamber-body {
+            padding: 24px;
+        }
+
+        .sync-description {
+            font-family: 'VT323', monospace;
+            color: #00d9ff;
+            font-size: 18px;
+            text-align: center;
+            margin-bottom: 24px;
+            padding: 12px;
+            background: rgba(0, 217, 255, 0.05);
+            border-left: 3px solid #00d9ff;
+        }
+
+        .sync-input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .sync-input-label {
+            font-family: 'VT323', monospace;
+            color: #00ff9f;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .sync-input {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(0, 0, 0, 0.6);
+            border: none;
+            border-bottom: 3px solid rgba(0, 255, 159, 0.3);
+            color: #00ff9f;
+            font-family: 'VT323', monospace;
+            font-size: 20px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .sync-input:focus {
+            border-bottom-color: #00ff9f;
+            box-shadow: 0 5px 30px rgba(0, 255, 159, 0.2);
+        }
+
+        .sync-input::placeholder {
+            color: rgba(0, 255, 159, 0.3);
+        }
+
+        .sync-action-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .sync-action-card {
+            padding: 24px 16px;
+            background: linear-gradient(135deg, rgba(0, 255, 159, 0.1), transparent);
+            border: 2px solid rgba(0, 255, 159, 0.3);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sync-action-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 159, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .sync-action-card:hover::before {
+            left: 100%;
+        }
+
+        .sync-action-card:hover {
+            border-color: #00ff9f;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(0, 255, 159, 0.3);
+        }
+
+        .sync-action-card.primary {
+            background: linear-gradient(135deg, rgba(0, 255, 159, 0.2), rgba(0, 255, 159, 0.05));
+            border-color: #00ff9f;
+        }
+
+        .sync-action-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .sync-action-label {
+            font-family: 'VT323', monospace;
+            font-size: 18px;
+            color: #00ff9f;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .sync-divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .sync-divider-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 159, 0.5), transparent);
+        }
+
+        .sync-divider-text {
+            font-family: 'VT323', monospace;
+            color: #666;
+            font-size: 16px;
+        }
+
+        .frequency-code-display {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff9f;
+            padding: 16px 24px;
+            text-align: center;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .frequency-code-label {
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: #0a0a19;
+            padding: 0 10px;
+            font-family: 'VT323', monospace;
+            font-size: 12px;
+            color: #00d9ff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .frequency-code-value {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 24px;
+            color: #00ff9f;
+            letter-spacing: 8px;
+            animation: frequencyGlow 2s ease-in-out infinite;
+            cursor: pointer;
+        }
+
+        /* ============= 3. COMMENTS SECTION - "TRANSMISSION LOG" ============= */
+        @keyframes transmissionScan {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        @keyframes messageReveal {
+            0% { opacity: 0; transform: translateX(-20px); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+
+        #commentsSection.transmission-log {
+            background: linear-gradient(180deg, rgba(8, 8, 20, 0.98), rgba(12, 12, 28, 0.98));
+            border: none;
+            padding: 0;
+            margin-top: 30px;
+            position: relative;
+            overflow: hidden;
+            clip-path: polygon(0 0, calc(100% - 25px) 0, 100% 25px, 100% 100%, 0 100%);
+        }
+
+        #commentsSection.transmission-log::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #00ff9f, #00d9ff, #ff00ff);
+        }
+
+        #commentsSection.transmission-log::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            background: linear-gradient(180deg,
+                rgba(0, 255, 159, 0.1),
+                transparent 20%,
+                transparent 80%,
+                rgba(0, 217, 255, 0.1)
+            );
+            pointer-events: none;
+        }
+
+        .transmission-header {
+            background: linear-gradient(90deg, rgba(0, 255, 159, 0.15), rgba(0, 217, 255, 0.1), transparent);
+            padding: 20px 30px;
+            border-bottom: 1px solid rgba(0, 255, 159, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .transmission-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #00ff9f, #00d9ff);
+            clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: statusBlink 2s ease-in-out infinite;
+        }
+
+        .transmission-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 14px;
+            color: #00d9ff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .transmission-status {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'VT323', monospace;
+            font-size: 14px;
+            color: #00ff9f;
+        }
+
+        .transmission-status::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #00ff9f;
+            border-radius: 50%;
+            animation: statusBlink 1s ease-in-out infinite;
+        }
+
+        .transmission-body {
+            padding: 20px 30px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .transmission-body::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .transmission-body::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .transmission-body::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #00ff9f, #00d9ff);
+            border-radius: 3px;
+        }
+
+        /* Message Card - Holographic */
+        .transmission-message {
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.08), rgba(0, 255, 159, 0.03));
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-left: 3px solid #00d9ff;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            position: relative;
+            animation: messageReveal 0.5s ease-out forwards;
+            transition: all 0.3s ease;
+        }
+
+        .transmission-message:hover {
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.12), rgba(0, 255, 159, 0.06));
+            border-color: #00d9ff;
+            transform: translateX(5px);
+        }
+
+        .transmission-message.own-message {
+            border-left-color: #00ff9f;
+            background: linear-gradient(135deg, rgba(0, 255, 159, 0.08), rgba(0, 217, 255, 0.03));
+        }
+
+        .transmission-message-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .transmission-avatar {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #1a1a2e, #0f0f1e);
+            border: 2px solid #00d9ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00d9ff;
+            font-family: 'VT323', monospace;
+            font-size: 18px;
+            position: relative;
+        }
+
+        .transmission-avatar::after {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 50%;
+            border: 1px solid;
+            border-color: transparent #00d9ff transparent #00d9ff;
+            animation: spin 3s linear infinite;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        .transmission-username {
+            font-family: 'VT323', monospace;
+            font-size: 18px;
+            color: #00d9ff;
+            font-weight: bold;
+        }
+
+        .own-message .transmission-username {
+            color: #00ff9f;
+        }
+
+        .transmission-timestamp {
+            margin-left: auto;
+            font-family: 'VT323', monospace;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .transmission-content {
+            font-family: 'VT323', monospace;
+            font-size: 18px;
+            color: #e0e0e0;
+            line-height: 1.5;
+            padding-left: 50px;
+        }
+
+        .transmission-actions {
+            display: flex;
+            gap: 16px;
+            padding-left: 50px;
+            margin-top: 12px;
+        }
+
+        .transmission-action-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            font-family: 'VT323', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+            padding: 4px 8px;
+        }
+
+        .transmission-action-btn:hover {
+            color: #00d9ff;
+            background: rgba(0, 217, 255, 0.1);
+        }
+
+        .transmission-action-btn.liked {
+            color: #ff6b9d;
+        }
+
+        /* Reply Thread with Connection Lines */
+        .transmission-reply {
+            margin-left: 30px;
+            padding-left: 20px;
+            border-left: 2px solid rgba(255, 0, 255, 0.3);
+            position: relative;
+        }
+
+        .transmission-reply::before {
+            content: '';
+            position: absolute;
+            left: -2px;
+            top: 20px;
+            width: 20px;
+            height: 2px;
+            background: rgba(255, 0, 255, 0.3);
+        }
+
+        .transmission-reply .transmission-message {
+            border-left-color: #ff00ff;
+            background: linear-gradient(135deg, rgba(255, 0, 255, 0.06), transparent);
+        }
+
+        /* Broadcast Input Terminal */
+        .transmission-input-section {
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5));
+            padding: 20px 30px;
+            border-top: 1px solid rgba(0, 255, 159, 0.2);
+        }
+
+        .transmission-input-wrapper {
+            position: relative;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(0, 255, 159, 0.3);
+            padding: 4px;
+        }
+
+        .transmission-input-label {
+            position: absolute;
+            top: -12px;
+            left: 16px;
+            background: #0a0a19;
+            padding: 2px 12px;
+            font-family: 'VT323', monospace;
+            font-size: 12px;
+            color: #00ff9f;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .transmission-textarea {
+            width: 100%;
+            min-height: 60px;
+            max-height: 150px;
+            padding: 16px;
+            background: transparent;
+            border: none;
+            color: #00ff9f;
+            font-family: 'VT323', monospace;
+            font-size: 18px;
+            resize: none;
+            outline: none;
+        }
+
+        .transmission-textarea::placeholder {
+            color: rgba(0, 255, 159, 0.3);
+        }
+
+        .transmission-input-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+        }
+
+        .transmission-char-count {
+            font-family: 'VT323', monospace;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .transmission-submit-btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #00ff9f, #00d9ff);
+            border: none;
+            color: #0f0f1e;
+            font-family: 'VT323', monospace;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%);
+            transition: all 0.3s ease;
+        }
+
+        .transmission-submit-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(0, 255, 159, 0.5);
+        }
+
+        /* Reply Box Styling */
+        .transmission-reply-box {
+            background: rgba(255, 0, 255, 0.05);
+            border: 1px solid rgba(255, 0, 255, 0.3);
+            padding: 12px;
+            margin-top: 12px;
+            margin-left: 50px;
+        }
+
+        .transmission-reply-box textarea {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 0, 255, 0.3);
+            color: #ff00ff;
+            font-family: 'VT323', monospace;
+            font-size: 16px;
+            resize: none;
+            outline: none;
+            min-height: 50px;
+        }
+
+        .transmission-reply-box textarea:focus {
+            border-color: #ff00ff;
+        }
+
+        .transmission-reply-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .transmission-reply-btn {
+            padding: 8px 20px;
+            background: transparent;
+            border: 1px solid #ff00ff;
+            color: #ff00ff;
+            font-family: 'VT323', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .transmission-reply-btn:hover {
+            background: #ff00ff;
+            color: #0f0f1e;
+        }
+
+        .transmission-reply-btn.cancel {
+            border-color: #666;
+            color: #666;
+        }
+
+        .transmission-reply-btn.cancel:hover {
+            background: #666;
+            color: #fff;
+        }
+
+        /* ============= 4. SOURCE NOTIFICATION - NARROWER WIDTH ============= */
+        .source-tooltip-box {
+            background: var(--bg-dark, #0f0f1e);
+            border: 2px solid var(--primary-color, #00ff9f);
+            border-radius: 8px;
+            padding: 12px 40px 12px 16px;
+            color: var(--primary-color, #00ff9f);
+            font-family: 'VT323', monospace;
+            font-size: 16px;
+            white-space: normal;
+            max-width: 180px;
+            text-align: center;
+            line-height: 1.4;
+            box-shadow: 0 0 20px rgba(0, 255, 159, 0.5);
+            position: relative;
+        }
+
+        /* ============= 5. CARD HOVER PANEL - "DATA READOUT" ============= */
+        @keyframes dataReadoutScan {
+            0% { top: -100%; }
+            100% { top: 100%; }
+        }
+
+        @keyframes readoutReveal {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); clip-path: polygon(0 50%, 100% 50%, 100% 50%, 0 50%); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+        }
+
+        @keyframes gaugeLoad {
+            0% { width: 0%; }
+        }
+
+        .omdb-ratings-tooltip {
+            font-family: 'VT323', monospace;
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(145deg, rgba(8, 8, 20, 0.98), rgba(15, 15, 35, 0.98));
+            border: 2px solid #00ff9f;
+            padding: 0;
+            z-index: 100;
+            min-width: 220px;
+            max-width: 85%;
+            pointer-events: none;
+            display: none;
+            overflow: hidden;
+            clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
+        }
+
+        .content-card:hover .omdb-ratings-tooltip {
+            display: block !important;
+            animation: readoutReveal 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .omdb-ratings-tooltip::before {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background: linear-gradient(180deg, transparent, rgba(0, 255, 159, 0.1), transparent);
+            animation: dataReadoutScan 2s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        /* Corner Brackets */
+        .omdb-ratings-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 2px solid transparent;
+            background:
+                linear-gradient(to right, #00ff9f 15px, transparent 15px) top left,
+                linear-gradient(to left, #00ff9f 15px, transparent 15px) top right,
+                linear-gradient(to right, #00ff9f 15px, transparent 15px) bottom left,
+                linear-gradient(to left, #00ff9f 15px, transparent 15px) bottom right,
+                linear-gradient(to bottom, #00ff9f 15px, transparent 15px) top left,
+                linear-gradient(to top, #00ff9f 15px, transparent 15px) bottom left,
+                linear-gradient(to bottom, #00ff9f 15px, transparent 15px) top right,
+                linear-gradient(to top, #00ff9f 15px, transparent 15px) bottom right;
+            background-size: 20px 20px;
+            background-repeat: no-repeat;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        .data-readout-header {
+            background: linear-gradient(90deg, rgba(0, 255, 159, 0.2), transparent);
+            padding: 10px 14px;
+            border-bottom: 1px solid rgba(0, 255, 159, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .data-readout-title {
+            font-size: 12px;
+            color: #00ff9f;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .data-readout-body {
+            padding: 14px;
+        }
+
+        .tooltip-rating-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0, 217, 255, 0.15);
+        }
+
+        .tooltip-rating-row:last-child {
+            border-bottom: none;
+        }
+
+        .tooltip-rating-source {
+            color: #00d9ff;
+            font-size: 15px;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        .tooltip-rating-gauge {
+            flex: 1;
+            height: 6px;
+            background: rgba(0, 0, 0, 0.5);
+            margin: 0 12px;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .tooltip-rating-gauge-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff9f, #00d9ff);
+            border-radius: 3px;
+            animation: gaugeLoad 0.6s ease-out forwards;
+        }
+
+        .tooltip-rating-value {
+            color: #00ff9f;
+            font-size: 16px;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(0, 255, 159, 0.5);
+            min-width: 50px;
+            text-align: right;
+        }
+
+        .tooltip-runtime-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-top: 10px;
+            margin-top: 6px;
+            border-top: 1px solid rgba(255, 0, 255, 0.2);
+        }
+
+        .tooltip-runtime-icon {
+            color: #ff00ff;
+            font-size: 16px;
+        }
+
+        .tooltip-runtime-value {
+            color: #ff00ff;
+            font-size: 16px;
+        }
+
+        .tooltip-loading {
+            color: #00d9ff;
+            font-size: 16px;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* ============= 6. LIVE SPORTS PANEL - WIDER WIDTH ============= */
+        .live-slide-panel {
+            position: absolute;
+            top: calc(100% + 12px);
+            right: 0;
+            width: 480px;
+            background: linear-gradient(145deg, #1a1408 0%, #0f0c05 100%);
+            border: 3px solid var(--primary-color, #F5A623);
+            border-radius: 12px;
+            box-shadow: 0 0 30px rgba(245, 166, 35, 0.3);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(100%);
+            transform-origin: top right;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .live-category-grid.sports-grid {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .live-category-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-subtle, rgba(245, 166, 35, 0.1));
+            border-radius: 10px;
+            color: var(--text-primary, #F5F0E8);
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 70px;
+        }
+
     </style>
 
     <!-- Monetag Ads Integration -->
@@ -7305,11 +8912,13 @@
             <!-- Main Options View -->
             <div class="live-main-options" id="liveMainOptions">
                 <div class="live-options">
-                    <button class="live-option-btn live-option-btn-icon-only" onclick="showLiveCategories('channels')" title="Live Channels">
-                        <img src="live-tv.png" alt="Channels" class="live-icon" style="width: 48px; height: 48px;">
+                    <button class="live-option-btn live-option-btn-icon-only" onclick="showLiveCategories('channels')" title="Live Channels" style="flex-direction: column; gap: 8px;">
+                        <img src="live-tv.png" alt="Channels" class="live-icon" style="width: 64px; height: 64px;">
+                        <span style="font-family: 'VT323', monospace; font-size: 16px; color: var(--text-primary, #F5F0E8); text-transform: uppercase; letter-spacing: 0.05em;">Channels</span>
                     </button>
-                    <button class="live-option-btn live-option-btn-icon-only" onclick="showLiveCategories('sports')" title="Live Sports">
-                        <img src="Icons/LiveIcons/sports.png" alt="Sports" class="live-icon" style="width: 48px; height: 48px;">
+                    <button class="live-option-btn live-option-btn-icon-only" onclick="showLiveCategories('sports')" title="Live Sports" style="flex-direction: column; gap: 8px;">
+                        <img src="Icons/LiveIcons/sports.png" alt="Sports" class="live-icon" style="width: 64px; height: 64px;">
+                        <span style="font-family: 'VT323', monospace; font-size: 16px; color: var(--text-primary, #F5F0E8); text-transform: uppercase; letter-spacing: 0.05em;">Sports</span>
                     </button>
                 </div>
             </div>
@@ -7342,43 +8951,43 @@
                 </button>
                 <div class="live-category-grid sports-grid">
                     <button class="live-category-btn" onclick="loadSportsCategory('football')" title="Football">
-                        <img src="Icons/LiveIcons/soccer.png" alt="Football" style="width: 48px; height: 48px;">
+                        <img src="Icons/LiveIcons/soccer.png" alt="Football" style="width: 56px; height: 56px;">
                     </button>
                     <button class="live-category-btn" onclick="loadSportsCategory('basketball')" title="Basketball">
-                        <img src="Icons/LiveIcons/basketball.png" alt="Basketball" style="width: 48px; height: 48px;">
+                        <img src="Icons/LiveIcons/basketball.png" alt="Basketball" style="width: 56px; height: 56px;">
                     </button>
                     <button class="live-category-btn" onclick="loadSportsCategory('american-football')" title="American Football">
-                        <img src="Icons/LiveIcons/american-football.png" alt="American Football" style="width: 48px; height: 48px;">
+                        <img src="Icons/LiveIcons/american-football.png" alt="American Football" style="width: 56px; height: 56px;">
                     </button>
                     <button class="live-category-btn" onclick="loadSportsCategory('hockey')" title="Hockey">
-                        <img src="Icons/LiveIcons/ice-hockey.png" alt="Hockey" style="width: 48px; height: 48px;">
+                        <img src="Icons/LiveIcons/ice-hockey.png" alt="Hockey" style="width: 56px; height: 56px;">
                     </button>
                     <button class="live-category-btn" onclick="loadSportsCategory('baseball')" title="Baseball">
-                        <img src="Icons/LiveIcons/baseball-player.png" alt="Baseball" style="width: 48px; height: 48px;">
+                        <img src="Icons/LiveIcons/baseball-player.png" alt="Baseball" style="width: 56px; height: 56px;">
                     </button>
                     <button class="live-category-btn" onclick="loadSportsCategory('motor-sports')" title="Motor Sports">
-                        <img src="Icons/LiveIcons/f1.png" alt="Motor Sports" style="width: 48px; height: 48px;">
+                        <img src="Icons/LiveIcons/f1.png" alt="Motor Sports" style="width: 56px; height: 56px;">
                     </button>
                     <button class="live-category-btn" onclick="loadSportsCategory('fight')" title="Fight">
-                        <img src="Icons/LiveIcons/wrestling.png" alt="Fight" style="width: 48px; height: 48px;">
+                        <img src="Icons/LiveIcons/wrestling.png" alt="Fight" style="width: 56px; height: 56px;">
                     </button>
                     <button class="live-category-btn" onclick="loadSportsCategory('tennis')" title="Tennis">
-                        <img src="Icons/LiveIcons/smash.png" alt="Tennis" style="width: 48px; height: 48px;">
+                        <img src="Icons/LiveIcons/smash.png" alt="Tennis" style="width: 56px; height: 56px;">
                     </button>
                     <button class="live-category-btn" onclick="loadSportsCategory('rugby')" title="Rugby">
-                        <img src="Icons/LiveIcons/rugby.png" alt="Rugby" style="width: 48px; height: 48px;">
+                        <img src="Icons/LiveIcons/rugby.png" alt="Rugby" style="width: 56px; height: 56px;">
                     </button>
                     <button class="live-category-btn" onclick="loadSportsCategory('golf')" title="Golf">
-                        <img src="Icons/LiveIcons/golf-player.png" alt="Golf" style="width: 48px; height: 48px;">
+                        <img src="Icons/LiveIcons/golf-player.png" alt="Golf" style="width: 56px; height: 56px;">
                     </button>
                     <button class="live-category-btn" onclick="loadSportsCategory('cricket')" title="Cricket">
-                        <img src="Icons/LiveIcons/cricket.png" alt="Cricket" style="width: 48px; height: 48px;">
+                        <img src="Icons/LiveIcons/cricket.png" alt="Cricket" style="width: 56px; height: 56px;">
                     </button>
                     <button class="live-category-btn" onclick="loadSportsCategory('darts')" title="Darts">
-                        <img src="Icons/LiveIcons/dart.png" alt="Darts" style="width: 48px; height: 48px;">
+                        <img src="Icons/LiveIcons/dart.png" alt="Darts" style="width: 56px; height: 56px;">
                     </button>
                     <button class="live-category-btn" onclick="loadSportsCategory('other')" title="Other">
-                        <img src="Icons/LiveIcons/other.png" alt="Other" style="width: 48px; height: 48px;">
+                        <img src="Icons/LiveIcons/other.png" alt="Other" style="width: 56px; height: 56px;">
                     </button>
                 </div>
             </div>
@@ -7393,6 +9002,11 @@
 
     <!-- User Menu Dropdown -->
     <div class="user-menu-container">
+        <!-- Friend Request Notification Icon - beside user menu -->
+        <div id="friendRequestNotification" class="friend-request-notification-left" onclick="showFriendsModal()">
+            <img src="/Icons/friend-request.png" alt="Friend Requests">
+            <span id="friendRequestBadge" class="request-count-badge">0</span>
+        </div>
         <button class="user-menu-btn" id="userMenuBtn" onclick="toggleUserMenu()">
             <img id="userMenuIcon" src="Icons/user.png" alt="User" style="width: 30px; height: 30px;">
             <span id="userMenuText" style="display: none;"></span>
@@ -7425,36 +9039,51 @@
     </div>
 
     <!-- Watchparty Panel -->
-    <div id="watchpartyPanel" class="bg-effects-panel" style="top: 70px; min-width: 320px;">
-        <div class="bg-effects-title">
-            <span style="width: 24px;"></span>
-            <span class="title-text">WATCHPARTY</span>
-            <button class="panel-close-btn" onclick="document.getElementById('watchpartyPanel').classList.remove('active')">×</button>
+    <div id="watchpartyPanel" class="bg-effects-panel sync-chamber" style="top: 70px;">
+        <div class="sync-chamber-header">
+            <div class="sync-chamber-title">
+                <div class="sync-icon"></div>
+                SYNC CHAMBER
+            </div>
+            <button class="friends-terminal-close" onclick="document.getElementById('watchpartyPanel').classList.remove('active')">×</button>
         </div>
 
-        <div style="font-family: 'VT323', monospace; color: var(--accent-color, #00d9ff); font-size: 18px; margin-bottom: 16px; text-align: center; line-height: 1.4;">
-            Watch together with friends! (chat only)
+        <div class="sync-chamber-body">
+            <div class="sync-description">
+                ◈ Synchronize viewing sessions with friends in real-time
+            </div>
+
+            <div class="sync-input-group">
+                <label class="sync-input-label">Identity Code</label>
+                <input type="text" id="usernameInput" class="sync-input" placeholder="Enter your display name...">
+            </div>
+
+            <div class="sync-action-cards">
+                <div class="sync-action-card primary" onclick="createWatchparty()">
+                    <span class="sync-action-icon">◉</span>
+                    <span class="sync-action-label">Create</span>
+                </div>
+                <div class="sync-action-card" onclick="document.getElementById('joinRoomCodeInput').focus()">
+                    <span class="sync-action-icon">◈</span>
+                    <span class="sync-action-label">Join</span>
+                </div>
+            </div>
+
+            <div class="sync-divider">
+                <div class="sync-divider-line"></div>
+                <span class="sync-divider-text">FREQUENCY</span>
+                <div class="sync-divider-line"></div>
+            </div>
+
+            <div class="sync-input-group">
+                <label class="sync-input-label">Room Frequency</label>
+                <input type="text" id="joinRoomCodeInput" class="sync-input" placeholder="Enter room code..." style="text-align: center; text-transform: uppercase; letter-spacing: 4px;">
+            </div>
+
+            <div class="sync-action-card" onclick="joinWatchparty()" style="margin-top: 16px;">
+                <span class="sync-action-label">◈ Connect to Frequency ◈</span>
+            </div>
         </div>
-
-        <div style="margin-bottom: 12px;">
-            <label style="font-family: 'VT323', monospace; color: var(--primary-color, #00ff9f); font-size: 16px; display: block; margin-bottom: 6px;">Display Name</label>
-            <input type="text" id="usernameInput" placeholder="Enter your name..."
-                   style="font-family: 'VT323', monospace; width: 100%; padding: 12px; background: var(--bg-dark, #0f0f1e); border: 2px solid var(--secondary-color, #ff00ff); color: var(--primary-color, #00ff9f); font-size: 18px; border-radius: 8px; box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.3);">
-        </div>
-
-        <button onclick="createWatchparty()" class="effects-btn" style="width: 100%; margin-bottom: 8px; padding: 12px; background: var(--primary-color, #00ff9f); border-color: var(--primary-color, #00ff9f); color: var(--bg-dark, #0f0f1e);">
-            Create Party
-        </button>
-
-        <div style="font-family: 'VT323', monospace; text-align: center; color: #888; margin: 8px 0; font-size: 16px;">OR</div>
-
-        <input type="text" id="joinRoomCodeInput" placeholder="Room Code"
-               style="font-family: 'VT323', monospace; width: 100%; padding: 12px; background: var(--bg-dark, #0f0f1e); border: 2px solid var(--accent-color, #00d9ff); color: var(--primary-color, #00ff9f); font-size: 18px; margin-bottom: 8px; text-align: center; text-transform: uppercase; letter-spacing: 2px; font-weight: 600; border-radius: 8px; box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.3);">
-
-        <button onclick="joinWatchparty()" class="effects-btn" style="width: 100%; padding: 12px;">
-            Join Party
-        </button>
-
     </div>
 
     <!-- Background Effects Panel -->
@@ -7731,24 +9360,28 @@
             <div id="syncIndicator" class="sync-indicator"></div>
 
             <!-- Comments Section -->
-            <div id="commentsSection" style="display: none; background: #0f0f1e; border: 3px solid var(--accent-color, #00d9ff); padding: 24px; margin-top: 24px; box-shadow: 0 0 15px rgba(0, 217, 255, 0.3);">
-                <h3 style="font-family: 'Press Start 2P', cursive; font-size: 16px; color: var(--accent-color, #00d9ff); margin-bottom: 20px; text-shadow: 0 0 10px rgba(0, 217, 255, 0.5);">
-                    Friends' Comments
-                </h3>
-
-                <div id="commentsList" style="max-height: 300px; overflow-y: auto; margin-bottom: 20px;">
-                    <!-- Comments will be loaded here -->
+            <div id="commentsSection" class="transmission-log" style="display: none;">
+                <div class="transmission-header">
+                    <div class="transmission-icon">◈</div>
+                    <span class="transmission-title">Transmission Log</span>
+                    <div class="transmission-status">LIVE</div>
                 </div>
 
-                <div id="addCommentSection" style="border-top: 2px solid rgba(0, 217, 255, 0.3); padding-top: 16px;">
-                    <textarea id="commentTextarea" placeholder="Share your thoughts with friends..."
-                              style="width: 100%; padding: 12px; background: #1a1a2e; border: 2px solid var(--secondary-color, #ff00ff); color: #e0e0e0; font-family: 'VT323', monospace; font-size: 18px; resize: none; overflow: hidden; min-height: 40px; max-height: 200px; border-radius: 4px;"
-                              maxlength="500"
-                              rows="1"
-                              oninput="autoResizeTextarea(this); updateCharCount();"></textarea>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
-                        <span id="commentCharCount" style="color: #666; font-family: 'VT323', monospace; font-size: 14px;">0/500</span>
-                        <button onclick="submitComment()" class="btn" style="padding: 10px 24px;">Post Comment</button>
+                <div id="commentsList" class="transmission-body">
+                    <!-- Comments will be loaded here with new styling -->
+                </div>
+
+                <div id="addCommentSection" class="transmission-input-section">
+                    <div class="transmission-input-wrapper">
+                        <span class="transmission-input-label">Broadcast</span>
+                        <textarea id="commentTextarea" class="transmission-textarea" placeholder="Transmit your message..."
+                                  maxlength="500"
+                                  rows="1"
+                                  oninput="autoResizeTextarea(this); updateCharCount();"></textarea>
+                    </div>
+                    <div class="transmission-input-footer">
+                        <span id="commentCharCount" class="transmission-char-count">0/500</span>
+                        <button onclick="submitComment()" class="transmission-submit-btn">◈ Transmit</button>
                     </div>
                 </div>
             </div>
@@ -7914,33 +9547,78 @@
             </div>
         </div>
 
-        <!-- Friends Modal -->
-        <div id="friendsModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 10000; padding: 40px; overflow-y: auto;">
-            <div style="max-width: 700px; margin: 0 auto; background: #0f0f1e; border: 4px solid #00d9ff; padding: 32px; box-shadow: 0 0 0 4px #1a1a2e, 0 0 30px rgba(0, 217, 255, 0.5);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                    <h2 style="font-family: 'Press Start 2P', cursive; font-size: 18px; color: #00d9ff; margin: 0;">Friends</h2>
-                    <button onclick="closeFriendsModal()" style="background: none; border: none; color: #ff00ff; font-size: 40px; cursor: pointer; padding: 8px 16px; line-height: 1; transition: color 0.2s;">×</button>
+        <!-- Create New List Modal -->
+        <div id="createListModalOverlay" class="create-list-modal-overlay" onclick="closeCreateListModal()">
+            <div class="create-list-modal" onclick="event.stopPropagation()">
+                <div class="create-list-header">
+                    <div class="create-list-title">Create New List</div>
+                    <button class="create-list-close" onclick="closeCreateListModal()">×</button>
                 </div>
-
-                <!-- Friend Requests -->
-                <div id="friendRequestsSection" style="margin-bottom: 24px;">
-                    <h3 style="color: var(--primary-color); font-family: 'VT323', monospace; font-size: 20px; margin-bottom: 12px;">Friend Requests</h3>
-                    <div id="friendRequestsList"></div>
-                </div>
-
-                <!-- Add Friend -->
-                <div style="margin-bottom: 24px;">
-                    <h3 style="color: var(--primary-color); font-family: 'VT323', monospace; font-size: 20px; margin-bottom: 12px;">Add Friend</h3>
-                    <div style="display: flex; gap: 10px;">
-                        <input type="text" id="friendSearchInput" class="search-input" placeholder="Search username..." oninput="searchFriends()" style="flex: 1; padding: 12px;">
+                <div class="create-list-body">
+                    <p class="create-list-description">
+                        ◈ Give your new collection a unique name
+                    </p>
+                    <div class="create-list-input-group">
+                        <span class="create-list-input-label">List Name</span>
+                        <input type="text" id="createListNameInput" class="create-list-input" placeholder="Enter list name..." maxlength="50" autocomplete="off">
                     </div>
-                    <div id="friendSearchResults" style="margin-top: 12px;"></div>
+                    <div id="createListError" class="create-list-error">
+                        A list with this name already exists
+                    </div>
+                    <div class="create-list-actions">
+                        <button class="create-list-btn secondary" onclick="closeCreateListModal()">Cancel</button>
+                        <button class="create-list-btn primary" onclick="confirmCreateList()">◈ Create List</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Friends Modal - NETWORK TERMINAL -->
+        <div id="friendsModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 10000; padding: 20px; overflow-y: auto; backdrop-filter: blur(10px);">
+            <div class="friends-terminal">
+                <div class="friends-terminal-header">
+                    <div class="friends-terminal-title">
+                        NETWORK TERMINAL
+                    </div>
+                    <button class="friends-terminal-close" onclick="closeFriendsModal()">×</button>
                 </div>
 
-                <!-- My Friends -->
-                <div>
-                    <h3 style="color: var(--primary-color); font-family: 'VT323', monospace; font-size: 20px; margin-bottom: 12px;">My Friends</h3>
-                    <div id="friendsList"></div>
+                <div class="friends-terminal-body">
+                    <!-- Friend Requests Section -->
+                    <div class="friends-section" id="friendRequestsSection">
+                        <div class="friends-section-header">
+                            <div class="friends-section-icon"></div>
+                            <span class="friends-section-title">Incoming Requests</span>
+                        </div>
+                        <div id="friendRequestsList">
+                            <!-- Friend requests will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Add Friend Section -->
+                    <div class="friends-section">
+                        <div class="friends-section-header">
+                            <div class="friends-section-icon" style="background: linear-gradient(135deg, #ff00ff, #00d9ff);"></div>
+                            <span class="friends-section-title">Scan for Users</span>
+                        </div>
+                        <div class="friends-search-wrapper">
+                            <span class="friends-search-label">Username Query</span>
+                            <span class="friends-search-icon">◈</span>
+                            <input type="text" id="friendSearchInput" class="friends-search-input" placeholder="Enter username to scan..." oninput="searchFriends()">
+                        </div>
+                        <div id="friendSearchResults"></div>
+                    </div>
+
+                    <!-- My Friends Section -->
+                    <div class="friends-section">
+                        <div class="friends-section-header">
+                            <div class="friends-section-icon" style="background: linear-gradient(135deg, #00ff9f, #00d9ff);"></div>
+                            <span class="friends-section-title">Connected Users</span>
+                        </div>
+                        <div id="friendsList">
+                            <!-- Friends will be populated here -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -14658,8 +16336,19 @@
 
             const listNames = Object.keys(watchlists);
 
+            // Create the "Create New List" button HTML
+            const createBtnHTML = `
+                <button class="watchlist-slide-create-btn" onclick="promptCreateNewList()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 5v14M5 12h14"/>
+                    </svg>
+                    Create New List
+                </button>
+            `;
+
             if (listNames.length === 0) {
                 container.innerHTML = `
+                    ${createBtnHTML}
                     <div class="watchlist-slide-empty">
                         <div class="watchlist-slide-empty-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -14672,7 +16361,7 @@
                 return;
             }
 
-            container.innerHTML = listNames.map(listName => {
+            const listsHTML = listNames.map(listName => {
                 const items = watchlists[listName] || [];
                 const count = items.length;
                 return `
@@ -14694,7 +16383,89 @@
                     </div>
                 `;
             }).join('');
+
+            container.innerHTML = createBtnHTML + listsHTML;
         }
+
+        // Open the Create New List modal
+        window.promptCreateNewList = function() {
+            const overlay = document.getElementById('createListModalOverlay');
+            const input = document.getElementById('createListNameInput');
+            const errorEl = document.getElementById('createListError');
+
+            if (overlay) {
+                overlay.classList.add('active');
+                if (input) {
+                    input.value = '';
+                    input.classList.remove('error');
+                    input.focus();
+                }
+                if (errorEl) {
+                    errorEl.classList.remove('visible');
+                }
+            }
+        }
+
+        // Close the Create New List modal
+        window.closeCreateListModal = function() {
+            const overlay = document.getElementById('createListModalOverlay');
+            if (overlay) {
+                overlay.classList.remove('active');
+            }
+        }
+
+        // Confirm and create the new list
+        window.confirmCreateList = function() {
+            const input = document.getElementById('createListNameInput');
+            const errorEl = document.getElementById('createListError');
+
+            if (!input) return;
+
+            const listName = input.value.trim();
+
+            // Validate empty name
+            if (!listName) {
+                input.classList.add('error');
+                errorEl.textContent = 'Please enter a name for your list';
+                errorEl.classList.add('visible');
+                input.focus();
+                return;
+            }
+
+            // Check for duplicate names (case-insensitive)
+            const existingNames = Object.keys(watchlists).map(name => name.toLowerCase());
+            if (existingNames.includes(listName.toLowerCase())) {
+                input.classList.add('error');
+                errorEl.textContent = 'A list with this name already exists';
+                errorEl.classList.add('visible');
+                input.focus();
+                return;
+            }
+
+            // Create the list
+            watchlists[listName] = [];
+            localStorage.setItem('streamingSite_watchlists', JSON.stringify(watchlists));
+            showStatus(`Created new list: ${listName}`);
+            renderWatchlistLists();
+            closeCreateListModal();
+        }
+
+        // Handle Enter key in create list input
+        document.addEventListener('DOMContentLoaded', function() {
+            const createListInput = document.getElementById('createListNameInput');
+            if (createListInput) {
+                createListInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        confirmCreateList();
+                    }
+                });
+                // Clear error state on input
+                createListInput.addEventListener('input', function() {
+                    this.classList.remove('error');
+                    document.getElementById('createListError')?.classList.remove('visible');
+                });
+            }
+        });
 
         window.showWatchlistItems = async function(listName) {
             const listsContainer = document.getElementById('watchlistSlideLists');
@@ -16290,6 +18061,8 @@
 
         function updateFriendRequestNotification() {
             const countElement = document.getElementById('friendRequestCount');
+            const notificationIcon = document.getElementById('friendRequestNotification');
+            const badgeElement = document.getElementById('friendRequestBadge');
             const count = pendingFriendRequests.length;
 
             console.log('[Friend Requests] Updating count - count:', count, 'element:', !!countElement);
@@ -16305,6 +18078,18 @@
                 }
             } else {
                 console.error('[Friend Requests] Count element not found!');
+            }
+
+            // Update the home screen notification icon
+            if (notificationIcon && badgeElement) {
+                if (count > 0) {
+                    notificationIcon.classList.add('has-requests');
+                    badgeElement.textContent = count;
+                    console.log('[Friend Requests] Home icon shown with count:', count);
+                } else {
+                    notificationIcon.classList.remove('has-requests');
+                    console.log('[Friend Requests] Home icon hidden (no requests)');
+                }
             }
         }
 
@@ -16837,7 +18622,7 @@
                 } else if (!Array.isArray(response)) {
                     console.error('[Friends] Response is not an array:', response);
                     const friendsList = document.getElementById('friendsList');
-                    friendsList.innerHTML = '<p style="color: #ff6b6b; padding: 20px; text-align: center;">Error loading friends</p>';
+                    friendsList.innerHTML = '<div class="friends-empty-state"><span style="color: #ff6b6b;">◈ Error loading connections</span></div>';
                     return;
                 }
 
@@ -16847,7 +18632,7 @@
 
                 if (friends.length === 0) {
                     console.log('[Friends] No friends found');
-                    friendsList.innerHTML = '<p style="color: #666; padding: 20px; text-align: center;">No friends yet</p>';
+                    friendsList.innerHTML = '<div class="friends-empty-state">◈ No connections established</div>';
                     return;
                 }
 
@@ -16856,22 +18641,31 @@
                 // Clear existing content
                 friendsList.innerHTML = '';
 
-                // Create elements programmatically
+                // Create elements with new Network Terminal styling
                 friends.forEach(friend => {
                     const container = document.createElement('div');
-                    container.style.cssText = 'background: rgba(15, 15, 30, 0.6); border: 2px solid var(--primary-color); padding: 16px; margin-bottom: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;';
+                    container.className = 'friend-card';
+
+                    const infoDiv = document.createElement('div');
+                    infoDiv.className = 'friend-request-info';
+
+                    const avatar = document.createElement('div');
+                    avatar.className = 'friend-avatar friend-status-online';
+                    avatar.textContent = friend.username ? friend.username.charAt(0).toUpperCase() : '?';
 
                     const username = document.createElement('span');
-                    username.style.cssText = 'color: #e0e0e0; font-family: "VT323", monospace; font-size: 18px;';
+                    username.className = 'friend-username';
                     username.textContent = friend.username;
 
+                    infoDiv.appendChild(avatar);
+                    infoDiv.appendChild(username);
+
                     const removeBtn = document.createElement('button');
-                    removeBtn.className = 'btn';
-                    removeBtn.style.cssText = 'padding: 8px 16px; background: #ff6b6b;';
-                    removeBtn.textContent = 'Remove';
+                    removeBtn.className = 'friend-btn-reject';
+                    removeBtn.textContent = 'Disconnect';
                     removeBtn.onclick = () => removeFriend(friend.id);
 
-                    container.appendChild(username);
+                    container.appendChild(infoDiv);
                     container.appendChild(removeBtn);
                     friendsList.appendChild(container);
                 });
@@ -16888,41 +18682,50 @@
                 const requestsList = document.getElementById('friendRequestsList');
 
                 if (requests.length === 0) {
-                    requestsList.innerHTML = '<p style="color: #666; padding: 20px; text-align: center;">No pending requests</p>';
+                    requestsList.innerHTML = '<div class="friends-empty-state">◈ No incoming requests</div>';
                     return;
                 }
 
                 // Clear existing content
                 requestsList.innerHTML = '';
 
-                // Create elements programmatically to avoid string escaping issues
+                // Create elements with Network Terminal styling
                 requests.forEach(req => {
                     const container = document.createElement('div');
-                    container.style.cssText = 'background: rgba(15, 15, 30, 0.6); border: 2px solid #00d9ff; padding: 16px; margin-bottom: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;';
+                    container.className = 'friend-request-card';
+
+                    const infoDiv = document.createElement('div');
+                    infoDiv.className = 'friend-request-info';
+
+                    const avatar = document.createElement('div');
+                    avatar.className = 'friend-avatar';
+                    avatar.style.borderColor = '#ff00ff';
+                    avatar.textContent = req.from_user.username ? req.from_user.username.charAt(0).toUpperCase() : '?';
 
                     const username = document.createElement('span');
-                    username.style.cssText = 'color: #e0e0e0; font-family: "VT323", monospace; font-size: 18px;';
+                    username.className = 'friend-username';
                     username.textContent = req.from_user.username;
 
+                    infoDiv.appendChild(avatar);
+                    infoDiv.appendChild(username);
+
                     const buttonContainer = document.createElement('div');
-                    buttonContainer.style.cssText = 'display: flex; gap: 8px;';
+                    buttonContainer.className = 'friend-request-actions';
 
                     const acceptBtn = document.createElement('button');
-                    acceptBtn.className = 'btn';
-                    acceptBtn.style.cssText = 'padding: 8px 16px; background: #00ff9f;';
-                    acceptBtn.textContent = 'Accept';
+                    acceptBtn.className = 'friend-btn-accept';
+                    acceptBtn.textContent = '◈ Accept';
                     acceptBtn.onclick = () => acceptFriendRequest(req.id);
 
                     const rejectBtn = document.createElement('button');
-                    rejectBtn.className = 'btn';
-                    rejectBtn.style.cssText = 'padding: 8px 16px; background: #ff6b6b;';
-                    rejectBtn.textContent = 'Reject';
+                    rejectBtn.className = 'friend-btn-reject';
+                    rejectBtn.textContent = '✕ Reject';
                     rejectBtn.onclick = () => rejectFriendRequest(req.id);
 
                     buttonContainer.appendChild(acceptBtn);
                     buttonContainer.appendChild(rejectBtn);
 
-                    container.appendChild(username);
+                    container.appendChild(infoDiv);
                     container.appendChild(buttonContainer);
 
                     requestsList.appendChild(container);
@@ -17154,52 +18957,45 @@
             console.log(`[Comments] renderReplies called with ${replies?.length || 0} replies at depth ${depth}`);
             if (!replies || replies.length === 0) return '';
 
-            const marginLeft = 20; // Consistent left margin for all nested levels
-
             return replies.map((reply, index) => {
                 console.log(`[Comments]   Rendering reply ${index} at depth ${depth}: "${reply.comment_text.substring(0, 30)}"`);
                 console.log(`[Comments]     Reply has ${reply.replies?.length || 0} nested replies`);
                 const replyDate = new Date(reply.created_at);
                 const isOwnReply = currentUser && reply.user_id === currentUser.id;
                 const likeIconReply = reply.liked_by_user ? '❤️' : '🤍';
+                const userInitial = reply.username ? reply.username.charAt(0).toUpperCase() : '?';
 
                 // Recursively render nested replies underneath this reply
                 const nestedRepliesHTML = renderReplies(reply.replies || [], depth + 1);
 
                 return `
-                    <div style="background: rgba(15, 15, 30, 0.4); border-left: 3px solid ${isOwnReply ? 'var(--primary-color, #00ff9f)' : 'var(--accent-color, #00d9ff)'}; padding: 8px; margin: 6px 0 6px ${marginLeft}px; border-radius: 3px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                            <span style="color: ${isOwnReply ? 'var(--primary-color, #00ff9f)' : 'var(--accent-color, #00d9ff)'}; font-family: 'VT323', monospace; font-size: 14px; font-weight: bold;">
-                                ${reply.username}${isOwnReply ? ' (You)' : ''}
-                            </span>
-                            <div style="display: flex; gap: 6px; align-items: center;">
-                                <span style="color: #888; font-family: 'VT323', monospace; font-size: 11px;">
-                                    ${replyDate.toLocaleDateString()} ${replyDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                                </span>
-                                ${isOwnReply ? `<button onclick="event.stopPropagation(); deleteCommentUI('${reply._id}')" style="background: #ff6b6b; border: none; color: #fff; padding: 2px 6px; cursor: pointer; border-radius: 2px; font-family: 'VT323', monospace; font-size: 12px;">Delete</button>` : ''}
+                    <div class="transmission-reply">
+                        <div class="transmission-message ${isOwnReply ? 'own-message' : ''}" style="margin-bottom: 8px;">
+                            <div class="transmission-message-header">
+                                <div class="transmission-avatar" style="width: 32px; height: 32px; font-size: 14px; ${isOwnReply ? 'border-color: #00ff9f;' : ''}">${userInitial}</div>
+                                <span class="transmission-username" style="font-size: 16px;">${reply.username}${isOwnReply ? ' (You)' : ''}</span>
+                                <span class="transmission-timestamp">${replyDate.toLocaleDateString()} ${replyDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                                ${isOwnReply ? `<button onclick="event.stopPropagation(); deleteCommentUI('${reply._id}')" class="transmission-action-btn" style="color: #ff6b6b; margin-left: 8px; font-size: 12px;">✕</button>` : ''}
                             </div>
-                        </div>
-                        <p style="color: #e0e0e0; font-family: 'VT323', monospace; font-size: 14px; line-height: 1.3; margin: 0 0 6px 0; white-space: pre-wrap;">
-                            ${escapeHtml(reply.comment_text)}
-                        </p>
-                        <div style="display: flex; gap: 10px; align-items: center;">
-                            <button onclick="event.stopPropagation(); toggleLike('${reply._id}')" style="background: none; border: none; color: #ccc; cursor: pointer; font-family: 'VT323', monospace; font-size: 14px; display: flex; align-items: center; gap: 3px; padding: 3px 6px;">
-                                <span>${likeIconReply}</span>
-                                <span id="like-count-${reply._id}">${reply.like_count || 0}</span>
-                            </button>
-                            <button onclick="event.stopPropagation(); showReplyBox('${reply._id}')" style="background: none; border: none; color: var(--accent-color, #00d9ff); cursor: pointer; font-family: 'VT323', monospace; font-size: 13px; padding: 3px 6px;">
-                                💬 Reply
-                            </button>
-                        </div>
-                        <div id="reply-box-${reply._id}" style="display: none; margin-top: 8px; padding: 8px; background: rgba(0, 0, 0, 0.3); border-radius: 3px;">
-                            <textarea id="reply-textarea-${reply._id}" placeholder="Write a reply..."
-                                      style="width: 100%; padding: 6px; background: #1a1a2e; border: 2px solid var(--secondary-color, #ff00ff); color: #e0e0e0; font-family: 'VT323', monospace; font-size: 14px; resize: none; overflow: hidden; min-height: 25px; max-height: 120px; border-radius: 3px; margin-bottom: 6px;"
-                                      maxlength="500"
-                                      rows="1"
-                                      oninput="autoResizeTextarea(this)"></textarea>
-                            <div style="display: flex; gap: 6px;">
-                                <button onclick="submitReply('${reply._id}')" class="btn" style="padding: 4px 12px; font-size: 14px;">Post Reply</button>
-                                <button onclick="hideReplyBox('${reply._id}')" class="btn btn-secondary" style="padding: 4px 12px; font-size: 14px;">Cancel</button>
+                            <div class="transmission-content" style="padding-left: 42px; font-size: 16px;">${escapeHtml(reply.comment_text)}</div>
+                            <div class="transmission-actions" style="padding-left: 42px;">
+                                <button onclick="event.stopPropagation(); toggleLike('${reply._id}')" class="transmission-action-btn ${reply.liked_by_user ? 'liked' : ''}" style="font-size: 13px;">
+                                    <span>${likeIconReply}</span>
+                                    <span id="like-count-${reply._id}">${reply.like_count || 0}</span>
+                                </button>
+                                <button onclick="event.stopPropagation(); showReplyBox('${reply._id}')" class="transmission-action-btn" style="font-size: 13px;">
+                                    ◈ Reply
+                                </button>
+                            </div>
+                            <div id="reply-box-${reply._id}" class="transmission-reply-box" style="display: none; margin-left: 42px;">
+                                <textarea id="reply-textarea-${reply._id}" placeholder="Transmit reply..."
+                                          maxlength="500"
+                                          rows="1"
+                                          oninput="autoResizeTextarea(this)"></textarea>
+                                <div class="transmission-reply-actions">
+                                    <button onclick="submitReply('${reply._id}')" class="transmission-reply-btn">◈ Send</button>
+                                    <button onclick="hideReplyBox('${reply._id}')" class="transmission-reply-btn cancel">Cancel</button>
+                                </div>
                             </div>
                         </div>
                         ${nestedRepliesHTML}
@@ -17240,11 +19036,11 @@
             });
 
             if (comments.length === 0) {
-                commentsList.innerHTML = '<p style="color: #666; text-align: center; padding: 20px; font-family: \'VT323\', monospace; font-size: 18px;">No comments yet. Be the first to share your thoughts!</p>';
+                commentsList.innerHTML = '<div class="friends-empty-state" style="padding: 40px; text-align: center;"><span style="font-size: 40px; display: block; margin-bottom: 16px; opacity: 0.5;">◈</span><p style="color: rgba(0, 217, 255, 0.6); font-family: \'VT323\', monospace; font-size: 18px;">No transmissions yet.<br>Be the first to broadcast.</p></div>';
                 return;
             }
 
-            // Generate new comments HTML with likes and replies
+            // Generate new comments HTML with Transmission Log styling
             const newCommentsHTML = comments.map(comment => {
                 const date = new Date(comment.created_at);
                 const isOwnComment = currentUser && comment.user_id === currentUser.id;
@@ -17253,41 +19049,34 @@
                 const repliesHTML = renderReplies(comment.replies || [], 0);
 
                 const likeIcon = comment.liked_by_user ? '❤️' : '🤍';
+                const userInitial = comment.username ? comment.username.charAt(0).toUpperCase() : '?';
 
                 return`
-                    <div style="background: rgba(15, 15, 30, 0.6); border-left: 4px solid ${isOwnComment ? 'var(--primary-color, #00ff9f)' : 'var(--accent-color, #00d9ff)'}; padding: 10px; margin-bottom: 10px; border-radius: 4px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                            <span style="color: ${isOwnComment ? 'var(--primary-color, #00ff9f)' : 'var(--accent-color, #00d9ff)'}; font-family: 'VT323', monospace; font-size: 16px; font-weight: bold;">
-                                ${comment.username}${isOwnComment ? ' (You)' : ''}
-                            </span>
-                            <div style="display: flex; gap: 8px; align-items: center;">
-                                <span style="color: #888; font-family: 'VT323', monospace; font-size: 12px;">
-                                    ${date.toLocaleDateString()} ${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                                </span>
-                                ${isOwnComment ? `<button onclick="event.stopPropagation(); deleteCommentUI('${comment._id}')" style="background: #ff6b6b; border: none; color: #fff; padding: 3px 10px; cursor: pointer; border-radius: 3px; font-family: 'VT323', monospace; font-size: 13px;">Delete</button>` : ''}
-                            </div>
+                    <div class="transmission-message ${isOwnComment ? 'own-message' : ''}">
+                        <div class="transmission-message-header">
+                            <div class="transmission-avatar" style="${isOwnComment ? 'border-color: #00ff9f;' : ''}">${userInitial}</div>
+                            <span class="transmission-username">${comment.username}${isOwnComment ? ' (You)' : ''}</span>
+                            <span class="transmission-timestamp">${date.toLocaleDateString()} ${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                            ${isOwnComment ? `<button onclick="event.stopPropagation(); deleteCommentUI('${comment._id}')" class="transmission-action-btn" style="color: #ff6b6b; margin-left: 8px;">✕ Delete</button>` : ''}
                         </div>
-                        <p style="color: #e0e0e0; font-family: 'VT323', monospace; font-size: 15px; line-height: 1.4; margin: 0 0 8px 0; white-space: pre-wrap;">
-                            ${escapeHtml(comment.comment_text)}
-                        </p>
-                        <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 6px;">
-                            <button onclick="event.stopPropagation(); toggleLike('${comment._id}')" style="background: none; border: none; color: #ccc; cursor: pointer; font-family: 'VT323', monospace; font-size: 15px; display: flex; align-items: center; gap: 4px; padding: 4px 8px;">
+                        <div class="transmission-content">${escapeHtml(comment.comment_text)}</div>
+                        <div class="transmission-actions">
+                            <button onclick="event.stopPropagation(); toggleLike('${comment._id}')" class="transmission-action-btn ${comment.liked_by_user ? 'liked' : ''}">
                                 <span>${likeIcon}</span>
                                 <span id="like-count-${comment._id}">${comment.like_count || 0}</span>
                             </button>
-                            <button onclick="event.stopPropagation(); showReplyBox('${comment._id}')" style="background: none; border: none; color: var(--accent-color, #00d9ff); cursor: pointer; font-family: 'VT323', monospace; font-size: 14px; padding: 4px 8px;">
-                                💬 Reply
+                            <button onclick="event.stopPropagation(); showReplyBox('${comment._id}')" class="transmission-action-btn">
+                                ◈ Reply
                             </button>
                         </div>
-                        <div id="reply-box-${comment._id}" style="display: none; margin-top: 8px; padding: 10px; background: rgba(0, 0, 0, 0.3); border-radius: 4px;">
-                            <textarea id="reply-textarea-${comment._id}" placeholder="Write a reply..."
-                                      style="width: 100%; padding: 6px; background: #1a1a2e; border: 2px solid var(--secondary-color, #ff00ff); color: #e0e0e0; font-family: 'VT323', monospace; font-size: 14px; resize: none; overflow: hidden; min-height: 25px; max-height: 130px; border-radius: 3px; margin-bottom: 6px;"
+                        <div id="reply-box-${comment._id}" class="transmission-reply-box" style="display: none;">
+                            <textarea id="reply-textarea-${comment._id}" placeholder="Transmit reply..."
                                       maxlength="500"
                                       rows="1"
                                       oninput="autoResizeTextarea(this)"></textarea>
-                            <div style="display: flex; gap: 6px;">
-                                <button onclick="submitReply('${comment._id}')" class="btn" style="padding: 5px 14px; font-size: 14px;">Post Reply</button>
-                                <button onclick="hideReplyBox('${comment._id}')" class="btn btn-secondary" style="padding: 5px 14px; font-size: 14px;">Cancel</button>
+                            <div class="transmission-reply-actions">
+                                <button onclick="submitReply('${comment._id}')" class="transmission-reply-btn">◈ Send</button>
+                                <button onclick="hideReplyBox('${comment._id}')" class="transmission-reply-btn cancel">Cancel</button>
                             </div>
                         </div>
                         ${repliesHTML}
