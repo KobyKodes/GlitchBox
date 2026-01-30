@@ -9086,6 +9086,19 @@
             }
         });
 
+        // Close watchlist panel when clicking outside
+        document.addEventListener('click', function(event) {
+            const panel = document.getElementById('watchlistPanel');
+            if (panel && panel.classList.contains('active')) {
+                // Check if click is outside panel and not on a watchlist-btn
+                if (!panel.contains(event.target) && !event.target.closest('.watchlist-btn') && !event.target.closest('#playerWatchlistBtn')) {
+                    panel.classList.remove('active');
+                    setTimeout(() => { panel.style.display = 'none'; }, 250);
+                    window.pendingWatchlistPanelItem = null;
+                }
+            }
+        });
+
         // Legacy function for compatibility (now uses dropdown)
         window.showSourceSelector = function() {
             toggleSourceMenu();
@@ -10177,6 +10190,13 @@
             const panel = document.getElementById('watchlistPanel');
             if (!panel) return;
 
+            // If panel is already open, close it
+            if (panel.classList.contains('active')) {
+                panel.classList.remove('active');
+                setTimeout(() => { panel.style.display = 'none'; }, 250);
+                return;
+            }
+
             // Store current item data
             window.pendingWatchlistPanelItem = {
                 id: id,
@@ -10197,23 +10217,30 @@
             updateWatchlistPanel(inLists);
 
             // Position panel near the clicked button
-            const button = event.target;
+            const button = event.target.closest('.watchlist-btn') || event.target;
             const rect = button.getBoundingClientRect();
 
             // Position below button, but adjust if too close to bottom
             const spaceBelow = window.innerHeight - rect.bottom;
-            const panelHeight = 400; // max-height of panel
+            const panelHeight = 450;
+            const panelWidth = 360;
 
             if (spaceBelow < panelHeight && rect.top > panelHeight) {
-                // Position above button if not enough space below
-                panel.style.top = `${rect.top + window.scrollY - panelHeight - 5}px`;
+                panel.style.top = `${rect.top + window.scrollY - panelHeight - 8}px`;
             } else {
-                // Position below button
-                panel.style.top = `${rect.bottom + window.scrollY + 5}px`;
+                panel.style.top = `${rect.bottom + window.scrollY + 8}px`;
             }
 
-            panel.style.left = `${rect.left + window.scrollX}px`;
+            let left = rect.left + window.scrollX;
+            if (left + panelWidth > window.innerWidth) {
+                left = window.innerWidth - panelWidth - 16;
+            }
+
+            panel.style.left = `${left}px`;
             panel.style.display = 'flex';
+            requestAnimationFrame(() => {
+                panel.classList.add('active');
+            });
         }
 
         function showWatchlistModal(event) {

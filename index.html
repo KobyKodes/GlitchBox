@@ -539,9 +539,213 @@
             border: none;
             border-bottom: 2px solid var(--primary-color, #00ff9f);
             padding: 32px;
+            padding-top: 48px;
             margin-bottom: 32px;
             box-shadow: none;
             position: relative;
+        }
+
+        .player-close-btn {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            z-index: 100;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            color: var(--text-secondary, #aaa);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .player-close-btn:hover {
+            background: rgba(255, 70, 70, 0.15);
+            border-color: rgba(255, 70, 70, 0.4);
+            color: #ff4646;
+            transform: scale(1.08);
+        }
+
+        /* Redesigned Player Watchlist Panel */
+        .player-watchlist-panel {
+            display: none;
+            flex-direction: column;
+            width: 360px;
+            max-height: 450px;
+            background: var(--bg-elevated, rgba(26, 26, 46, 0.97));
+            border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.1));
+            border-radius: 18px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 20px var(--primary-glow, rgba(0, 255, 159, 0.15));
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px) scale(0.96);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .player-watchlist-panel.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+            display: flex;
+        }
+
+        .player-watchlist-header {
+            padding: 18px 22px 14px;
+            border-bottom: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+        }
+
+        .player-watchlist-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .player-watchlist-title {
+            font-family: inherit;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary, #f5f5f7);
+            margin: 0;
+        }
+
+        .player-watchlist-close {
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            border-radius: 10px;
+            color: var(--text-secondary, #aaa);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .player-watchlist-close:hover {
+            background: rgba(255, 70, 70, 0.12);
+            color: #ff4646;
+        }
+
+        .player-watchlist-lists {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .player-watchlist-list-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid transparent;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-primary, #f5f5f7);
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .player-watchlist-list-card:hover {
+            background: var(--primary-glow, rgba(0, 255, 159, 0.08));
+            border-color: var(--primary-glow, rgba(0, 255, 159, 0.2));
+            transform: translateX(4px);
+        }
+
+        .player-watchlist-list-card.remove-card:hover {
+            background: rgba(255, 59, 48, 0.1);
+            border-color: rgba(255, 59, 48, 0.25);
+        }
+
+        .player-watchlist-list-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--primary-color, #00ff9f) 0%, var(--accent-color, #00d9ff) 100%);
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--bg-dark, #0f0f1e);
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .player-watchlist-list-card.remove-card .player-watchlist-list-icon {
+            background: linear-gradient(135deg, #ff3b30 0%, #ff6b60 100%);
+        }
+
+        .player-watchlist-list-name {
+            flex: 1;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .player-watchlist-list-arrow {
+            color: var(--text-secondary, #aaa);
+            opacity: 0;
+            transform: translateX(-8px);
+            transition: all 0.2s ease;
+            font-size: 16px;
+        }
+
+        .player-watchlist-list-card:hover .player-watchlist-list-arrow {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .player-watchlist-create {
+            padding: 14px 16px 16px;
+            border-top: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+        }
+
+        .player-watchlist-input {
+            width: 100%;
+            padding: 12px 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.1));
+            border-radius: 10px;
+            color: var(--text-primary, #f5f5f7);
+            font-size: 15px;
+            margin-bottom: 10px;
+            outline: none;
+            transition: border-color 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        .player-watchlist-input:focus {
+            border-color: var(--primary-color, #00ff9f);
+        }
+
+        .player-watchlist-input::placeholder {
+            color: var(--text-secondary, #777);
+        }
+
+        .player-watchlist-create-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color, #00ff9f);
+            border: none;
+            border-radius: 10px;
+            color: var(--bg-dark, #0f0f1e);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .player-watchlist-create-btn:hover {
+            opacity: 0.85;
+            transform: translateY(-1px);
         }
 
         .backdrop-image {
@@ -661,9 +865,9 @@
 
         .current-content {
             display: grid;
-            grid-template-columns: 1fr auto;
+            grid-template-columns: 1fr 240px;
             grid-template-rows: auto 1fr;
-            gap: 20px;
+            gap: 24px;
             align-items: start;
             margin-bottom: 15px;
             position: relative;
@@ -686,13 +890,14 @@
         }
 
         .current-content-poster {
-            width: 200px;
-            height: 300px;
+            width: 230px;
+            height: 345px;
             object-fit: cover;
             border-radius: 8px;
             background: #333;
             border: 3px solid var(--accent-color, #00d9ff);
             box-shadow: 0 0 15px var(--secondary-glow, rgba(0, 217, 255, 0.3));
+            flex-shrink: 0;
         }
 
         .poster-container #playerWatchlistBtn {
@@ -718,7 +923,16 @@
                 2px 2px 0 var(--accent-color, #00d9ff),
                 4px 4px 0 rgba(0, 0, 0, 0.3);
             font-weight: 600;
-            font-size: 36px;
+            font-size: 46px;
+            text-align: center;
+        }
+
+        .current-content-info p#currentYear {
+            font-family: 'VT323', monospace;
+            color: var(--accent-color, #00d9ff);
+            font-size: 32px;
+            margin: 0;
+            text-align: center;
         }
 
         .current-content-info p {
@@ -773,6 +987,7 @@
             display: flex;
             gap: 20px;
             flex-wrap: wrap;
+            justify-content: center;
         }
 
         .rating-item {
@@ -799,7 +1014,7 @@
         }
 
         .rating-source {
-            font-size: 16px;
+            font-size: 22px;
             font-weight: 600;
             color: var(--accent-color, #00d9ff);
             text-transform: uppercase;
@@ -808,7 +1023,7 @@
         }
 
         .rating-value {
-            font-size: 28px;
+            font-size: 36px;
             font-weight: 700;
             color: var(--primary-color, #00ff9f);
             text-shadow: 0 0 10px var(--primary-glow, rgba(0, 255, 159, 0.5));
@@ -818,7 +1033,7 @@
         .omdb-details {
             font-family: 'VT323', monospace;
             margin: 0;
-            padding: 16px;
+            padding: 20px;
             background: rgba(0, 122, 255, 0.05);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -827,15 +1042,17 @@
             width: 100%;
             overflow: hidden;
             box-sizing: border-box;
+            text-align: center;
         }
 
         .detail-item {
             color: #f5f5f7;
-            font-size: 20px;
-            margin-bottom: 8px;
+            font-size: 26px;
+            margin-bottom: 10px;
             line-height: 1.5;
             word-wrap: break-word;
             overflow-wrap: break-word;
+            text-align: center;
         }
 
         .detail-item strong {
@@ -945,7 +1162,7 @@
 
         #episodeDescriptionText {
             font-family: 'VT323', monospace;
-            font-size: 26px;
+            font-size: 30px;
             line-height: 1.6;
             color: #e5e5e7;
             margin: 0;
@@ -956,7 +1173,7 @@
 
         #currentOverview {
             font-family: 'VT323', monospace;
-            font-size: 26px;
+            font-size: 30px;
             line-height: 1.6;
             color: #e5e5e7;
             margin: 0;
@@ -987,7 +1204,7 @@
             border: 4px solid var(--primary-color, #00ff9f);
             border-style: solid;
             color: var(--primary-color, #00ff9f);
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 600;
             margin: 8px 8px 8px 0;
             cursor: pointer;
@@ -1132,9 +1349,44 @@
             gap: 12px;
             flex-wrap: wrap;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
             position: relative;
             overflow: visible;
+        }
+
+        .player-controls-left,
+        .player-controls-center,
+        .player-controls-right {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .player-controls-left {
+            justify-content: flex-start;
+        }
+
+        .player-controls-center {
+            justify-content: center;
+            flex: 1;
+        }
+
+        .player-controls-right {
+            justify-content: flex-end;
+        }
+
+        .player-icon-btn {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 14px !important;
+        }
+
+        .player-control-icon {
+            width: 28px !important;
+            height: 28px !important;
+            margin: 0 !important;
+            vertical-align: middle;
         }
 
         .loading {
@@ -7391,6 +7643,27 @@
             animation: slideInFromRight 0.3s ease-out;
         }
 
+        /* Season & Episode Panel Animations */
+        #seasonPanel,
+        #episodePanel {
+            opacity: 0;
+            transform: translateY(-8px) scale(0.96);
+            transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                        transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #seasonPanel.panel-visible,
+        #episodePanel.panel-visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        #seasonPanel.panel-closing,
+        #episodePanel.panel-closing {
+            opacity: 0;
+            transform: translateY(-8px) scale(0.96);
+        }
+
         .bg-effects-title {
             font-family: 'Press Start 2P', cursive;
             font-size: 11px;
@@ -10508,6 +10781,11 @@
         </div>
 
         <div class="player-section" id="playerSection" style="display: none;">
+            <button class="player-close-btn" onclick="stopPlayback()" title="Close player">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+            </button>
             <div id="currentContent" class="current-content" style="display: none;">
                 <div id="backdropImage" class="backdrop-image"></div>
                 <div id="playerBgAnimation" class="player-bg-animation"></div>
@@ -10584,42 +10862,52 @@
             </div>
 
             <div class="player-controls">
-                <button onclick="playNextEpisode()" class="btn" id="nextEpisodeBtn" style="display: none;"><img src="Icons/next-episode.png" alt="Next" style="width: 18px; height: 18px; margin-right: 6px; vertical-align: middle;"> Next Episode</button>
-                <button onclick="toggleFullscreen()" class="btn btn-secondary"><img src="Icons/fullscreen.png" alt="Fullscreen" style="width: 38px; height: 38px; vertical-align: middle;"></button>
-                <button id="sportsSourceBtn" class="btn btn-secondary" onclick="switchSportsSource()" style="display: none;">
-                    <span id="sportsSourceBtnText">Source 1</span>
-                </button>
-                <button onclick="toggleComments()" class="btn btn-secondary" id="commentsBtn" style="display: none;"><img src="Icons/comments.png" alt="Comments" style="width: 18px; height: 18px; margin-right: 6px; vertical-align: middle;"> Comments</button>
-                <button onclick="stopPlayback()" class="btn btn-secondary" id="stopBtn" style="display: none;"><img src="Icons/stop-sign.png" alt="Stop" style="width: 38px; height: 38px; vertical-align: middle;"></button>
+                <!-- Left group: Next Episode + Comments -->
+                <div class="player-controls-left">
+                    <button onclick="playNextEpisode()" class="btn player-icon-btn" id="nextEpisodeBtn" style="display: none;" title="Next Episode"><img src="Icons/next-episode.png" alt="Next Episode" class="player-control-icon"></button>
+                    <button onclick="toggleComments()" class="btn btn-secondary player-icon-btn" id="commentsBtn" style="display: none;" title="Comments"><img src="Icons/comments.png" alt="Comments" class="player-control-icon"></button>
+                </div>
 
-                <!-- Source Dropdown Menu -->
-                <div class="source-menu-container" id="sourceMenuContainer" style="display: none;">
-                    <button class="source-menu-btn" id="videoSourceBtn" onclick="toggleSourceMenu()">
-                        <span id="videoSourceBtnText">Source: VidSrc</span>
+                <!-- Center group: Source + Copy URL -->
+                <div class="player-controls-center">
+                    <button id="sportsSourceBtn" class="btn btn-secondary" onclick="switchSportsSource()" style="display: none;">
+                        <span id="sportsSourceBtnText">Source 1</span>
                     </button>
-                    <div class="source-menu-dropdown" id="sourceMenuDropdown">
-                        <button class="source-menu-item" onclick="selectVideoSource('vidsrc'); closeSourceMenu();">
-                            <span>VidSrc</span>
-                            <span class="source-check" id="vidsrc-check">✓</span>
+                    <!-- Source Dropdown Menu -->
+                    <div class="source-menu-container" id="sourceMenuContainer" style="display: none;">
+                        <button class="source-menu-btn" id="videoSourceBtn" onclick="toggleSourceMenu()">
+                            <span id="videoSourceBtnText">Source: VidSrc</span>
                         </button>
-                        <button class="source-menu-item" onclick="selectVideoSource('vidking'); closeSourceMenu();">
-                            <span>VidKing</span>
-                            <span class="source-check" id="vidking-check" style="display: none;">✓</span>
-                        </button>
-                        <button class="source-menu-item" onclick="selectVideoSource('superembed'); closeSourceMenu();">
-                            <span>SuperEmbed</span>
-                            <span class="source-check" id="superembed-check" style="display: none;">✓</span>
-                        </button>
-                    </div>
+                        <div class="source-menu-dropdown" id="sourceMenuDropdown">
+                            <button class="source-menu-item" onclick="selectVideoSource('vidsrc'); closeSourceMenu();">
+                                <span>VidSrc</span>
+                                <span class="source-check" id="vidsrc-check">✓</span>
+                            </button>
+                            <button class="source-menu-item" onclick="selectVideoSource('vidking'); closeSourceMenu();">
+                                <span>VidKing</span>
+                                <span class="source-check" id="vidking-check" style="display: none;">✓</span>
+                            </button>
+                            <button class="source-menu-item" onclick="selectVideoSource('superembed'); closeSourceMenu();">
+                                <span>SuperEmbed</span>
+                                <span class="source-check" id="superembed-check" style="display: none;">✓</span>
+                            </button>
+                        </div>
 
-                    <!-- Tooltip beside source button -->
-                    <div class="source-tooltip-hint" id="sourceTooltipHint">
-                        <div class="source-tooltip-arrow-left"></div>
-                        <div class="source-tooltip-box">
-                            <button class="source-tooltip-close" onclick="dismissSourceHint()">×</button>
-                            Change source if stuck or not loading
+                        <!-- Tooltip beside source button -->
+                        <div class="source-tooltip-hint" id="sourceTooltipHint">
+                            <div class="source-tooltip-arrow-left"></div>
+                            <div class="source-tooltip-box">
+                                <button class="source-tooltip-close" onclick="dismissSourceHint()">×</button>
+                                Change source if stuck or not loading
+                            </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Right group: Fullscreen + Stop -->
+                <div class="player-controls-right">
+                    <button onclick="toggleFullscreen()" class="btn btn-secondary player-icon-btn" title="Fullscreen"><img src="Icons/fullscreen.png" alt="Fullscreen" class="player-control-icon"></button>
+                    <button onclick="stopPlayback()" class="btn btn-secondary player-icon-btn" id="stopBtn" style="display: none;" title="Stop"><img src="Icons/stop-sign.png" alt="Stop" class="player-control-icon"></button>
                 </div>
             </div>
 
@@ -11025,7 +11313,7 @@
                 <div class="bg-effects-title">
                     <span style="width: 24px;"></span>
                     <span class="title-text">SELECT SEASON</span>
-                    <button class="panel-close-btn" onclick="document.getElementById('seasonPanel').style.display='none'">×</button>
+                    <button class="panel-close-btn" onclick="closePanelAnimated(document.getElementById('seasonPanel'))">×</button>
                 </div>
                 <div id="seasonList" style="display: flex; flex-direction: column; gap: 6px;">
                     <!-- Seasons will be loaded dynamically -->
@@ -11037,27 +11325,31 @@
                 <div class="bg-effects-title">
                     <span style="width: 24px;"></span>
                     <span class="title-text">SELECT EPISODE</span>
-                    <button class="panel-close-btn" onclick="document.getElementById('episodePanel').style.display='none'">×</button>
+                    <button class="panel-close-btn" onclick="closePanelAnimated(document.getElementById('episodePanel'))">×</button>
                 </div>
                 <div id="episodeList" style="display: flex; flex-direction: column; gap: 6px;">
                     <!-- Episodes will be loaded dynamically -->
                 </div>
             </div>
 
-            <!-- Watchlist Panel -->
-            <div id="watchlistPanel" class="bg-effects-panel" style="position: absolute; display: none; width: 300px; max-height: 400px; overflow-y: auto; z-index: 2147483647;">
-                <div class="bg-effects-title">
-                    <span style="width: 24px;"></span>
-                    <span class="title-text" id="watchlistPanelTitle">ADD TO WATCHLIST</span>
-                    <button class="panel-close-btn" onclick="document.getElementById('watchlistPanel').style.display='none'; window.pendingWatchlistPanelItem=null;">×</button>
+            <!-- Watchlist Panel (Redesigned) -->
+            <div id="watchlistPanel" class="player-watchlist-panel" style="position: absolute; z-index: 2147483647;">
+                <div class="player-watchlist-header">
+                    <div class="player-watchlist-title-row">
+                        <h2 class="player-watchlist-title" id="watchlistPanelTitle">Add to Watchlist</h2>
+                        <button class="player-watchlist-close" onclick="document.getElementById('watchlistPanel').classList.remove('active'); setTimeout(() => { document.getElementById('watchlistPanel').style.display='none'; }, 250); window.pendingWatchlistPanelItem=null;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 6L6 18M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
-                <div id="watchlistPanelList" style="display: flex; flex-direction: column; gap: 6px;">
+                <div id="watchlistPanelList" class="player-watchlist-lists">
                     <!-- Watchlists will be loaded dynamically -->
                 </div>
-                <div id="watchlistPanelCreate" style="margin-top: 12px; padding-top: 12px; border-top: 2px solid rgba(255, 255, 255, 0.1);">
-                    <input type="text" id="newWatchlistNamePanel" placeholder="New watchlist name..."
-                           style="font-family: 'VT323', monospace; width: 100%; padding: 10px; background: var(--bg-dark, #0f0f1e); border: 2px solid var(--primary-color, #00ff9f); color: var(--primary-color, #00ff9f); font-size: 16px; margin-bottom: 8px; border-radius: 4px;">
-                    <button onclick="createWatchlistFromPanel()" class="effects-btn" style="width: 100%; padding: 10px; font-size: 16px;">Create New List</button>
+                <div id="watchlistPanelCreate" class="player-watchlist-create">
+                    <input type="text" id="newWatchlistNamePanel" class="player-watchlist-input" placeholder="New watchlist name...">
+                    <button onclick="createWatchlistFromPanel()" class="player-watchlist-create-btn">+ Create New List</button>
                 </div>
             </div>
 
@@ -12626,7 +12918,7 @@
                     }
                     commentsPollingInterval = setInterval(() => {
                         displayComments(contentId);
-                    }, 3000);
+                    }, 30000);
                     // Refresh comments immediately for new content
                     displayComments(contentId);
                 }
@@ -12943,10 +13235,11 @@
                 return;
             }
 
-            const isVisible = panel.style.display === 'flex';
+            const isVisible = panel.classList.contains('active');
 
             if (isVisible) {
-                panel.style.display = 'none';
+                panel.classList.remove('active');
+                setTimeout(() => { panel.style.display = 'none'; }, 250);
             } else {
                 // Get poster URL and other data from currentContentData
                 const posterUrl = currentContentData?.poster_url || '';
@@ -12983,14 +13276,13 @@
                 }
 
                 const rect = watchlistButton.getBoundingClientRect();
-                console.log('Button position:', rect);
 
                 // Calculate position - ensure it's within viewport
-                let top = rect.bottom + window.scrollY + 5;
+                let top = rect.bottom + window.scrollY + 8;
                 let left = rect.left + window.scrollX;
 
                 // Adjust if too close to right edge
-                const panelWidth = 300;
+                const panelWidth = 360;
                 if (left + panelWidth > window.innerWidth) {
                     left = rect.right + window.scrollX - panelWidth;
                 }
@@ -12998,8 +13290,9 @@
                 panel.style.top = `${top}px`;
                 panel.style.left = `${left}px`;
                 panel.style.display = 'flex';
-
-                console.log('Panel displayed at:', panel.style.top, panel.style.left);
+                requestAnimationFrame(() => {
+                    panel.classList.add('active');
+                });
             }
         }
 
@@ -13011,19 +13304,20 @@
 
             if (inLists.length > 0) {
                 // Item is in watchlists - show removal options
-                title.textContent = 'REMOVE FROM WATCHLIST';
+                title.textContent = 'Remove from Watchlist';
                 createSection.style.display = 'none';
 
                 list.innerHTML = inLists.map(listName => `
-                    <button onclick="removeFromWatchlistPanel('${listName.replace(/'/g, "\\'")}'); event.stopPropagation();"
-                            class="effects-btn"
-                            style="width: 100%; padding: 12px; background: rgba(255, 59, 48, 0.15); border-color: rgba(255, 59, 48, 0.5);">
-                        Remove from ${listName}
-                    </button>
+                    <div onclick="removeFromWatchlistPanel('${listName.replace(/'/g, "\\'")}'); event.stopPropagation();"
+                            class="player-watchlist-list-card remove-card">
+                        <div class="player-watchlist-list-icon">✕</div>
+                        <span class="player-watchlist-list-name">${listName}</span>
+                        <span class="player-watchlist-list-arrow">›</span>
+                    </div>
                 `).join('');
             } else {
                 // Item not in any watchlist - show add options
-                title.textContent = 'ADD TO WATCHLIST';
+                title.textContent = 'Add to Watchlist';
                 createSection.style.display = 'block';
 
                 const listNames = Object.keys(watchlists);
@@ -13033,11 +13327,12 @@
                 }
 
                 list.innerHTML = Object.keys(watchlists).map(listName => `
-                    <button onclick="addToWatchlistPanel('${listName.replace(/'/g, "\\'")}'); event.stopPropagation();"
-                            class="effects-btn"
-                            style="width: 100%; padding: 12px;">
-                        ${listName}
-                    </button>
+                    <div onclick="addToWatchlistPanel('${listName.replace(/'/g, "\\'")}'); event.stopPropagation();"
+                            class="player-watchlist-list-card">
+                        <div class="player-watchlist-list-icon">📋</div>
+                        <span class="player-watchlist-list-name">${listName}</span>
+                        <span class="player-watchlist-list-arrow">›</span>
+                    </div>
                 `).join('');
             }
         }
@@ -13073,9 +13368,12 @@
                 showError('Failed to add to watchlist');
             }
 
-            // Close panel
+            // Close panel with animation
             const panel = document.getElementById('watchlistPanel');
-            if (panel) panel.style.display = 'none';
+            if (panel) {
+                panel.classList.remove('active');
+                setTimeout(() => { panel.style.display = 'none'; }, 250);
+            }
             window.pendingWatchlistPanelItem = null;
         }
 
@@ -13088,7 +13386,10 @@
                 showError('Please login to use watchlist');
                 showLoginModal();
                 const panel = document.getElementById('watchlistPanel');
-                if (panel) panel.style.display = 'none';
+                if (panel) {
+                    panel.classList.remove('active');
+                    setTimeout(() => { panel.style.display = 'none'; }, 250);
+                }
                 window.pendingWatchlistPanelItem = null;
                 return;
             }
@@ -13100,9 +13401,12 @@
                 showError('Failed to remove from watchlist');
             }
 
-            // Close panel
+            // Close panel with animation
             const panel = document.getElementById('watchlistPanel');
-            if (panel) panel.style.display = 'none';
+            if (panel) {
+                panel.classList.remove('active');
+                setTimeout(() => { panel.style.display = 'none'; }, 250);
+            }
             window.pendingWatchlistPanelItem = null;
         }
 
@@ -13157,25 +13461,44 @@
             }
         }
 
+        function closePanelAnimated(panel) {
+            if (!panel) return;
+            panel.classList.add('panel-closing');
+            panel.classList.remove('panel-visible');
+            setTimeout(() => {
+                panel.style.display = 'none';
+                panel.classList.remove('panel-closing');
+            }, 250);
+        }
+
+        function openPanelAnimated(panel) {
+            if (!panel) return;
+            panel.style.display = 'flex';
+            panel.classList.remove('panel-closing');
+            requestAnimationFrame(() => {
+                panel.classList.add('panel-visible');
+            });
+        }
+
         window.toggleSeasonPanel = function() {
             const panel = document.getElementById('seasonPanel');
             const episodePanel = document.getElementById('episodePanel');
 
             if (panel) {
-                const isVisible = panel.style.display === 'flex';
+                const isVisible = panel.style.display === 'flex' && panel.classList.contains('panel-visible');
 
                 if (isVisible) {
-                    panel.style.display = 'none';
+                    closePanelAnimated(panel);
                 } else {
                     // Close episode panel if open
-                    if (episodePanel) episodePanel.style.display = 'none';
+                    if (episodePanel && episodePanel.style.display === 'flex') closePanelAnimated(episodePanel);
 
-                    // Position panel below the season button
+                    // Position panel beside the season button
                     const seasonButton = document.getElementById('seasonButton');
                     const rect = seasonButton.getBoundingClientRect();
-                    panel.style.top = `${rect.bottom + window.scrollY + 5}px`;
-                    panel.style.left = `${rect.left + window.scrollX}px`;
-                    panel.style.display = 'flex';
+                    panel.style.top = `${rect.top + window.scrollY}px`;
+                    panel.style.left = `${rect.right + window.scrollX + 8}px`;
+                    openPanelAnimated(panel);
 
                     // Populate seasons
                     const seasonList = document.getElementById('seasonList');
@@ -13196,9 +13519,9 @@
             currentSelectedSeason = seasonNumber;
             document.getElementById('seasonButtonText').textContent = `Season ${seasonNumber}`;
 
-            // Close panel
+            // Close panel with animation
             const panel = document.getElementById('seasonPanel');
-            if (panel) panel.style.display = 'none';
+            if (panel) closePanelAnimated(panel);
 
             await updateEpisodeSelector(seasonNumber);
         }
@@ -13208,20 +13531,20 @@
             const seasonPanel = document.getElementById('seasonPanel');
 
             if (panel) {
-                const isVisible = panel.style.display === 'flex';
+                const isVisible = panel.style.display === 'flex' && panel.classList.contains('panel-visible');
 
                 if (isVisible) {
-                    panel.style.display = 'none';
+                    closePanelAnimated(panel);
                 } else {
                     // Close season panel if open
-                    if (seasonPanel) seasonPanel.style.display = 'none';
+                    if (seasonPanel && seasonPanel.style.display === 'flex') closePanelAnimated(seasonPanel);
 
-                    // Position panel below the episode button
+                    // Position panel beside the episode button
                     const episodeButton = document.getElementById('episodeButton');
                     const rect = episodeButton.getBoundingClientRect();
-                    panel.style.top = `${rect.bottom + window.scrollY + 5}px`;
-                    panel.style.left = `${rect.left + window.scrollX}px`;
-                    panel.style.display = 'flex';
+                    panel.style.top = `${rect.top + window.scrollY}px`;
+                    panel.style.left = `${rect.right + window.scrollX + 8}px`;
+                    openPanelAnimated(panel);
                 }
             }
         }
@@ -13281,9 +13604,9 @@
                 descriptionSection.style.display = 'none';
             }
 
-            // Close panel
+            // Close panel with animation
             const panel = document.getElementById('episodePanel');
-            if (panel) panel.style.display = 'none';
+            if (panel) closePanelAnimated(panel);
 
             if (currentContentId) {
                 playTVEpisode(currentContentId, currentSelectedSeason, episodeNumber);
@@ -13731,19 +14054,8 @@
         let sourceHintShownThisSession = false;
 
         function showSourceHint() {
-            // Only show once per page load/session
-            if (sourceHintShownThisSession) {
-                return;
-            }
-
-            const hint = document.getElementById('sourceTooltipHint');
-            if (hint) {
-                sourceHintShownThisSession = true;
-                // Show after 1 second delay
-                setTimeout(() => {
-                    hint.classList.add('active');
-                }, 1000);
-            }
+            // Disabled - notification removed
+            return;
         }
 
         window.dismissSourceHint = function() {
@@ -14704,6 +15016,13 @@
             const panel = document.getElementById('watchlistPanel');
             if (!panel) return;
 
+            // If panel is already open, close it
+            if (panel.classList.contains('active')) {
+                panel.classList.remove('active');
+                setTimeout(() => { panel.style.display = 'none'; }, 250);
+                return;
+            }
+
             // Store current item data
             window.pendingWatchlistPanelItem = {
                 id: id,
@@ -14724,23 +15043,30 @@
             updateWatchlistPanel(inLists);
 
             // Position panel near the clicked button
-            const button = event.target;
+            const button = event.target.closest('.watchlist-btn') || event.target;
             const rect = button.getBoundingClientRect();
 
             // Position below button, but adjust if too close to bottom
             const spaceBelow = window.innerHeight - rect.bottom;
-            const panelHeight = 400; // max-height of panel
+            const panelHeight = 450;
+            const panelWidth = 360;
 
             if (spaceBelow < panelHeight && rect.top > panelHeight) {
-                // Position above button if not enough space below
-                panel.style.top = `${rect.top + window.scrollY - panelHeight - 5}px`;
+                panel.style.top = `${rect.top + window.scrollY - panelHeight - 8}px`;
             } else {
-                // Position below button
-                panel.style.top = `${rect.bottom + window.scrollY + 5}px`;
+                panel.style.top = `${rect.bottom + window.scrollY + 8}px`;
             }
 
-            panel.style.left = `${rect.left + window.scrollX}px`;
+            let left = rect.left + window.scrollX;
+            if (left + panelWidth > window.innerWidth) {
+                left = window.innerWidth - panelWidth - 16;
+            }
+
+            panel.style.left = `${left}px`;
             panel.style.display = 'flex';
+            requestAnimationFrame(() => {
+                panel.classList.add('active');
+            });
         }
 
         function showWatchlistModal(event) {
@@ -15655,6 +15981,19 @@
                     document.getElementById('seasonButtonText').textContent = `Season ${season}`;
                     await updateEpisodeSelector(season);
                     document.getElementById('episodeButtonText').textContent = getEpisodeButtonText(episode, season);
+
+                    // Update episode description for the resumed episode
+                    const cacheKey = `${id}_${season}`;
+                    const cachedSeason = episodeCache[cacheKey];
+                    if (cachedSeason && cachedSeason.episodes) {
+                        const ep = cachedSeason.episodes.find(e => e.episode_number === episode);
+                        if (ep && ep.overview && ep.overview.trim() !== '') {
+                            const descSection = document.getElementById('episodeDescription');
+                            const descText = document.getElementById('episodeDescriptionText');
+                            if (descText) descText.textContent = ep.overview;
+                            if (descSection) descSection.style.display = 'block';
+                        }
+                    }
 
                     playTVEpisode(id, season, episode, progress);
                 } else {
@@ -18070,7 +18409,7 @@
                 const seasonButton = document.getElementById('seasonButton');
                 if (seasonPanel && seasonPanel.style.display === 'flex') {
                     if (!seasonPanel.contains(event.target) && !seasonButton.contains(event.target)) {
-                        seasonPanel.style.display = 'none';
+                        closePanelAnimated(seasonPanel);
                     }
                 }
 
@@ -18079,21 +18418,22 @@
                 const episodeButton = document.getElementById('episodeButton');
                 if (episodePanel && episodePanel.style.display === 'flex') {
                     if (!episodePanel.contains(event.target) && !episodeButton.contains(event.target)) {
-                        episodePanel.style.display = 'none';
+                        closePanelAnimated(episodePanel);
                     }
                 }
 
                 // Watchlist Panel
                 const watchlistPanel = document.getElementById('watchlistPanel');
                 const playerWatchlistBtn = document.getElementById('playerWatchlistBtn');
-                if (watchlistPanel && watchlistPanel.style.display === 'flex') {
+                if (watchlistPanel && (watchlistPanel.style.display === 'flex' || watchlistPanel.classList.contains('active'))) {
                     // Check if click is on any watchlist button or the panel itself
                     const isWatchlistButton = event.target.classList.contains('watchlist-btn') ||
                                              event.target.closest('.watchlist-btn') ||
                                              (playerWatchlistBtn && playerWatchlistBtn.contains(event.target));
 
                     if (!watchlistPanel.contains(event.target) && !isWatchlistButton) {
-                        watchlistPanel.style.display = 'none';
+                        watchlistPanel.classList.remove('active');
+                        setTimeout(() => { watchlistPanel.style.display = 'none'; }, 250);
                         window.pendingWatchlistPanelItem = null;
                     }
                 }
@@ -20215,6 +20555,7 @@
         // Comments Functions
         let currentContentComments = [];
         let commentsPollingInterval = null;
+        let lastCommentsHash = '';
 
         async function loadComments(contentId) {
             if (!authToken) return [];
@@ -20301,13 +20642,13 @@
             document.getElementById('commentsSection').style.display = 'block';
             displayComments(contentId);
 
-            // Start polling for new comments every 3 seconds
+            // Start polling for new comments every 30 seconds
             if (commentsPollingInterval) {
                 clearInterval(commentsPollingInterval);
             }
             commentsPollingInterval = setInterval(() => {
                 displayComments(contentId);
-            }, 3000);
+            }, 30000);
         }
 
         function hideCommentsSection() {
@@ -20375,6 +20716,13 @@
         async function displayComments(contentId) {
             const comments = await loadComments(contentId);
             const commentsList = document.getElementById('commentsList');
+
+            // Skip DOM rebuild if comments data hasn't changed
+            const commentsHash = JSON.stringify(comments);
+            if (commentsHash === lastCommentsHash) {
+                return;
+            }
+            lastCommentsHash = commentsHash;
 
             // Preserve scroll position, open reply boxes, textarea values, AND focus state
             const scrollPos = commentsList.scrollTop;
