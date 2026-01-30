@@ -2846,6 +2846,42 @@ def remove_from_watchlist(content_id):
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/api/watchlist/rename', methods=['PUT'])
+@jwt_required()
+def rename_watchlist():
+    try:
+        user_id = get_jwt_identity()
+        data = request.get_json()
+
+        old_name = data.get('old_name')
+        new_name = data.get('new_name')
+
+        if not old_name or not new_name:
+            return jsonify({'error': 'old_name and new_name are required'}), 400
+
+        if len(new_name) > 50:
+            return jsonify({'error': 'List name must be 50 characters or less'}), 400
+
+        # Update all watchlist items with the old list_name to the new list_name
+        result = users_collection.update_one(
+            {'_id': ObjectId(user_id)},
+            {
+                '$set': {
+                    'watchlist.$[elem].list_name': new_name
+                }
+            },
+            array_filters=[{'elem.list_name': old_name}]
+        )
+
+        if result.matched_count == 0:
+            return jsonify({'error': 'User not found'}), 404
+
+        return jsonify({'message': f'Renamed list from "{old_name}" to "{new_name}"'}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 # ============= CONTINUE WATCHING ROUTES =============
 
 @app.route('/api/continue-watching', methods=['GET'])

@@ -535,7 +535,7 @@
         }
 
         .player-section {
-            background: var(--bg-dark, #0f0f1e);
+            background: transparent;
             border: none;
             border-bottom: 2px solid var(--primary-color, #00ff9f);
             padding: 32px;
@@ -3677,7 +3677,7 @@
 
         [data-theme="jspecial"] .omdb-details {
             background: rgba(0, 255, 159, 0.08);
-            border: 3px solid #00ff9f;
+            border: none;
             box-shadow: 0 0 20px rgba(0, 255, 159, 0.6);
         }
 
@@ -5909,6 +5909,200 @@
 
         .watchlist-slide-list-delete:active svg {
             transform: scale(0.95);
+        }
+
+        .watchlist-slide-list-rename {
+            position: absolute;
+            top: 50%;
+            right: 68px;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            color: var(--text-secondary, #666);
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.2s ease;
+            z-index: 2;
+        }
+
+        .watchlist-slide-list-rename svg {
+            width: 14px;
+            height: 14px;
+            transition: transform 0.2s ease;
+        }
+
+        .watchlist-slide-list-card:hover .watchlist-slide-list-rename {
+            opacity: 0.5;
+        }
+
+        .watchlist-slide-list-rename:hover {
+            opacity: 1 !important;
+            color: var(--primary-color, #00ff9f);
+            background: rgba(0, 255, 159, 0.1);
+        }
+
+        .watchlist-slide-list-rename:hover svg {
+            transform: scale(1.1);
+        }
+
+        .watchlist-slide-list-rename:active svg {
+            transform: scale(0.95);
+        }
+
+        /* Rename list modal */
+        .rename-list-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 100002;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(4px);
+        }
+
+        .rename-list-modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .rename-list-modal {
+            background: var(--bg-dark, #0f0f1e);
+            border: 2px solid var(--primary-color, #00ff9f);
+            padding: 0;
+            width: 90%;
+            max-width: 380px;
+            transform: scale(0.95);
+            transition: transform 0.2s ease;
+            box-shadow: 0 0 30px rgba(0, 255, 159, 0.15);
+        }
+
+        .rename-list-modal-overlay.active .rename-list-modal {
+            transform: scale(1);
+        }
+
+        .rename-list-modal-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(0, 255, 159, 0.2);
+            background: rgba(0, 255, 159, 0.05);
+        }
+
+        .rename-list-modal-icon {
+            width: 20px;
+            height: 20px;
+            color: var(--primary-color, #00ff9f);
+        }
+
+        .rename-list-modal-title {
+            font-family: 'VT323', monospace;
+            font-size: 20px;
+            color: var(--primary-color, #00ff9f);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .rename-list-modal-body {
+            padding: 20px;
+        }
+
+        .rename-list-modal-text {
+            font-family: 'VT323', monospace;
+            font-size: 18px;
+            color: var(--text-primary, #e0e0e0);
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .rename-list-modal-input {
+            width: 100%;
+            padding: 12px 14px;
+            background: rgba(0, 255, 159, 0.05);
+            border: 1px solid rgba(0, 255, 159, 0.3);
+            color: var(--text-primary, #e0e0e0);
+            font-family: 'VT323', monospace;
+            font-size: 18px;
+            outline: none;
+            transition: border-color 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        .rename-list-modal-input:focus {
+            border-color: var(--primary-color, #00ff9f);
+            box-shadow: 0 0 8px rgba(0, 255, 159, 0.15);
+        }
+
+        .rename-list-modal-input::placeholder {
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        .rename-list-modal-error {
+            font-family: 'VT323', monospace;
+            font-size: 15px;
+            color: #ff6b6b;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .rename-list-modal-error.visible {
+            display: block;
+        }
+
+        .rename-list-modal-actions {
+            display: flex;
+            gap: 12px;
+            padding: 16px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .rename-list-modal-btn {
+            flex: 1;
+            padding: 12px 16px;
+            font-family: 'VT323', monospace;
+            font-size: 18px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .rename-list-modal-btn.cancel {
+            background: transparent;
+            border: 1px solid #444;
+            color: #888;
+        }
+
+        .rename-list-modal-btn.cancel:hover {
+            border-color: #666;
+            color: #aaa;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .rename-list-modal-btn.confirm {
+            background: rgba(0, 255, 159, 0.15);
+            border: 1px solid var(--primary-color, #00ff9f);
+            color: var(--primary-color, #00ff9f);
+        }
+
+        .rename-list-modal-btn.confirm:hover {
+            background: var(--primary-color, #00ff9f);
+            color: #0f0f1e;
         }
 
         /* Delete confirmation modal */
@@ -10818,35 +11012,35 @@
                     </div>
 
                     <p id="currentOverview">Overview...</p>
+                </div>
+            </div>
 
-                    <!-- OMDB Details -->
-                    <div id="omdbDetails" class="omdb-details" style="display: none;">
-                        <div id="castSection" class="cast-section" style="display: none;">
-                            <h3 style="color: var(--primary-color); font-family: 'VT323', monospace; font-size: 28px; margin-bottom: 12px;">Cast</h3>
-                            <div id="castGrid" class="cast-grid"></div>
-                        </div>
-                        <p id="omdbActors" class="detail-item" style="display: none;"><strong>Cast:</strong> <span></span></p>
-                        <p id="omdbDirector" class="detail-item"><strong>Director:</strong> <span></span></p>
-                        <p id="omdbGenre" class="detail-item"><strong>Genre:</strong> <span></span></p>
-                        <p id="omdbRated" class="detail-item"><strong>Rating:</strong> <span></span></p>
-                        <p id="omdbRuntime" class="detail-item"><strong>Runtime:</strong> <span></span></p>
-                        <p id="omdbAwards" class="detail-item awards"><strong>Awards:</strong> <span></span></p>
-                    </div>
+            <!-- OMDB Details (outside grid for full-width centering) -->
+            <div id="omdbDetails" class="omdb-details" style="display: none;">
+                <div id="castSection" class="cast-section" style="display: none;">
+                    <h3 style="color: var(--primary-color); font-family: 'VT323', monospace; font-size: 28px; margin-bottom: 12px;">Cast</h3>
+                    <div id="castGrid" class="cast-grid"></div>
+                </div>
+                <p id="omdbActors" class="detail-item" style="display: none;"><strong>Cast:</strong> <span></span></p>
+                <p id="omdbDirector" class="detail-item"><strong>Director:</strong> <span></span></p>
+                <p id="omdbGenre" class="detail-item"><strong>Genre:</strong> <span></span></p>
+                <p id="omdbRated" class="detail-item"><strong>Rating:</strong> <span></span></p>
+                <p id="omdbRuntime" class="detail-item"><strong>Runtime:</strong> <span></span></p>
+                <p id="omdbAwards" class="detail-item awards"><strong>Awards:</strong> <span></span></p>
+            </div>
 
-                    <!-- Episode Selection and Description Container -->
-                    <div id="tvControls" class="tv-controls" style="display: none;">
-                        <button id="seasonButton" class="bg-animation-toggle" onclick="toggleSeasonPanel()" style="margin-right: 12px;">
-                            <span id="seasonButtonText">Season 1</span>
-                        </button>
-                        <button id="episodeButton" class="bg-animation-toggle" onclick="toggleEpisodePanel()" style="min-width: 400px; text-align: left;">
-                            <span id="episodeButtonText">Episode 1</span>
-                        </button>
+            <!-- Episode Selection and Description Container (outside grid for full-width centering) -->
+            <div id="tvControls" class="tv-controls" style="display: none;">
+                <button id="seasonButton" class="bg-animation-toggle" onclick="toggleSeasonPanel()" style="margin-right: 12px;">
+                    <span id="seasonButtonText">Season 1</span>
+                </button>
+                <button id="episodeButton" class="bg-animation-toggle" onclick="toggleEpisodePanel()" style="min-width: 400px; text-align: left;">
+                    <span id="episodeButtonText">Episode 1</span>
+                </button>
 
-                        <!-- Episode Description -->
-                        <div id="episodeDescription" class="episode-description" style="display: none;">
-                            <p id="episodeDescriptionText"></p>
-                        </div>
-                    </div>
+                <!-- Episode Description -->
+                <div id="episodeDescription" class="episode-description" style="display: none;">
+                    <p id="episodeDescriptionText"></p>
                 </div>
             </div>
 
@@ -11178,6 +11372,27 @@
                 <div class="delete-list-modal-actions">
                     <button class="delete-list-modal-btn cancel" onclick="closeDeleteListModal()">Cancel</button>
                     <button class="delete-list-modal-btn confirm" onclick="confirmDeleteList()">Delete</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rename List Modal -->
+        <div id="renameListModalOverlay" class="rename-list-modal-overlay" onclick="closeRenameListModal()">
+            <div class="rename-list-modal" onclick="event.stopPropagation()">
+                <div class="rename-list-modal-header">
+                    <svg class="rename-list-modal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
+                    </svg>
+                    <span class="rename-list-modal-title">Rename List</span>
+                </div>
+                <div class="rename-list-modal-body">
+                    <p class="rename-list-modal-text">Enter a new name for this list:</p>
+                    <input type="text" id="renameListInput" class="rename-list-modal-input" placeholder="New list name..." maxlength="50" autocomplete="off">
+                    <div id="renameListError" class="rename-list-modal-error"></div>
+                </div>
+                <div class="rename-list-modal-actions">
+                    <button class="rename-list-modal-btn cancel" onclick="closeRenameListModal()">Cancel</button>
+                    <button class="rename-list-modal-btn confirm" onclick="confirmRenameList()">Rename</button>
                 </div>
             </div>
         </div>
@@ -12897,6 +13112,12 @@
             clearRatingsUI();
             __earlyLastRefreshedContentId = null;
 
+            // Clear episode description from previous content
+            const epDescSection = document.getElementById('episodeDescription');
+            const epDescText = document.getElementById('episodeDescriptionText');
+            if (epDescSection) epDescSection.style.display = 'none';
+            if (epDescText) epDescText.textContent = '';
+
             // Scroll to player section immediately
             const playerSection = document.querySelector('.player-section');
             if (playerSection) {
@@ -13179,6 +13400,10 @@
                 } else {
                     // Play movie
                     tvControls.style.display = 'none';
+
+                    // Hide next episode button for movies
+                    const nextEpisodeBtn = document.getElementById('nextEpisodeBtn');
+                    if (nextEpisodeBtn) nextEpisodeBtn.style.display = 'none';
 
                     if (existingProgress && existingProgress.progress > 5 && existingProgress.progress < 95) {
                     }
@@ -15752,6 +15977,12 @@
         async function resumeContent(id, title, type, season, episode, progress) {
             hideError();
 
+            // Clear episode description from previous content
+            const epDescSection = document.getElementById('episodeDescription');
+            const epDescText = document.getElementById('episodeDescriptionText');
+            if (epDescSection) epDescSection.style.display = 'none';
+            if (epDescText) epDescText.textContent = '';
+
             // Scroll to player section immediately
             const playerSection = document.querySelector('.player-section');
             if (playerSection) {
@@ -15999,6 +16230,11 @@
                 } else {
                     // Play movie
                     tvControls.style.display = 'none';
+
+                    // Hide next episode button for movies
+                    const nextEpisodeBtn = document.getElementById('nextEpisodeBtn');
+                    if (nextEpisodeBtn) nextEpisodeBtn.style.display = 'none';
+
                     playMovie(id, progress);
                 }
 
@@ -18036,6 +18272,11 @@
                             <div class="watchlist-slide-list-name">${listName}</div>
                             <div class="watchlist-slide-list-count">${count} ${count === 1 ? 'item' : 'items'}</div>
                         </div>
+                        <button class="watchlist-slide-list-rename" onclick="event.stopPropagation(); promptRenameList('${escapedName}')" title="Rename list">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
+                            </svg>
+                        </button>
                         <button class="watchlist-slide-list-delete" onclick="event.stopPropagation(); promptDeleteList('${escapedName}')" title="Delete list">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14zM10 11v6M14 11v6"/>
@@ -18157,7 +18398,104 @@
             closeDeleteListModal();
         }
 
-        // Handle Enter key in create list input
+        // Rename list functionality
+        let pendingRenameListName = null;
+
+        window.promptRenameList = function(listName) {
+            pendingRenameListName = listName;
+            const overlay = document.getElementById('renameListModalOverlay');
+            const input = document.getElementById('renameListInput');
+            const errorEl = document.getElementById('renameListError');
+
+            if (input) {
+                input.value = listName;
+                input.select();
+            }
+            if (errorEl) {
+                errorEl.textContent = '';
+                errorEl.classList.remove('visible');
+            }
+            if (overlay) {
+                overlay.classList.add('active');
+                setTimeout(() => { if (input) input.focus(); }, 200);
+            }
+        }
+
+        window.closeRenameListModal = function() {
+            const overlay = document.getElementById('renameListModalOverlay');
+            if (overlay) {
+                overlay.classList.remove('active');
+            }
+            pendingRenameListName = null;
+        }
+
+        window.confirmRenameList = async function() {
+            if (!pendingRenameListName) return;
+
+            const oldName = pendingRenameListName;
+            const input = document.getElementById('renameListInput');
+            const errorEl = document.getElementById('renameListError');
+            const newName = input ? input.value.trim() : '';
+
+            if (!newName) {
+                if (errorEl) {
+                    errorEl.textContent = 'Please enter a list name';
+                    errorEl.classList.add('visible');
+                }
+                return;
+            }
+
+            if (newName.length > 50) {
+                if (errorEl) {
+                    errorEl.textContent = 'Name must be 50 characters or less';
+                    errorEl.classList.add('visible');
+                }
+                return;
+            }
+
+            if (newName === oldName) {
+                closeRenameListModal();
+                return;
+            }
+
+            // Check for duplicate (case-insensitive)
+            const duplicate = Object.keys(watchlists).find(
+                name => name.toLowerCase() === newName.toLowerCase() && name !== oldName
+            );
+            if (duplicate) {
+                if (errorEl) {
+                    errorEl.textContent = 'A list with this name already exists';
+                    errorEl.classList.add('visible');
+                }
+                return;
+            }
+
+            // Rename in local watchlists object
+            watchlists[newName] = watchlists[oldName];
+            delete watchlists[oldName];
+            localStorage.setItem('streamingSite_watchlists', JSON.stringify(watchlists));
+
+            // Rename in database for authenticated users
+            if (authToken) {
+                try {
+                    await apiRequest('/watchlist/rename', {
+                        method: 'PUT',
+                        body: JSON.stringify({
+                            old_name: oldName,
+                            new_name: newName
+                        })
+                    });
+                } catch (error) {
+                    console.error('Failed to rename list in database:', error);
+                }
+            }
+
+            showStatus(`Renamed list to: ${newName}`);
+            renderWatchlistLists();
+            closeRenameListModal();
+        }
+
+        // Handle Enter key in create list and rename list inputs
         document.addEventListener('DOMContentLoaded', function() {
             const createListInput = document.getElementById('createListNameInput');
             if (createListInput) {
@@ -18170,6 +18508,18 @@
                 createListInput.addEventListener('input', function() {
                     this.classList.remove('error');
                     document.getElementById('createListError')?.classList.remove('visible');
+                });
+            }
+
+            const renameListInput = document.getElementById('renameListInput');
+            if (renameListInput) {
+                renameListInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        confirmRenameList();
+                    }
+                });
+                renameListInput.addEventListener('input', function() {
+                    document.getElementById('renameListError')?.classList.remove('visible');
                 });
             }
         });
