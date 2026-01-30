@@ -8031,7 +8031,7 @@
                     }
                     commentsPollingInterval = setInterval(() => {
                         displayComments(contentId);
-                    }, 3000);
+                    }, 30000);
                     // Refresh comments immediately for new content
                     displayComments(contentId);
                 }
@@ -9168,19 +9168,8 @@
         let sourceHintShownThisSession = false;
 
         function showSourceHint() {
-            // Only show once per page load/session
-            if (sourceHintShownThisSession) {
-                return;
-            }
-
-            const hint = document.getElementById('sourceTooltipHint');
-            if (hint) {
-                sourceHintShownThisSession = true;
-                // Show after 1 second delay
-                setTimeout(() => {
-                    hint.classList.add('active');
-                }, 1000);
-            }
+            // Disabled - notification removed
+            return;
         }
 
         window.dismissSourceHint = function() {
@@ -11139,6 +11128,19 @@
                     document.getElementById('seasonButtonText').textContent = `Season ${season}`;
                     await updateEpisodeSelector(season);
                     document.getElementById('episodeButtonText').textContent = getEpisodeButtonText(episode, season);
+
+                    // Update episode description for the resumed episode
+                    const cacheKey = `${id}_${season}`;
+                    const cachedSeason = episodeCache[cacheKey];
+                    if (cachedSeason && cachedSeason.episodes) {
+                        const ep = cachedSeason.episodes.find(e => e.episode_number === episode);
+                        if (ep && ep.overview && ep.overview.trim() !== '') {
+                            const descSection = document.getElementById('episodeDescription');
+                            const descText = document.getElementById('episodeDescriptionText');
+                            if (descText) descText.textContent = ep.overview;
+                            if (descSection) descSection.style.display = 'block';
+                        }
+                    }
 
                     playTVEpisode(id, season, episode, progress);
                 } else {
@@ -15098,6 +15100,7 @@
         // Comments Functions
         let currentContentComments = [];
         let commentsPollingInterval = null;
+        let lastCommentsHash = '';
 
         async function loadComments(contentId) {
             if (!authToken) return [];
@@ -15184,13 +15187,13 @@
             document.getElementById('commentsSection').style.display = 'block';
             displayComments(contentId);
 
-            // Start polling for new comments every 3 seconds
+            // Start polling for new comments every 30 seconds
             if (commentsPollingInterval) {
                 clearInterval(commentsPollingInterval);
             }
             commentsPollingInterval = setInterval(() => {
                 displayComments(contentId);
-            }, 3000);
+            }, 30000);
         }
 
         function hideCommentsSection() {
@@ -15265,6 +15268,13 @@
         async function displayComments(contentId) {
             const comments = await loadComments(contentId);
             const commentsList = document.getElementById('commentsList');
+
+            // Skip DOM rebuild if comments data hasn't changed
+            const commentsHash = JSON.stringify(comments);
+            if (commentsHash === lastCommentsHash) {
+                return;
+            }
+            lastCommentsHash = commentsHash;
 
             // Preserve scroll position, open reply boxes, AND textarea values
             const scrollPos = commentsList.scrollTop;

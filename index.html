@@ -21103,6 +21103,8 @@
                 }
 
                 // Store auth data
+                authToken = data.access_token;
+                currentUser = data.user;
                 localStorage.setItem('authToken', data.access_token);
                 localStorage.setItem('currentUser', JSON.stringify(data.user));
                 window.authToken = data.access_token;
@@ -21150,6 +21152,8 @@
                 }
 
                 // Store auth data
+                authToken = data.access_token;
+                currentUser = data.user;
                 localStorage.setItem('authToken', data.access_token);
                 localStorage.setItem('currentUser', JSON.stringify(data.user));
                 window.authToken = data.access_token;
