@@ -12,6 +12,7 @@
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <!-- <script src="https://fpyf8.com/88/tag.min.js" data-zone="178035" async data-cfasync="false"></script> -->
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -3897,39 +3898,28 @@
             gap: 12px;
             padding: 20px 30px;
             background: linear-gradient(145deg, rgba(26, 20, 8, 0.9) 0%, rgba(15, 12, 5, 0.95) 100%);
-            border: 3px solid var(--primary-color, #F5A623);
+            border: 3px solid rgba(40, 32, 12, 0.6);
             border-radius: 16px;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow:
-                0 0 20px rgba(245, 166, 35, 0.3),
-                inset 0 0 30px rgba(245, 166, 35, 0.05);
+                0 0 20px hsl(calc(var(--glow-hue) * 1deg) 100% 60% / 0.3),
+                0 0 50px hsl(calc(var(--glow-hue) * 1deg) 100% 50% / 0.15),
+                0 0 80px hsl(calc(var(--glow-hue) * 1deg) 100% 40% / 0.08);
             position: relative;
             overflow: hidden;
-        }
-
-        .hero-nav-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(245, 166, 35, 0.2), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .hero-nav-btn:hover::before {
-            left: 100%;
+            animation: glowing-hue 4s linear infinite;
         }
 
         .hero-nav-btn:hover {
             transform: translateY(-8px) scale(1.05);
-            border-color: #FFD700;
             box-shadow:
-                0 0 40px rgba(245, 166, 35, 0.5),
-                0 15px 40px rgba(0, 0, 0, 0.4),
-                inset 0 0 40px rgba(245, 166, 35, 0.1);
+                0 0 30px hsl(calc(var(--glow-hue) * 1deg) 100% 60% / 0.5),
+                0 0 60px hsl(calc(var(--glow-hue) * 1deg) 100% 50% / 0.3),
+                0 0 100px hsl(calc(var(--glow-hue) * 1deg) 100% 40% / 0.15),
+                0 0 calc(var(--white-shadow) * 1vw) calc(var(--white-shadow) * 0.15vw) rgb(255 255 255 / 20%),
+                0 15px 40px rgba(0, 0, 0, 0.4);
+            animation: glowing-hue 4s linear infinite, shadow-pulse 8s linear infinite;
         }
 
         .hero-nav-btn:active {
@@ -3938,12 +3928,12 @@
 
         /* Active/Selected state for Movies/Shows buttons */
         .hero-nav-btn.active {
-            border-color: #FFD700;
             background: linear-gradient(145deg, rgba(40, 32, 10, 0.95) 0%, rgba(25, 20, 8, 0.98) 100%);
             box-shadow:
-                0 0 40px rgba(255, 215, 0, 0.5),
-                0 10px 30px rgba(0, 0, 0, 0.4),
-                inset 0 0 40px rgba(255, 215, 0, 0.15);
+                0 0 35px hsl(calc(var(--glow-hue) * 1deg) 100% 60% / 0.45),
+                0 0 70px hsl(calc(var(--glow-hue) * 1deg) 100% 50% / 0.25),
+                0 0 100px hsl(calc(var(--glow-hue) * 1deg) 100% 40% / 0.12),
+                0 10px 30px rgba(0, 0, 0, 0.4);
         }
 
         .hero-nav-btn.active .hero-nav-icon {
@@ -4008,25 +3998,29 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(145deg, rgba(15, 15, 30, 0.95) 0%, rgba(26, 26, 46, 0.98) 100%);
-            border: 2px solid var(--accent-color, #00d9ff);
+            background:
+                linear-gradient(145deg, rgba(15, 15, 30, 0.95) 0%, rgba(26, 26, 46, 0.98) 100%) padding-box,
+                linear-gradient(45deg, #fb0094, #0000ff, #00ff00, #ffff00, #ff0000, #fb0094, #0000ff, #00ff00, #ffff00, #ff0000) border-box;
+            background-size: 100%, 400%;
+            border: 2px solid transparent;
             border-radius: 50%;
             cursor: pointer;
             opacity: 0;
             transform: translate(-50%, -50%) scale(0);
             transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             box-shadow:
-                0 0 20px rgba(0, 217, 255, 0.3),
-                inset 0 0 15px rgba(0, 217, 255, 0.1);
+                0 0 15px rgba(251, 0, 148, 0.2),
+                0 0 25px rgba(0, 0, 255, 0.1);
             text-decoration: none;
+            animation: rainbow 20s linear infinite;
         }
 
         .radial-option:hover {
-            border-color: #00ff9f;
             transform: translate(-50%, -50%) scale(1.15) !important;
             box-shadow:
-                0 0 30px rgba(0, 255, 159, 0.5),
-                inset 0 0 20px rgba(0, 255, 159, 0.2);
+                0 0 25px rgba(251, 0, 148, 0.4),
+                0 0 40px rgba(0, 0, 255, 0.2),
+                0 0 55px rgba(0, 255, 0, 0.15);
         }
 
         .radial-option:active {
@@ -4035,11 +4029,13 @@
 
         /* Active/Selected state for radial menu options */
         .radial-option.selected {
-            border-color: #FFD700;
-            background: linear-gradient(145deg, rgba(40, 32, 10, 0.95) 0%, rgba(25, 20, 8, 0.98) 100%);
+            background-image:
+                linear-gradient(145deg, rgba(40, 32, 10, 0.95) 0%, rgba(25, 20, 8, 0.98) 100%),
+                linear-gradient(45deg, #fb0094, #0000ff, #00ff00, #ffff00, #ff0000, #fb0094, #0000ff, #00ff00, #ffff00, #ff0000);
             box-shadow:
-                0 0 30px rgba(255, 215, 0, 0.5),
-                inset 0 0 20px rgba(255, 215, 0, 0.2);
+                0 0 30px rgba(251, 0, 148, 0.4),
+                0 0 50px rgba(0, 0, 255, 0.25),
+                0 0 65px rgba(255, 215, 0, 0.2);
         }
 
         .radial-option.selected .radial-option-icon {
@@ -4139,13 +4135,51 @@
 
         /* Pulse animation for active button */
         .hero-nav-btn.menu-open {
-            animation: radialPulse 1.5s infinite;
+            animation: glowing-hue 4s linear infinite, radialPulse 1.5s infinite;
             z-index: 1001;
         }
 
         @keyframes radialPulse {
-            0%, 100% { box-shadow: 0 0 20px rgba(0, 217, 255, 0.4); }
-            50% { box-shadow: 0 0 40px rgba(0, 217, 255, 0.8), 0 0 60px rgba(255, 0, 255, 0.3); }
+            0%, 100% {
+                box-shadow:
+                    0 0 25px hsl(calc(var(--glow-hue) * 1deg) 100% 60% / 0.4),
+                    0 0 50px hsl(calc(var(--glow-hue) * 1deg) 100% 50% / 0.2);
+            }
+            50% {
+                box-shadow:
+                    0 0 45px hsl(calc(var(--glow-hue) * 1deg) 100% 60% / 0.6),
+                    0 0 80px hsl(calc(var(--glow-hue) * 1deg) 100% 50% / 0.3);
+            }
+        }
+
+        @keyframes rainbow {
+            0% { background-position: 0 0, 0% 0; }
+            50% { background-position: 0 0, 400% 0; }
+            100% { background-position: 0 0, 0% 0; }
+        }
+
+        /* Glowing Shadow @property declarations */
+        @property --glow-hue {
+            syntax: "<number>";
+            inherits: true;
+            initial-value: 0;
+        }
+        @property --white-shadow {
+            syntax: "<number>";
+            inherits: true;
+            initial-value: 0;
+        }
+
+        @keyframes glowing-hue {
+            0% { --glow-hue: 0; }
+            100% { --glow-hue: 360; }
+        }
+
+        @keyframes shadow-pulse {
+            0%, 24%, 46%, 73%, 96% { --white-shadow: 0.5; }
+            12%, 28%, 41%, 63%, 75%, 82%, 98% { --white-shadow: 2.5; }
+            6%, 32%, 57% { --white-shadow: 1.3; }
+            18%, 52%, 88% { --white-shadow: 3.5; }
         }
 
         /* Phosphor Theme Specific Hero Overrides */
@@ -4687,20 +4721,27 @@
             margin-left: auto;
             margin-right: auto;
             max-width: 580px;
+            position: relative;
             background: linear-gradient(145deg, rgba(26, 20, 8, 0.8) 0%, rgba(15, 12, 5, 0.9) 100%);
-            border: 2px solid var(--primary-color, #F5A623);
+            border: 2px solid rgba(40, 32, 12, 0.6);
             border-radius: 12px;
-            box-shadow: 0 0 20px rgba(245, 166, 35, 0.2);
+            box-shadow:
+                0 0 18px hsl(calc(var(--glow-hue) * 1deg) 100% 60% / 0.25),
+                0 0 45px hsl(calc(var(--glow-hue) * 1deg) 100% 50% / 0.12),
+                0 0 70px hsl(calc(var(--glow-hue) * 1deg) 100% 40% / 0.06);
             transition: all 0.3s ease;
+            animation: glowing-hue 4s linear infinite;
         }
 
         .section-header-bar:hover {
             transform: translateY(-4px) scale(1.02);
-            border-color: #FFD700;
             box-shadow:
-                0 0 40px rgba(245, 166, 35, 0.5),
-                0 10px 30px rgba(0, 0, 0, 0.4),
-                inset 0 0 30px rgba(245, 166, 35, 0.1);
+                0 0 30px hsl(calc(var(--glow-hue) * 1deg) 100% 60% / 0.45),
+                0 0 60px hsl(calc(var(--glow-hue) * 1deg) 100% 50% / 0.25),
+                0 0 90px hsl(calc(var(--glow-hue) * 1deg) 100% 40% / 0.12),
+                0 0 calc(var(--white-shadow) * 1vw) calc(var(--white-shadow) * 0.15vw) rgb(255 255 255 / 20%),
+                0 10px 30px rgba(0, 0, 0, 0.4);
+            animation: glowing-hue 4s linear infinite, shadow-pulse 8s linear infinite;
         }
 
         .section-header-bar:hover .section-title {
@@ -4710,12 +4751,12 @@
 
         /* Active state for Continue Watching */
         .section-header-bar.active {
-            border-color: #FFD700;
             background: linear-gradient(145deg, rgba(40, 32, 10, 0.9) 0%, rgba(25, 20, 8, 0.95) 100%);
             box-shadow:
-                0 0 40px rgba(255, 215, 0, 0.5),
-                0 10px 30px rgba(0, 0, 0, 0.4),
-                inset 0 0 30px rgba(255, 215, 0, 0.15);
+                0 0 35px hsl(calc(var(--glow-hue) * 1deg) 100% 60% / 0.45),
+                0 0 65px hsl(calc(var(--glow-hue) * 1deg) 100% 50% / 0.25),
+                0 0 95px hsl(calc(var(--glow-hue) * 1deg) 100% 40% / 0.12),
+                0 10px 30px rgba(0, 0, 0, 0.4);
         }
 
         .section-header-bar.active .section-title {
@@ -7613,6 +7654,22 @@
         /* ============= ANIMATED BACKGROUNDS ============= */
 
         /* Background Animation Container */
+        #shaderBackground {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        #shaderBackground canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
         #bgAnimation {
             position: fixed;
             top: 0;
@@ -10419,6 +10476,455 @@
 
         /* ============= END AUTH GATE & ONBOARDING STYLES ============= */
 
+        /* ============= SPOTLIGHT CARD BORDER EFFECT ============= */
+        .spotlight-card {
+            --spotlight-size: 200;
+            --spotlight-base: 180;
+            --spotlight-spread: 200;
+            --spotlight-hue: calc(var(--spotlight-base) + (var(--mouse-xp, 0) * var(--spotlight-spread)));
+            --spotlight-border-size: calc(var(--spotlight-border, 2) * 1px);
+            --spotlight-spot-size: calc(var(--spotlight-size) * 1px);
+            position: relative;
+        }
+
+        /* Per-card border width */
+        .content-card.spotlight-card,
+        .continue-item.spotlight-card {
+            --spotlight-border: 3;
+        }
+
+        .sync-action-card.spotlight-card {
+            --spotlight-border: 2;
+        }
+
+        .player-watchlist-list-card.spotlight-card,
+        .watchlist-slide-list-card.spotlight-card,
+        .watchlist-item-card.spotlight-card,
+        .friend-request-card.spotlight-card,
+        .friend-card.spotlight-card {
+            --spotlight-border: 1;
+        }
+
+        /* Override border-color across all states */
+        .spotlight-card,
+        .spotlight-card:hover,
+        .spotlight-card:active,
+        .spotlight-card.active,
+        .spotlight-card.selected {
+            border-color: hsl(0 0% 60% / 0.12) !important;
+        }
+
+        /* Normalize friend-request-card left border */
+        .friend-request-card.spotlight-card {
+            border-left-width: 1px !important;
+        }
+
+        /* Override overflow for cards that clip pseudo-elements */
+        .continue-item.spotlight-card,
+        .friend-request-card.spotlight-card,
+        .sync-action-card.spotlight-card {
+            overflow: visible !important;
+        }
+
+        /* Shared pseudo-element styles for spotlight border */
+        .spotlight-card::before,
+        .spotlight-card::after {
+            content: "" !important;
+            display: block !important;
+            position: absolute !important;
+            inset: calc(var(--spotlight-border-size) * -1) !important;
+            border: var(--spotlight-border-size) solid transparent !important;
+            border-radius: inherit !important;
+            background-attachment: fixed !important;
+            background-size: calc(100% + (2 * var(--spotlight-border-size))) calc(100% + (2 * var(--spotlight-border-size))) !important;
+            background-repeat: no-repeat !important;
+            background-position: 50% 50% !important;
+            background-color: transparent !important;
+            pointer-events: none !important;
+            z-index: 2 !important;
+            width: auto !important;
+            height: auto !important;
+            transform: none !important;
+            animation: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            mask: linear-gradient(transparent, transparent), linear-gradient(white, white);
+            mask-clip: padding-box, border-box;
+            mask-composite: intersect;
+            -webkit-mask: linear-gradient(transparent, transparent), linear-gradient(white, white);
+            -webkit-mask-clip: padding-box, border-box;
+            -webkit-mask-composite: xor;
+        }
+
+        /* Colored glow border */
+        .spotlight-card::before {
+            background-image: radial-gradient(
+                calc(var(--spotlight-spot-size) * 0.75) calc(var(--spotlight-spot-size) * 0.75) at
+                calc(var(--mouse-x, 0) * 1px) calc(var(--mouse-y, 0) * 1px),
+                hsl(var(--spotlight-hue, 210) 100% 50% / 1),
+                transparent 100%
+            ) !important;
+            filter: brightness(2) !important;
+        }
+
+        /* White highlight border */
+        .spotlight-card::after {
+            background-image: radial-gradient(
+                calc(var(--spotlight-spot-size) * 0.5) calc(var(--spotlight-spot-size) * 0.5) at
+                calc(var(--mouse-x, 0) * 1px) calc(var(--mouse-y, 0) * 1px),
+                hsl(0 100% 100% / 1),
+                transparent 100%
+            ) !important;
+            filter: none !important;
+            opacity: 1 !important;
+        }
+        /* ============= END SPOTLIGHT CARD BORDER EFFECT ============= */
+
+        /* ============= LIQUID GLASS DOCK ============= */
+        .glass-dock-wrapper {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+            pointer-events: none;
+        }
+
+        .glass-dock {
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 14px;
+            border-radius: 24px;
+            position: relative;
+            cursor: default;
+            box-shadow: 0 6px 32px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255,255,255,0.08);
+            transition: padding 0.7s cubic-bezier(0.175, 0.885, 0.32, 2.2),
+                        border-radius 0.7s cubic-bezier(0.175, 0.885, 0.32, 2.2),
+                        gap 0.7s cubic-bezier(0.175, 0.885, 0.32, 2.2);
+        }
+
+        .glass-dock:hover {
+            padding: 12px 18px;
+            gap: 10px;
+            border-radius: 28px;
+        }
+
+        /* Glass layers */
+        .glass-dock-blur {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            border-radius: inherit;
+            backdrop-filter: blur(18px) saturate(1.6);
+            -webkit-backdrop-filter: blur(18px) saturate(1.6);
+            filter: url(#glass-distortion);
+            isolation: isolate;
+        }
+
+        .glass-dock-tint {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            border-radius: inherit;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .glass-dock-specular {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            border-radius: inherit;
+            overflow: hidden;
+            box-shadow:
+                inset 1.5px 1.5px 1px 0 rgba(255,255,255,0.45),
+                inset -1px -1px 1px 0.5px rgba(255,255,255,0.25);
+        }
+
+        .glass-dock-items {
+            position: relative;
+            z-index: 3;
+            display: flex;
+            align-items: center;
+            gap: inherit;
+        }
+
+        /* Dock icon buttons */
+        .glass-dock-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            border: none;
+            background: rgba(255,255,255,0.06);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 2.2);
+            position: relative;
+            color: rgba(255,255,255,0.85);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            padding: 0;
+        }
+
+        .glass-dock-btn:hover {
+            transform: scale(1.18) translateY(-4px);
+            background: rgba(255,255,255,0.14);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+        }
+
+        .glass-dock-btn:active {
+            transform: scale(0.95);
+        }
+
+        .glass-dock-btn.dock-active {
+            background: rgba(255,255,255,0.22);
+            box-shadow: 0 4px 20px rgba(255,255,255,0.1), 0 0 0 1.5px rgba(255,255,255,0.2);
+        }
+
+        .glass-dock-btn img {
+            width: 30px;
+            height: 30px;
+            pointer-events: none;
+            filter: brightness(1.1);
+        }
+
+        .glass-dock-btn svg {
+            width: 24px;
+            height: 24px;
+            pointer-events: none;
+        }
+
+        /* Active dot indicator under button */
+        .glass-dock-btn.dock-active::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.7);
+            box-shadow: 0 0 6px rgba(255,255,255,0.4);
+        }
+
+        /* Dock separator */
+        .glass-dock-sep {
+            width: 1px;
+            height: 28px;
+            background: rgba(255,255,255,0.12);
+            border-radius: 1px;
+            flex-shrink: 0;
+        }
+
+        /* Tooltip */
+        .glass-dock-btn::before {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%) scale(0.8);
+            padding: 5px 12px;
+            border-radius: 8px;
+            background: rgba(30,30,30,0.85);
+            backdrop-filter: blur(12px);
+            color: rgba(255,255,255,0.9);
+            font-family: 'Outfit', 'VT323', sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 2.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .glass-dock-btn:hover::before {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+
+        /* ---- DOCK PANEL ANIMATIONS ---- */
+        /* Panels now rise from the dock area */
+        .dock-panel-anchor {
+            position: fixed;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 199999;
+            pointer-events: none;
+            display: flex;
+            justify-content: center;
+            width: 420px;
+            max-width: 94vw;
+        }
+
+        .dock-panel-anchor > * {
+            pointer-events: auto;
+        }
+
+        /* Override panel animations for dock-driven panels */
+        /* User menu dropdown - now anchored to dock */
+        .user-menu-dropdown.dock-panel {
+            position: fixed !important;
+            bottom: 90px !important;
+            left: 50% !important;
+            top: auto !important;
+            right: auto !important;
+            transform: translateX(-50%) translateY(20px) scale(0.92) !important;
+            transform-origin: bottom center !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            min-width: 240px !important;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.4) !important;
+            z-index: 199999 !important;
+            border-radius: 16px !important;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .user-menu-dropdown.dock-panel.show {
+            transform: translateX(-50%) translateY(0) scale(1) !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        /* Watchlist panel - dock driven */
+        .watchlist-slide-panel.dock-panel {
+            position: fixed !important;
+            bottom: 90px !important;
+            left: 50% !important;
+            top: auto !important;
+            right: auto !important;
+            transform: translateX(-50%) translateY(30px) scale(0.9) !important;
+            transform-origin: bottom center !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            width: 400px !important;
+            max-width: 94vw !important;
+            max-height: 70vh !important;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.4) !important;
+            z-index: 199999 !important;
+            border-radius: 16px !important;
+        }
+
+        .watchlist-slide-panel.dock-panel.active {
+            transform: translateX(-50%) translateY(0) scale(1) !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        /* Live panel - dock driven */
+        .live-slide-panel.dock-panel {
+            position: fixed !important;
+            bottom: 90px !important;
+            left: 50% !important;
+            top: auto !important;
+            right: auto !important;
+            transform: translateX(-50%) translateY(30px) scale(0.9) !important;
+            transform-origin: bottom center !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            width: 400px !important;
+            max-width: 94vw !important;
+            max-height: 70vh !important;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.4) !important;
+            z-index: 199999 !important;
+            border-radius: 16px !important;
+        }
+
+        .live-slide-panel.dock-panel.active {
+            transform: translateX(-50%) translateY(0) scale(1) !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        /* Search panel - dock driven */
+        .floating-search-panel.dock-panel {
+            position: fixed !important;
+            bottom: 90px !important;
+            left: 50% !important;
+            top: auto !important;
+            right: auto !important;
+            transform: translateX(-50%) translateY(30px) scale(0.9) !important;
+            transform-origin: bottom center !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            width: 420px !important;
+            max-width: 94vw !important;
+            max-height: 70vh !important;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.4) !important;
+            z-index: 199999 !important;
+            border-radius: 16px !important;
+        }
+
+        .floating-search-panel.dock-panel.active {
+            transform: translateX(-50%) translateY(0) scale(1) !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        /* Hide original standalone buttons when dock is active */
+        body.glass-dock-active .user-menu-container > .user-menu-btn,
+        body.glass-dock-active .user-menu-container > .friend-request-notification-left,
+        body.glass-dock-active .user-menu-container > .user-menu-dropdown:not(.dock-panel) {
+            display: none !important;
+        }
+        body.glass-dock-active #watchlistContainer > .watchlist-trigger-btn {
+            display: none !important;
+        }
+        body.glass-dock-active #liveContainer > #liveTriggerBtn {
+            display: none !important;
+        }
+        body.glass-dock-active #floatingSearch > .floating-search-btn {
+            display: none !important;
+        }
+        /* Also hide the party button in top-right since dock replaces top nav */
+        body.glass-dock-active .bg-animation-toggle {
+            display: none !important;
+        }
+
+        /* Dock responsive */
+        @media (max-width: 480px) {
+            .glass-dock-wrapper {
+                bottom: 12px;
+            }
+            .glass-dock {
+                padding: 8px 10px;
+                gap: 4px;
+            }
+            .glass-dock-btn {
+                width: 44px;
+                height: 44px;
+                border-radius: 14px;
+            }
+            .glass-dock-btn img {
+                width: 24px;
+                height: 24px;
+            }
+            .glass-dock-btn svg {
+                width: 20px;
+                height: 20px;
+            }
+            .user-menu-dropdown.dock-panel,
+            .watchlist-slide-panel.dock-panel,
+            .live-slide-panel.dock-panel,
+            .floating-search-panel.dock-panel {
+                bottom: 76px !important;
+            }
+        }
+        /* ============= END LIQUID GLASS DOCK ============= */
+
     </style>
 
     <!-- Monetag Ads Integration -->
@@ -10848,6 +11354,7 @@
     <div id="crtPowerLed" class="crt-power-led"></div>
 
 
+    <div id="shaderBackground"></div>
     <div id="bgAnimation"></div>
 
     <!-- User Menu Dropdown -->
@@ -11763,6 +12270,70 @@
     </div>
 
     <script>
+        // ============= SPOTLIGHT CARD BORDER EFFECT - POINTER TRACKING =============
+        (function() {
+            var root = document.documentElement;
+
+            document.addEventListener('pointermove', function(e) {
+                root.style.setProperty('--mouse-x', e.clientX.toFixed(2));
+                root.style.setProperty('--mouse-y', e.clientY.toFixed(2));
+                root.style.setProperty('--mouse-xp', (e.clientX / window.innerWidth).toFixed(2));
+                root.style.setProperty('--mouse-yp', (e.clientY / window.innerHeight).toFixed(2));
+            });
+
+            var spotlightSelectors = [
+                '.content-card',
+                '.continue-item',
+                '.player-watchlist-list-card',
+                '.watchlist-slide-list-card',
+                '.watchlist-item-card',
+                '.friend-request-card',
+                '.friend-card',
+                '.sync-action-card'
+            ];
+
+            function addSpotlightClass() {
+                spotlightSelectors.forEach(function(sel) {
+                    document.querySelectorAll(sel).forEach(function(el) {
+                        if (!el.classList.contains('spotlight-card')) {
+                            el.classList.add('spotlight-card');
+                        }
+                    });
+                });
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', addSpotlightClass);
+            } else {
+                addSpotlightClass();
+            }
+
+            var observer = new MutationObserver(function(mutations) {
+                var shouldUpdate = false;
+                for (var i = 0; i < mutations.length; i++) {
+                    if (mutations[i].addedNodes.length) {
+                        shouldUpdate = true;
+                        break;
+                    }
+                }
+                if (shouldUpdate) {
+                    requestAnimationFrame(addSpotlightClass);
+                }
+            });
+
+            function startObserving() {
+                if (document.body) {
+                    observer.observe(document.body, { childList: true, subtree: true });
+                } else {
+                    document.addEventListener('DOMContentLoaded', function() {
+                        observer.observe(document.body, { childList: true, subtree: true });
+                    });
+                }
+            }
+            startObserving();
+        })();
+        // ============= END SPOTLIGHT POINTER TRACKING =============
+
         // Define global functions FIRST for onclick handlers
         console.log('[INIT] Script loading...');
 
@@ -12377,6 +12948,9 @@
 
         // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize aurora shader background
+            initShaderBackground();
+
             // Fix layout order: ensure popular-section (filters) appears before player-section
             const layoutContainer = document.querySelector('.container');
             const popularSection = layoutContainer && layoutContainer.querySelector('.popular-section');
@@ -17888,6 +18462,128 @@
             if (activeEffects.scanline) createScanline();
         }
 
+        // ============= AURORA SHADER BACKGROUND =============
+        function initShaderBackground() {
+            const container = document.getElementById('shaderBackground');
+            if (!container || typeof THREE === 'undefined') return;
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+            const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true });
+
+            // Render at half resolution - CSS scales it up, barely noticeable for a background
+            const scale = 0.5;
+            renderer.setSize(window.innerWidth * scale, window.innerHeight * scale);
+            renderer.setPixelRatio(1);
+            renderer.domElement.style.width = '100%';
+            renderer.domElement.style.height = '100%';
+            container.appendChild(renderer.domElement);
+
+            const material = new THREE.ShaderMaterial({
+                uniforms: {
+                    iTime: { value: 0 },
+                    iResolution: { value: new THREE.Vector2(window.innerWidth * scale, window.innerHeight * scale) }
+                },
+                vertexShader: `
+                    void main() {
+                        gl_Position = vec4(position, 1.0);
+                    }
+                `,
+                fragmentShader: `
+                    uniform float iTime;
+                    uniform vec2 iResolution;
+
+                    float rand(vec2 n) {
+                        return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
+                    }
+
+                    float noise(vec2 p) {
+                        vec2 ip = floor(p);
+                        vec2 u = fract(p);
+                        u = u*u*(3.0-2.0*u);
+                        float res = mix(
+                            mix(rand(ip), rand(ip + vec2(1.0, 0.0)), u.x),
+                            mix(rand(ip + vec2(0.0, 1.0)), rand(ip + vec2(1.0, 1.0)), u.x), u.y);
+                        return res * res;
+                    }
+
+                    float fbm(vec2 x) {
+                        float v = 0.0;
+                        float a = 0.3;
+                        vec2 shift = vec2(100);
+                        mat2 rot = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.5));
+                        for (int i = 0; i < 2; ++i) {
+                            v += a * noise(x);
+                            x = rot * x * 2.0 + shift;
+                            a *= 0.4;
+                        }
+                        return v;
+                    }
+
+                    void main() {
+                        vec2 shake = vec2(sin(iTime * 1.2) * 0.005, cos(iTime * 2.1) * 0.005);
+                        vec2 p = ((gl_FragCoord.xy + shake * iResolution.xy) - iResolution.xy * 0.5) / iResolution.y * mat2(6.0, -4.0, 4.0, 6.0);
+                        vec2 v;
+                        vec4 o = vec4(0.0);
+
+                        float f = 2.0 + fbm(p + vec2(iTime * 5.0, 0.0)) * 0.5;
+
+                        for (float i = 0.0; i < 18.0; i++) {
+                            v = p + cos(i * i + (iTime + p.x * 0.08) * 0.025 + i * vec2(13.0, 11.0)) * 3.5 + vec2(sin(iTime * 3.0 + i) * 0.003, cos(iTime * 3.5 - i) * 0.003);
+                            float tailNoise = rand(v + vec2(iTime * 0.3, i)) * 0.25 * (1.0 - (i / 18.0));
+                            vec4 auroraColors = vec4(
+                                0.1 + 0.3 * sin(i * 0.2 + iTime * 0.4),
+                                0.3 + 0.5 * cos(i * 0.3 + iTime * 0.5),
+                                0.7 + 0.3 * sin(i * 0.4 + iTime * 0.3),
+                                1.0
+                            );
+                            vec4 currentContribution = auroraColors * exp(sin(i * i + iTime * 0.8)) / length(max(v, vec2(v.x * f * 0.015, v.y * 1.5)));
+                            float thinnessFactor = smoothstep(0.0, 1.0, i / 18.0) * 0.6;
+                            o += currentContribution * (1.0 + tailNoise * 0.8) * thinnessFactor;
+                        }
+
+                        o = tanh(pow(o / 55.0, vec4(1.6)));
+                        gl_FragColor = o * 1.5;
+                    }
+                `
+            });
+
+            const geometry = new THREE.PlaneGeometry(2, 2);
+            const mesh = new THREE.Mesh(geometry, material);
+            scene.add(mesh);
+
+            // Throttle to ~30fps instead of 60
+            let frameId;
+            let lastTime = 0;
+            const interval = 1000 / 30;
+            const animate = (now) => {
+                frameId = requestAnimationFrame(animate);
+                if (now - lastTime < interval) return;
+                lastTime = now;
+                material.uniforms.iTime.value += 0.033;
+                renderer.render(scene, camera);
+            };
+            frameId = requestAnimationFrame(animate);
+
+            const handleResize = () => {
+                renderer.setSize(window.innerWidth * scale, window.innerHeight * scale);
+                material.uniforms.iResolution.value.set(window.innerWidth * scale, window.innerHeight * scale);
+            };
+            window.addEventListener('resize', handleResize);
+
+            // Store cleanup reference
+            window._shaderCleanup = () => {
+                cancelAnimationFrame(frameId);
+                window.removeEventListener('resize', handleResize);
+                if (container.contains(renderer.domElement)) {
+                    container.removeChild(renderer.domElement);
+                }
+                geometry.dispose();
+                material.dispose();
+                renderer.dispose();
+            };
+        }
+
         function initThemeSelector() {
             const panel = document.getElementById('themeSelectorPanel');
             // Use the container if it exists, otherwise use the panel directly
@@ -20591,8 +21287,9 @@
         // Close user menu when clicking outside
         document.addEventListener('click', function(event) {
             const userMenuContainer = document.querySelector('.user-menu-container');
+            const dock = document.getElementById('glassDock');
             const dropdown = document.getElementById('userMenuDropdown');
-            if (userMenuContainer && !userMenuContainer.contains(event.target)) {
+            if (userMenuContainer && !userMenuContainer.contains(event.target) && !(dock && dock.contains(event.target))) {
                 dropdown.classList.remove('show');
             }
         });
@@ -22345,5 +23042,206 @@
     })();
     </script>
     <!-- ============= END AUTH GATE & ONBOARDING SCRIPT ============= -->
+
+    <!-- Liquid Glass SVG Filter -->
+    <svg style="display:none">
+        <filter id="glass-distortion" x="0%" y="0%" width="100%" height="100%" filterUnits="objectBoundingBox">
+            <feTurbulence type="fractalNoise" baseFrequency="0.001 0.005" numOctaves="1" seed="17" result="turbulence"/>
+            <feComponentTransfer in="turbulence" result="mapped">
+                <feFuncR type="gamma" amplitude="1" exponent="10" offset="0.5"/>
+                <feFuncG type="gamma" amplitude="0" exponent="1" offset="0"/>
+                <feFuncB type="gamma" amplitude="0" exponent="1" offset="0.5"/>
+            </feComponentTransfer>
+            <feGaussianBlur in="turbulence" stdDeviation="3" result="softMap"/>
+            <feSpecularLighting in="softMap" surfaceScale="5" specularConstant="1" specularExponent="100" lightingColor="white" result="specLight">
+                <fePointLight x="-200" y="-200" z="300"/>
+            </feSpecularLighting>
+            <feComposite in="specLight" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="litImage"/>
+            <feDisplacementMap in="SourceGraphic" in2="softMap" scale="200" xChannelSelector="R" yChannelSelector="G"/>
+        </filter>
+    </svg>
+
+    <!-- Liquid Glass Dock -->
+    <div class="glass-dock-wrapper" id="glassDock">
+        <div class="glass-dock">
+            <div class="glass-dock-blur"></div>
+            <div class="glass-dock-tint"></div>
+            <div class="glass-dock-specular"></div>
+            <div class="glass-dock-items">
+                <button class="glass-dock-btn" id="dockBtnUser" data-tooltip="Profile" onclick="dockTogglePanel('user')">
+                    <img id="dockUserIcon" src="Icons/user.png" alt="User">
+                </button>
+                <div class="glass-dock-sep"></div>
+                <button class="glass-dock-btn" id="dockBtnLists" data-tooltip="My Lists" onclick="dockTogglePanel('lists')">
+                    <img src="to-do-list.png" alt="Lists" style="filter: brightness(1.3);">
+                </button>
+                <button class="glass-dock-btn" id="dockBtnLive" data-tooltip="Live" onclick="dockTogglePanel('live')">
+                    <img src="live-stream.png" alt="Live">
+                </button>
+                <div class="glass-dock-sep"></div>
+                <button class="glass-dock-btn" id="dockBtnSearch" data-tooltip="Search" onclick="dockTogglePanel('search')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // ============= LIQUID GLASS DOCK CONTROLLER =============
+    (function() {
+        var activeDockPanel = null;
+
+        function closeAllDockPanels() {
+            // User menu
+            var userDrop = document.getElementById('userMenuDropdown');
+            if (userDrop) userDrop.classList.remove('show');
+
+            // Watchlist
+            var wlPanel = document.getElementById('watchlistSlidePanel');
+            if (wlPanel) wlPanel.classList.remove('active');
+            if (typeof window.watchlistPanelOpen !== 'undefined') window.watchlistPanelOpen = false;
+
+            // Live
+            var livePanel = document.getElementById('liveSlidePanel');
+            if (livePanel) livePanel.classList.remove('active');
+            if (typeof window.livePanelOpen !== 'undefined') window.livePanelOpen = false;
+
+            // Search
+            var searchPanel = document.querySelector('.floating-search-panel');
+            if (searchPanel) searchPanel.classList.remove('active');
+            if (typeof window.floatingSearchOpen !== 'undefined') window.floatingSearchOpen = false;
+
+            // Remove active states from all dock buttons
+            document.querySelectorAll('.glass-dock-btn').forEach(function(btn) {
+                btn.classList.remove('dock-active');
+            });
+
+            activeDockPanel = null;
+        }
+
+        window.dockTogglePanel = function(panelName) {
+            var wasActive = activeDockPanel === panelName;
+
+            // Close everything first
+            closeAllDockPanels();
+
+            if (wasActive) return; // Was open, now closed
+
+            activeDockPanel = panelName;
+
+            switch(panelName) {
+                case 'user':
+                    var dropdown = document.getElementById('userMenuDropdown');
+                    if (dropdown) dropdown.classList.add('show');
+                    document.getElementById('dockBtnUser').classList.add('dock-active');
+                    break;
+
+                case 'lists':
+                    var wl = document.getElementById('watchlistSlidePanel');
+                    if (wl) {
+                        wl.classList.add('active');
+                        window.watchlistPanelOpen = true;
+                        if (typeof renderWatchlistLists === 'function') renderWatchlistLists();
+                    }
+                    document.getElementById('dockBtnLists').classList.add('dock-active');
+                    break;
+
+                case 'live':
+                    var lp = document.getElementById('liveSlidePanel');
+                    if (lp) {
+                        lp.classList.add('active');
+                        window.livePanelOpen = true;
+                        if (typeof showLiveMainOptions === 'function') showLiveMainOptions();
+                    }
+                    document.getElementById('dockBtnLive').classList.add('dock-active');
+                    break;
+
+                case 'search':
+                    var sp = document.querySelector('.floating-search-panel');
+                    if (sp) {
+                        sp.classList.add('active');
+                        window.floatingSearchOpen = true;
+                        setTimeout(function() {
+                            var input = document.getElementById('floatingSearchInput');
+                            if (input) { input.focus(); input.select(); }
+                        }, 150);
+                    }
+                    document.getElementById('dockBtnSearch').classList.add('dock-active');
+                    break;
+            }
+        };
+
+        // Initialize dock: tag panels with dock-panel class and activate dock mode
+        function initDock() {
+            document.body.classList.add('glass-dock-active');
+
+            var userDrop = document.getElementById('userMenuDropdown');
+            if (userDrop) userDrop.classList.add('dock-panel');
+
+            var wlPanel = document.getElementById('watchlistSlidePanel');
+            if (wlPanel) wlPanel.classList.add('dock-panel');
+
+            var livePanel = document.getElementById('liveSlidePanel');
+            if (livePanel) livePanel.classList.add('dock-panel');
+
+            var searchPanel = document.querySelector('.floating-search-panel');
+            if (searchPanel) searchPanel.classList.add('dock-panel');
+
+            // Make watchlist and live containers visible (dock handles display now)
+            var wlContainer = document.getElementById('watchlistContainer');
+            if (wlContainer) wlContainer.style.display = 'block';
+
+            var liveContainer = document.getElementById('liveContainer');
+            if (liveContainer) liveContainer.style.display = 'block';
+
+            var searchContainer = document.getElementById('floatingSearch');
+            if (searchContainer) searchContainer.style.display = 'block';
+
+            // Sync dock user icon with user menu icon
+            var origIcon = document.getElementById('userMenuIcon');
+            var dockIcon = document.getElementById('dockUserIcon');
+            if (origIcon && dockIcon) {
+                dockIcon.src = origIcon.src;
+                // Watch for icon source changes
+                var iconObserver = new MutationObserver(function() {
+                    dockIcon.src = origIcon.src;
+                });
+                iconObserver.observe(origIcon, { attributes: true, attributeFilter: ['src'] });
+            }
+        }
+
+        // Close panels on click outside
+        document.addEventListener('click', function(e) {
+            if (!activeDockPanel) return;
+            var dock = document.getElementById('glassDock');
+            var panels = document.querySelectorAll('.dock-panel.show, .dock-panel.active');
+            var clickedInsideDock = dock && dock.contains(e.target);
+            var clickedInsidePanel = false;
+            panels.forEach(function(p) {
+                if (p.contains(e.target)) clickedInsidePanel = true;
+            });
+            if (!clickedInsideDock && !clickedInsidePanel) {
+                closeAllDockPanels();
+            }
+        });
+
+        // Escape key closes panels
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && activeDockPanel) {
+                closeAllDockPanels();
+            }
+        });
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initDock);
+        } else {
+            initDock();
+        }
+    })();
+    // ============= END LIQUID GLASS DOCK CONTROLLER =============
+    </script>
+
 </body>
 </html>
