@@ -877,7 +877,9 @@
             background: #333;
             border: 3px solid var(--accent-color, #00d9ff);
             box-shadow: 0 0 15px var(--secondary-glow, rgba(0, 217, 255, 0.3));
+            margin-top: 10px;
             margin-bottom: 14px;
+            margin-left: 32px;
             align-self: flex-start;
         }
 
@@ -984,6 +986,8 @@
         .omdb-ratings {
             margin: 0;
             width: 100%;
+            display: flex;
+            justify-content: center;
         }
 
         .ratings-container {
@@ -3672,15 +3676,15 @@
 
         [data-theme="jspecial"] .cast-section {
             background: rgba(255, 0, 255, 0.08);
-            border: 3px solid #ff00ff;
+            border: none;
             border-radius: 12px;
             padding: 16px;
-            box-shadow: 0 0 20px rgba(255, 0, 255, 0.6);
+            box-shadow: none;
         }
 
         [data-theme="jspecial"] .tv-controls {
-            border: 3px solid #ff1493;
-            box-shadow: 0 0 20px rgba(255, 20, 147, 0.6);
+            border: none;
+            box-shadow: none;
         }
 
         [data-theme="jspecial"] .episode-description {
@@ -13999,19 +14003,19 @@
                         episodeButtons[episode.episode_number] = button;
                     });
 
-                    // Set first episode as default if not already set
-                    if (currentSelectedEpisode === 1 || !currentSelectedEpisode) {
-                        const firstEp = seasonData.episodes[0];
-                        currentSelectedEpisode = firstEp.episode_number;
+                    // Set episode info - use currentSelectedEpisode if it exists in this season, otherwise first episode
+                    const targetEp = seasonData.episodes.find(e => e.episode_number === currentSelectedEpisode) || seasonData.episodes[0];
+                    if (targetEp) {
+                        currentSelectedEpisode = targetEp.episode_number;
 
-                        document.getElementById('episodeButtonText').textContent = `E${firstEp.episode_number}: ${firstEp.name || 'Untitled'}`;
+                        document.getElementById('episodeButtonText').textContent = `E${targetEp.episode_number}: ${targetEp.name || 'Untitled'}`;
 
-                        // Update episode description for first episode
+                        // Update episode description
                         const descriptionSection = document.getElementById('episodeDescription');
                         const descriptionText = document.getElementById('episodeDescriptionText');
 
-                        if (firstEp.overview && firstEp.overview.trim() !== '') {
-                            descriptionText.textContent = firstEp.overview;
+                        if (targetEp.overview && targetEp.overview.trim() !== '') {
+                            descriptionText.textContent = targetEp.overview;
                             descriptionSection.style.display = 'block';
                         } else {
                             descriptionSection.style.display = 'none';
