@@ -56,6 +56,7 @@
         .container > .header { order: 2; }
         .container > .search-section { order: 3; }
         .container > .popular-section { order: 4; }
+        .container > .standalone-poster { order: 5; }
         .container > .player-section { order: 5; }
         .container > #contentResults { order: 6; }
         .container > #continueWatchingDisplay { order: 6; }
@@ -547,7 +548,7 @@
 
         .player-close-btn {
             position: absolute;
-            top: 12px;
+            top: 6px;
             right: 16px;
             z-index: 100;
             width: 38px;
@@ -761,8 +762,6 @@
             transition: opacity 0.5s ease-in-out;
             z-index: 1;
             pointer-events: none;
-            grid-column: 1 / -1;
-            grid-row: 1 / -1;
         }
 
         .backdrop-image::before {
@@ -794,8 +793,6 @@
             z-index: 0;
             pointer-events: none;
             overflow: hidden;
-            grid-column: 1 / -1;
-            grid-row: 1 / -1;
         }
 
         .current-content > *:not(.backdrop-image):not(.player-bg-animation) {
@@ -864,11 +861,7 @@
         }
 
         .current-content {
-            display: grid;
-            grid-template-columns: 1fr 240px;
-            grid-template-rows: auto 1fr;
-            gap: 24px;
-            align-items: start;
+            display: block;
             margin-bottom: 15px;
             position: relative;
             overflow: hidden;
@@ -876,41 +869,51 @@
             padding: 20px;
         }
 
-        .poster-container {
-            position: static !important;
-            grid-column: 2 !important;
-            grid-row: 1 / span 2 !important;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin: 0;
-            align-self: start;
-            justify-self: end;
-            order: 2;
-        }
-
-        .current-content-poster {
-            width: 230px;
-            height: 345px;
+        .standalone-poster {
+            width: 180px;
+            height: 270px;
             object-fit: cover;
             border-radius: 8px;
             background: #333;
             border: 3px solid var(--accent-color, #00d9ff);
             box-shadow: 0 0 15px var(--secondary-glow, rgba(0, 217, 255, 0.3));
-            flex-shrink: 0;
+            margin-bottom: 14px;
+            align-self: flex-start;
         }
 
-        .poster-container #playerWatchlistBtn {
-            width: 100%;
+        .player-heart-btn {
+            position: absolute;
+            top: 6px;
+            right: 60px;
+            z-index: 100;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 0;
+        }
+
+        .player-heart-btn:hover {
+            background: rgba(255, 70, 100, 0.15);
+            border-color: rgba(255, 70, 100, 0.4);
+            transform: scale(1.08);
+        }
+
+        .player-heart-btn img {
+            width: 22px;
+            height: 22px;
         }
 
         .current-content-info {
-            grid-column: 1 !important;
-            grid-row: 1 / span 2 !important;
             display: flex;
             flex-direction: column;
             gap: 16px;
-            order: 1;
             min-width: 0;
             overflow: hidden;
         }
@@ -1753,7 +1756,7 @@
                 gap: 12px;
             }
 
-            .current-content-poster {
+            .standalone-poster {
                 width: 140px;
                 height: 210px;
             }
@@ -1846,7 +1849,7 @@
                 gap: 14px;
             }
 
-            .current-content-poster {
+            .standalone-poster {
                 width: 120px;
                 height: 180px;
             }
@@ -1907,29 +1910,20 @@
         @media (max-width: 480px) {
             .current-content {
                 padding: 12px;
-                gap: 12px;
-                grid-template-columns: auto 1fr;
-                grid-template-rows: auto auto;
             }
 
-            .poster-container {
-                grid-column: 1 !important;
-                grid-row: 1 !important;
-                justify-self: start;
-                align-self: start;
-                order: 1;
+            .standalone-poster {
+                width: 90px;
+                height: 135px;
+                margin-bottom: 10px;
             }
 
             .current-content-info {
-                grid-column: 2 !important;
-                grid-row: 1 !important;
-                order: 2;
                 gap: 6px;
                 width: 100%;
                 min-width: 0;
             }
 
-            /* Title and year next to poster */
             .current-content-info h3 {
                 font-size: 1.1rem;
                 text-align: left;
@@ -1943,11 +1937,6 @@
                 text-align: left;
                 font-size: 16px;
                 margin: 0;
-            }
-
-            .current-content-poster {
-                width: 90px;
-                height: 135px;
             }
 
             /* Ratings inline with title area */
@@ -1980,7 +1969,6 @@
 
             /* Overview spans full width below */
             #currentOverview {
-                grid-column: 1 / -1;
                 font-size: 16px;
                 line-height: 1.5;
                 text-align: left;
@@ -2131,7 +2119,7 @@
                 gap: 10px;
             }
 
-            .current-content-poster {
+            .standalone-poster {
                 width: 75px;
                 height: 112px;
             }
@@ -3892,13 +3880,9 @@
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            gap: 60px;
+            gap: 250px;
             margin-top: 30px;
             padding: 0 40px;
-        }
-
-        .hero-center-spacer {
-            width: 200px;
         }
 
         .hero-nav-btn {
@@ -4209,10 +4193,6 @@
                 gap: 16px;
                 flex-wrap: wrap;
                 padding: 0 12px;
-            }
-
-            .hero-center-spacer {
-                display: none;
             }
 
             .hero-nav-btn {
@@ -5147,10 +5127,9 @@
         /* Floating Search Styles */
         .floating-search {
             display: none;
-            position: fixed;
+            position: absolute;
             right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
+            top: 100px;
             z-index: 100000;
         }
 
@@ -5185,10 +5164,10 @@
 
         .floating-search-panel {
             position: absolute;
-            right: 70px;
-            top: 50%;
-            transform: translateY(-50%) scaleX(0);
-            transform-origin: right center;
+            right: 0;
+            top: 70px;
+            transform: scaleY(0);
+            transform-origin: top right;
             width: 400px;
             background: linear-gradient(145deg, #1a1408 0%, #0f0c05 100%);
             border: 3px solid #ffb000;
@@ -5200,7 +5179,7 @@
         }
 
         .floating-search-panel.active {
-            transform: translateY(-50%) scaleX(1);
+            transform: scaleY(1);
             opacity: 1;
         }
 
@@ -5273,7 +5252,7 @@
         }
 
         .floating-search-results {
-            max-height: 300px;
+            max-height: min(450px, calc(100vh - 300px));
             overflow-y: auto;
             border-top: 1px solid rgba(255, 176, 0, 0.2);
         }
@@ -5305,10 +5284,11 @@
         }
 
         .floating-search-result-item img {
-            width: 40px;
-            height: 60px;
+            width: 80px;
+            height: 120px;
             object-fit: cover;
             border: 1px solid #ffb000;
+            border-radius: 4px;
         }
 
         .floating-search-result-info {
@@ -5325,6 +5305,56 @@
             color: rgba(51, 255, 102, 0.7);
             font-family: 'VT323', monospace;
             font-size: 18px;
+        }
+
+        /* Floating Search Clear Button */
+        .floating-search-clear {
+            background: none;
+            border: none;
+            color: rgba(255, 176, 0, 0.5);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px 8px;
+            line-height: 1;
+            transition: all 0.2s;
+            display: none;
+            flex-shrink: 0;
+        }
+
+        .floating-search-clear:hover {
+            color: #ff6666;
+            text-shadow: 0 0 8px rgba(255, 102, 102, 0.6);
+        }
+
+        .floating-search-clear.visible {
+            display: block;
+        }
+
+        /* Floating Search Watchlist Heart Button */
+        .floating-search-watchlist-btn {
+            flex-shrink: 0;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.7;
+        }
+
+        .floating-search-watchlist-btn:hover {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
+        .floating-search-watchlist-btn img {
+            width: 22px !important;
+            height: 22px !important;
+            object-fit: contain !important;
+            border: none !important;
+            border-radius: 0 !important;
         }
 
         /* Power LED Indicator */
@@ -5543,7 +5573,8 @@
         /* Mobile adjustments for floating search */
         @media (max-width: 768px) {
             .floating-search {
-                right: 10px;
+                right: 12px;
+                top: 84px;
             }
 
             .floating-search-btn {
@@ -5553,11 +5584,30 @@
 
             .floating-search-panel {
                 width: calc(100vw - 80px);
-                right: 60px;
+                right: 0;
+                top: 60px;
             }
 
             .floating-search-panel.active {
                 max-width: 350px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .floating-search {
+                right: 8px;
+                top: 76px;
+            }
+
+            .floating-search-btn {
+                width: 46px;
+                height: 46px;
+            }
+
+            .floating-search-panel {
+                width: calc(100vw - 70px);
+                right: 0;
+                top: 56px;
             }
         }
 
@@ -5666,6 +5716,23 @@
             font-family: 'Outfit', sans-serif;
             font-size: 13px;
             color: var(--text-secondary);
+        }
+
+        [data-theme="phosphor"] .floating-search-clear {
+            color: var(--text-secondary);
+            font-size: 18px;
+        }
+
+        [data-theme="phosphor"] .floating-search-clear:hover {
+            color: #ff6666;
+        }
+
+        [data-theme="phosphor"] .floating-search-watchlist-btn img {
+            filter: brightness(0.8);
+        }
+
+        [data-theme="phosphor"] .floating-search-watchlist-btn:hover img {
+            filter: brightness(1);
         }
 
         /* ============= PHOSPHOR MODERN - FLOATING WATCHLIST ============= */
@@ -6802,6 +6869,15 @@
         [data-theme="jspecial"] .floating-search-input:focus {
             border-color: #ffd700;
             box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+
+        [data-theme="jspecial"] .floating-search-clear {
+            color: rgba(255, 215, 0, 0.5);
+        }
+
+        [data-theme="jspecial"] .floating-search-clear:hover {
+            color: #ff6666;
+            text-shadow: 0 0 8px rgba(255, 102, 102, 0.6);
         }
 
         [data-theme="jspecial"] .floating-search-result-item {
@@ -10609,7 +10685,7 @@
     <!-- CRT Curvature/Vignette Overlay (Phosphor Theme Only) -->
     <div id="crtCurvature" class="crt-curvature-overlay"></div>
 
-    <!-- Floating Search (Phosphor Theme Only) -->
+    <!-- Floating Search (Below Live Button) -->
     <div id="floatingSearch" class="floating-search">
         <button class="floating-search-btn" onclick="toggleFloatingSearch()">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -10625,6 +10701,7 @@
             <div class="floating-search-input-wrapper">
                 <span class="terminal-cursor">&gt;</span>
                 <input type="text" id="floatingSearchInput" class="floating-search-input" placeholder="Enter search query..." autocomplete="off">
+                <button class="floating-search-clear" id="floatingSearchClear" onclick="clearFloatingSearch()" title="Clear search">&times;</button>
             </div>
             <div id="floatingSearchResults" class="floating-search-results"></div>
         </div>
@@ -10917,8 +10994,8 @@
 
                 <div class="radial-menu-container">
                     <button class="hero-nav-btn hero-nav-shows" id="tvShowsRadialBtn" onclick="toggleRadialMenu('tv-shows')">
-                        <img src="Icons/tv-show.png" alt="TV Shows" class="hero-nav-icon">
-                        <span class="hero-nav-label">TV Shows</span>
+                        <img src="Icons/tv-show.png" alt="Shows" class="hero-nav-icon">
+                        <span class="hero-nav-label">Shows</span>
                     </button>
                     <div class="radial-menu tv-menu" id="tvShowsRadialMenu">
                         <div class="radial-option" onclick="selectTvFilter('popular')">
@@ -10974,21 +11051,19 @@
             <div id="errorMessage" class="error" style="display: none;"></div>
         </div>
 
+        <img id="currentPoster" class="standalone-poster" alt="Poster" style="display: none;">
         <div class="player-section" id="playerSection" style="display: none;">
             <button class="player-close-btn" onclick="stopPlayback()" title="Close player">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M18 6L6 18M6 6l12 12"/>
                 </svg>
             </button>
+            <button id="playerWatchlistBtn" class="player-heart-btn" onclick="togglePlayerWatchlist()" style="display: none;" title="Add to Watchlist">
+                <img id="playerWatchlistIcon" src="Icons/heart-nofill.png" alt="Watchlist">
+            </button>
             <div id="currentContent" class="current-content" style="display: none;">
                 <div id="backdropImage" class="backdrop-image"></div>
                 <div id="playerBgAnimation" class="player-bg-animation"></div>
-                <div class="poster-container">
-                    <img id="currentPoster" class="current-content-poster" alt="Poster">
-                    <button id="playerWatchlistBtn" class="bg-animation-toggle" onclick="togglePlayerWatchlist()" style="display: none;">
-                        <span id="playerWatchlistBtnText">♡ Add to Watchlist</span>
-                    </button>
-                </div>
                 <div class="current-content-info">
                     <h3 id="currentTitle">Title</h3>
                     <p id="currentYear">Year</p>
@@ -11784,6 +11859,11 @@
 
             // Update radial option states before showing menu
             updateRadialOptionStates();
+
+            // Close floating search if open
+            if (floatingSearchOpen) {
+                toggleFloatingSearch();
+            }
 
             if (menuType === 'movies') {
                 if (moviesMenu.classList.contains('active')) {
@@ -13118,10 +13198,15 @@
             if (epDescSection) epDescSection.style.display = 'none';
             if (epDescText) epDescText.textContent = '';
 
-            // Scroll to player section immediately
-            const playerSection = document.querySelector('.player-section');
-            if (playerSection) {
-                playerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Scroll to poster/player section immediately
+            const standalonePoster = document.getElementById('currentPoster');
+            if (standalonePoster && standalonePoster.style.display !== 'none') {
+                standalonePoster.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                const playerSection = document.querySelector('.player-section');
+                if (playerSection) {
+                    playerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
             }
 
             try {
@@ -13433,21 +13518,23 @@
 
         function updatePlayerWatchlistButton(id, type) {
             const btn = document.getElementById('playerWatchlistBtn');
-            const btnText = document.getElementById('playerWatchlistBtnText');
+            const icon = document.getElementById('playerWatchlistIcon');
 
-            if (!btn || !btnText) return;
+            if (!btn || !icon) return;
 
             // Check if in any watchlist
             const inLists = Object.keys(watchlists).filter(listName =>
                 watchlists[listName].some(item => item.id === id && item.type === type)
             );
 
-            btn.style.display = 'inline-block';
+            btn.style.display = 'flex';
 
             if (inLists.length > 0) {
-                btnText.textContent = `♥ In Watchlist (${inLists.length})`;
+                icon.src = 'Icons/heart-filled.png';
+                btn.title = `In ${inLists.length} Watchlist(s)`;
             } else {
-                btnText.textContent = '♡ Add to Watchlist';
+                icon.src = 'Icons/heart-nofill.png';
+                btn.title = 'Add to Watchlist';
             }
         }
 
@@ -13492,6 +13579,9 @@
 
                 // Update panel content
                 updateWatchlistPanel(inLists);
+
+                // Reset to absolute positioning (may have been changed to fixed by search)
+                panel.style.position = 'absolute';
 
                 // Position panel below the watchlist button
                 const watchlistButton = document.getElementById('playerWatchlistBtn');
@@ -13593,6 +13683,9 @@
                 showError('Failed to add to watchlist');
             }
 
+            // Update heart icon in search results if applicable
+            refreshSearchResultHearts();
+
             // Close panel with animation
             const panel = document.getElementById('watchlistPanel');
             if (panel) {
@@ -13626,6 +13719,9 @@
                 showError('Failed to remove from watchlist');
             }
 
+            // Update heart icon in search results if applicable
+            refreshSearchResultHearts();
+
             // Close panel with animation
             const panel = document.getElementById('watchlistPanel');
             if (panel) {
@@ -13633,6 +13729,26 @@
                 setTimeout(() => { panel.style.display = 'none'; }, 250);
             }
             window.pendingWatchlistPanelItem = null;
+        }
+
+        function refreshSearchResultHearts() {
+            const resultsDiv = document.getElementById('floatingSearchResults');
+            if (!resultsDiv) return;
+            const heartBtns = resultsDiv.querySelectorAll('.floating-search-watchlist-btn');
+            heartBtns.forEach(btn => {
+                const onclick = btn.getAttribute('onclick');
+                if (!onclick) return;
+                const match = onclick.match(/toggleSearchResultWatchlist\((\d+),\s*'([^']+)'/);
+                if (!match) return;
+                const id = parseInt(match[1]);
+                const type = match[2];
+                const inWatchlist = typeof isItemInWatchlist === 'function' && isItemInWatchlist(id, type);
+                const img = btn.querySelector('img');
+                if (img) {
+                    img.src = inWatchlist ? 'Icons/heart-filled.png' : 'Icons/heart-nofill.png';
+                }
+                btn.title = inWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist';
+            });
         }
 
         function createWatchlistFromPanel() {
@@ -14710,6 +14826,10 @@
             // Hide player section
             const playerSection = document.getElementById('playerSection');
             if (playerSection) playerSection.style.display = 'none';
+
+            // Hide standalone poster
+            const posterEl = document.getElementById('currentPoster');
+            if (posterEl) posterEl.style.display = 'none';
 
             // Broadcast stop to watchparty if host
             if (watchpartyActive && isHost && socket) {
@@ -15983,10 +16103,15 @@
             if (epDescSection) epDescSection.style.display = 'none';
             if (epDescText) epDescText.textContent = '';
 
-            // Scroll to player section immediately
-            const playerSection = document.querySelector('.player-section');
-            if (playerSection) {
-                playerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Scroll to poster/player section immediately
+            const standalonePoster = document.getElementById('currentPoster');
+            if (standalonePoster && standalonePoster.style.display !== 'none') {
+                standalonePoster.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                const playerSection = document.querySelector('.player-section');
+                if (playerSection) {
+                    playerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
             }
 
             try {
@@ -18038,10 +18163,15 @@
             floatingSearchOpen = !floatingSearchOpen;
 
             if (floatingSearchOpen) {
+                // Close radial menus if open
+                if (typeof closeAllRadialMenus === 'function') {
+                    closeAllRadialMenus();
+                }
+
                 // Use GSAP for smooth animation if available
                 if (typeof gsap !== 'undefined') {
                     gsap.to(panel, {
-                        scaleX: 1,
+                        scaleY: 1,
                         opacity: 1,
                         duration: 0.4,
                         ease: 'back.out(1.7)',
@@ -18057,7 +18187,7 @@
             } else {
                 if (typeof gsap !== 'undefined') {
                     gsap.to(panel, {
-                        scaleX: 0,
+                        scaleY: 0,
                         opacity: 0,
                         duration: 0.3,
                         ease: 'power2.in',
@@ -18079,6 +18209,10 @@
 
             input.addEventListener('input', function(e) {
                 const query = e.target.value.trim();
+                const clearBtn = document.getElementById('floatingSearchClear');
+                if (clearBtn) {
+                    clearBtn.classList.toggle('visible', e.target.value.length > 0);
+                }
 
                 if (floatingSearchDebounceTimer) {
                     clearTimeout(floatingSearchDebounceTimer);
@@ -18107,17 +18241,23 @@
                                 const year = item.release_date || item.first_air_date;
                                 const yearStr = year ? year.substring(0, 4) : 'N/A';
                                 const posterPath = item.poster_path
-                                    ? `https://image.tmdb.org/t/p/w92${item.poster_path}`
-                                    : 'https://via.placeholder.com/40x60/333/fff?text=N/A';
+                                    ? `https://image.tmdb.org/t/p/w185${item.poster_path}`
+                                    : 'https://via.placeholder.com/80x120/333/fff?text=N/A';
                                 const type = item.media_type === 'tv' ? 'TV' : 'Movie';
+                                const contentType = item.media_type === 'tv' ? 'tv' : 'movie';
+                                const inWatchlist = typeof isItemInWatchlist === 'function' && isItemInWatchlist(item.id, contentType);
+                                const heartIcon = inWatchlist ? 'Icons/heart-filled.png' : 'Icons/heart-nofill.png';
 
                                 return `
                                     <div class="floating-search-result-item" onclick="floatingSearchSelect(${item.id}, '${title.replace(/'/g, "\\'")}', '${item.media_type}')">
-                                        <img src="${posterPath}" alt="${title}" onerror="this.src='https://via.placeholder.com/40x60/333/fff?text=N/A'">
+                                        <img src="${posterPath}" alt="${title}" onerror="this.src='https://via.placeholder.com/80x120/333/fff?text=N/A'">
                                         <div class="floating-search-result-info">
                                             <div class="floating-search-result-title">${title}</div>
                                             <div class="floating-search-result-year">${yearStr} • ${type}</div>
                                         </div>
+                                        <button class="floating-search-watchlist-btn" onclick="event.stopPropagation(); toggleSearchResultWatchlist(${item.id}, '${contentType}', '${title.replace(/'/g, "\\'")}', '${posterPath.replace(/'/g, "\\'")}', '${yearStr}', this)" title="${inWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}">
+                                            <img src="${heartIcon}" alt="Watchlist" onerror="this.parentElement.innerHTML='${inWatchlist ? '♥' : '♡'}'">
+                                        </button>
                                     </div>
                                 `;
                             }).join('');
@@ -18156,8 +18296,93 @@
             const resultsDiv = document.getElementById('floatingSearchResults');
             if (resultsDiv) resultsDiv.innerHTML = '';
 
+            // Hide clear button
+            const clearBtn = document.getElementById('floatingSearchClear');
+            if (clearBtn) clearBtn.classList.remove('visible');
+
             // Play the selected content
             playContent(id, title, type);
+        };
+
+        window.clearFloatingSearch = function() {
+            const input = document.getElementById('floatingSearchInput');
+            const resultsDiv = document.getElementById('floatingSearchResults');
+            const clearBtn = document.getElementById('floatingSearchClear');
+            if (input) { input.value = ''; input.focus(); }
+            if (resultsDiv) resultsDiv.innerHTML = '';
+            if (clearBtn) clearBtn.classList.remove('visible');
+        };
+
+        window.toggleSearchResultWatchlist = function(id, type, title, posterUrl, year, btnElement) {
+            const panel = document.getElementById('watchlistPanel');
+            if (!panel) return;
+
+            const isVisible = panel.classList.contains('active');
+
+            // If panel is already open for the same item, close it
+            if (isVisible && window.pendingWatchlistPanelItem && window.pendingWatchlistPanelItem.id === id) {
+                panel.classList.remove('active');
+                setTimeout(() => { panel.style.display = 'none'; }, 250);
+                window.pendingWatchlistPanelItem = null;
+                return;
+            }
+
+            // Store item data for the watchlist panel
+            window.pendingWatchlistPanelItem = {
+                id: id,
+                title: title,
+                type: type,
+                posterUrl: posterUrl,
+                year: year,
+                rating: 0,
+                addedAt: new Date().toISOString()
+            };
+
+            // Check if in any watchlist
+            const inLists = Object.keys(watchlists).filter(listName =>
+                watchlists[listName].some(item => item.id === id && item.type === type)
+            );
+
+            updateWatchlistPanel(inLists);
+
+            // Use fixed positioning so the panel escapes the floating-search stacking context
+            panel.style.position = 'fixed';
+
+            // Position panel next to the heart button using viewport coordinates
+            const rect = btnElement.getBoundingClientRect();
+            const panelWidth = 360;
+            let top = rect.top;
+            let left = rect.left - panelWidth - 8;
+
+            // If too close to left edge, position to the right instead
+            if (left < 10) {
+                left = rect.right + 8;
+            }
+
+            // Ensure it doesn't go off-screen bottom
+            if (top + 300 > window.innerHeight) {
+                top = window.innerHeight - 310;
+            }
+
+            panel.style.top = `${top}px`;
+            panel.style.left = `${left}px`;
+            panel.style.display = 'flex';
+            requestAnimationFrame(() => {
+                panel.classList.add('active');
+            });
+
+            // Store reference to update the heart icon after add/remove
+            window._searchWatchlistBtnElement = btnElement;
+
+            // Patch addToWatchlistPanel and removeFromWatchlistPanel callbacks to update heart
+            const origClose = panel.querySelector('.player-watchlist-close');
+            if (origClose) {
+                origClose.onclick = function() {
+                    panel.classList.remove('active');
+                    setTimeout(() => { panel.style.display = 'none'; }, 250);
+                    window.pendingWatchlistPanelItem = null;
+                };
+            }
         };
 
         // Close floating search when clicking outside
