@@ -54,11 +54,12 @@
         }
 
         .container > .hero-header { order: 1; }
-        .container > .header { order: 2; }
-        .container > .search-section { order: 3; }
-        .container > .popular-section { order: 4; }
-        .container > .standalone-poster { order: 5; }
-        .container > .player-section { order: 5; }
+        .container > .player-section { order: 2; }
+        .container > .standalone-poster { order: 2; }
+        .container > .hero-nav-section { order: 3; }
+        .container > .header { order: 4; }
+        .container > .search-section { order: 5; }
+        .container > .popular-section { order: 5; }
         .container > #contentResults { order: 6; }
         .container > #continueWatchingDisplay { order: 6; }
         .container > #watchlistDisplay { order: 6; }
@@ -4010,8 +4011,15 @@
         /* ============= HERO HEADER SECTION ============= */
         .hero-header {
             text-align: center;
-            padding: 40px 20px 20px;
+            padding: 40px 20px 0;
+            margin-bottom: 0;
+        }
+
+        .hero-nav-section {
+            text-align: center;
+            padding: 0 20px 20px;
             margin-bottom: 20px;
+            width: 100%;
         }
 
         .hero-title-section {
@@ -4347,7 +4355,7 @@
 
         /* Phosphor Theme Specific Hero Overrides */
         [data-theme="phosphor"] .hero-header {
-            padding: 60px 20px 30px;
+            padding: 60px 20px 0;
         }
 
         [data-theme="phosphor"] .hero-title {
@@ -4379,7 +4387,12 @@
         /* Responsive Hero */
         @media (max-width: 768px) {
             .hero-header {
-                padding: 24px 12px 16px;
+                padding: 24px 12px 0;
+                margin-bottom: 0;
+            }
+
+            .hero-nav-section {
+                padding: 0 12px 16px;
                 margin-bottom: 12px;
             }
 
@@ -4564,7 +4577,12 @@
 
         @media (max-width: 480px) {
             .hero-header {
-                padding: 16px 8px 12px;
+                padding: 16px 8px 0;
+                margin-bottom: 0;
+            }
+
+            .hero-nav-section {
+                padding: 0 8px 12px;
                 margin-bottom: 8px;
             }
 
@@ -11710,8 +11728,10 @@
                 <h1 class="hero-title" onclick="location.reload()" style="cursor: pointer;">GlitchBox</h1>
                 <p class="hero-subtitle">your one stop streaming shop</p>
             </div>
+        </div>
 
-            <!-- Movies and TV Shows buttons with radial menus -->
+        <!-- Movies and TV Shows buttons with radial menus (separate for flex ordering) -->
+        <div class="hero-nav-section">
             <div class="hero-nav-buttons">
                 <div class="radial-menu-container">
                     <button class="hero-nav-btn hero-nav-movies" id="moviesRadialBtn" onclick="toggleRadialMenu('movies')">
