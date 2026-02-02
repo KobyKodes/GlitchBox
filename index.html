@@ -11673,6 +11673,10 @@
                                 <span>SuperEmbed</span>
                                 <span class="source-check" id="superembed-check" style="display: none;">✓</span>
                             </button>
+                            <button class="source-menu-item" onclick="selectVideoSource('moviesapi'); closeSourceMenu();">
+                                <span>MoviesAPI</span>
+                                <span class="source-check" id="moviesapi-check" style="display: none;">✓</span>
+                            </button>
                         </div>
 
                         <!-- Tooltip beside source button -->
@@ -14740,6 +14744,10 @@
                     streamUrl = `https://www.vidking.net/embed/movie/${tmdbId}`;
                     streamType = 'embed';
                     console.log('VidKing URL:', streamUrl);
+                } else if (videoSource === 'moviesapi') {
+                    streamUrl = `https://moviesapi.club/movie/${tmdbId}`;
+                    streamType = 'embed';
+                    console.log('MoviesAPI URL:', streamUrl);
                 } else {
                     // VidSrc - Use stream extraction from API
                     streamUrl = data.stream_url || data.vidsrc_url;
@@ -14805,6 +14813,10 @@
                     streamUrl = `https://www.vidking.net/embed/tv/${tmdbId}/${season}/${episode}`;
                     streamType = 'embed';
                     console.log('VidKing URL:', streamUrl);
+                } else if (videoSource === 'moviesapi') {
+                    streamUrl = `https://moviesapi.club/tv/${tmdbId}-${season}-${episode}`;
+                    streamType = 'embed';
+                    console.log('MoviesAPI URL:', streamUrl);
                 } else {
                     // VidSrc - Use stream extraction from API
                     streamUrl = data.stream_url || data.vidsrc_url;
@@ -14876,7 +14888,7 @@
         }
 
         function updateSourceCheckmarks() {
-            ['vidsrc', 'vidking', 'superembed'].forEach(source => {
+            ['vidsrc', 'vidking', 'superembed', 'moviesapi'].forEach(source => {
                 const check = document.getElementById(`${source}-check`);
                 if (check) {
                     check.style.display = source === videoSource ? 'inline' : 'none';
@@ -14931,7 +14943,8 @@
             const sourceNames = {
                 'vidsrc': 'VidSrc',
                 'vidking': 'VidKing',
-                'superembed': 'SuperEmbed'
+                'superembed': 'SuperEmbed',
+                'moviesapi': 'MoviesAPI'
             };
 
             // Show different message if in watchparty
@@ -14955,7 +14968,8 @@
             const sourceNames = {
                 'vidsrc': 'VidSrc',
                 'vidking': 'VidKing',
-                'superembed': 'SuperEmbed'
+                'superembed': 'SuperEmbed',
+                'moviesapi': 'MoviesAPI'
             };
             btnText.textContent = `Source: ${sourceNames[videoSource] || 'VidSrc'}`;
 

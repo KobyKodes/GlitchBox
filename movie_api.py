@@ -536,10 +536,10 @@ class TMDBService:
         try:
             from datetime import datetime, timedelta
 
-            # Calculate date range: today to 90 days in the future
+            # Calculate date range: today to 30 days in the future
             today = datetime.now()
             min_date = today.strftime('%Y-%m-%d')
-            max_date = (today + timedelta(days=90)).strftime('%Y-%m-%d')
+            max_date = (today + timedelta(days=30)).strftime('%Y-%m-%d')
 
             params = {
                 "api_key": self.api_key,
@@ -548,6 +548,7 @@ class TMDBService:
                 "include_video": "false",
                 "sort_by": "popularity.desc",
                 "with_release_type": "2|3",  # Theatrical releases
+                "region": "US",
                 "release_date.gte": min_date,
                 "release_date.lte": max_date
             }
