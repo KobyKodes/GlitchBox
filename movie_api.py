@@ -2139,6 +2139,9 @@ def handle_create_party(data):
             'currentTime': 0,
             'timestamp': datetime.now().isoformat()
         },
+        'sync_mode': 'none',
+        'ready_users': {},
+        'ready_check_active': False,
         'created_at': datetime.now().isoformat()
     }
 
@@ -2184,7 +2187,8 @@ def handle_join_party(data):
         'is_host': (sid == room['host']),
         'content': room['content'],
         'users': users_list,
-        'state': room['state']
+        'state': room['state'],
+        'sync_mode': room.get('sync_mode', 'none')
     })
 
     # Notify others in room
@@ -2450,6 +2454,102 @@ def handle_chat_message(data):
                 'timestamp': datetime.now().isoformat(),
                 'is_host': (sid == room['host']),
                 'replyTo': reply_to
+            }, room=room_code)
+
+@socketio.on('set_sync_mode')
+def handle_set_sync_mode(data):
+    """Host reports stream type so server can set sync mode for the room"""
+    sid = request.sid
+
+    if sid in user_rooms:
+        room_code = user_rooms[sid]
+        room = watchparty_rooms.get(room_code)
+
+        if room and room['host'] == sid:
+            mode = data.get('mode', 'none')
+            if mode in ('full', 'coordinated', 'none'):
+                room['sync_mode'] = mode
+                print(f"[Sync] Room {room_code} sync mode set to: {mode}")
+
+                emit('sync_mode_changed', {
+                    'mode': mode
+                }, room=room_code)
+
+@socketio.on('ready_check')
+def handle_ready_check():
+    """Host initiates a ready check for coordinated sync"""
+    sid = request.sid
+
+    if sid in user_rooms:
+        room_code = user_rooms[sid]
+        room = watchparty_rooms.get(room_code)
+
+        if room and room['host'] == sid:
+            room['ready_users'] = {}
+            room['ready_check_active'] = True
+            total = len(room['users'])
+            print(f"[Sync] Ready check started in room {room_code} ({total} users)")
+
+            emit('ready_check_started', {
+                'total': total
+            }, room=room_code)
+
+@socketio.on('user_ready')
+def handle_user_ready():
+    """User marks themselves as ready during a ready check"""
+    sid = request.sid
+
+    if sid in user_rooms:
+        room_code = user_rooms[sid]
+        room = watchparty_rooms.get(room_code)
+
+        if room and room.get('ready_check_active'):
+            username = room['users'].get(sid, 'Unknown')
+            room['ready_users'][sid] = True
+            ready_count = len(room['ready_users'])
+            total = len(room['users'])
+            print(f"[Sync] {username} ready in room {room_code} ({ready_count}/{total})")
+
+            emit('user_ready_update', {
+                'username': username,
+                'ready_count': ready_count,
+                'total': total
+            }, room=room_code)
+
+@socketio.on('start_countdown')
+def handle_start_countdown():
+    """Host triggers the coordinated countdown"""
+    sid = request.sid
+
+    if sid in user_rooms:
+        room_code = user_rooms[sid]
+        room = watchparty_rooms.get(room_code)
+
+        if room and room['host'] == sid:
+            room['ready_check_active'] = False
+            room['ready_users'] = {}
+            timestamp = datetime.now().isoformat()
+            print(f"[Sync] Countdown started in room {room_code}")
+
+            emit('countdown_start', {
+                'timestamp': timestamp
+            }, room=room_code)
+
+@socketio.on('resync')
+def handle_resync():
+    """Host triggers a re-sync (new countdown) for all users"""
+    sid = request.sid
+
+    if sid in user_rooms:
+        room_code = user_rooms[sid]
+        room = watchparty_rooms.get(room_code)
+
+        if room and room['host'] == sid:
+            timestamp = datetime.now().isoformat()
+            print(f"[Sync] Re-sync triggered in room {room_code}")
+
+            emit('resync_triggered', {
+                'timestamp': timestamp
             }, room=room_code)
 
 # ============= END WATCHPARTY EVENTS =============

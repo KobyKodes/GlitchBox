@@ -2736,6 +2736,144 @@
             to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
 
+        /* Sync Status Badge */
+        .sync-status-badge {
+            display: none;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+        }
+        .sync-status-badge.full {
+            display: inline-block;
+            background: rgba(0, 200, 83, 0.2);
+            color: #00c853;
+            border: 1px solid rgba(0, 200, 83, 0.4);
+        }
+        .sync-status-badge.coordinated {
+            display: inline-block;
+            background: rgba(255, 152, 0, 0.2);
+            color: #ff9800;
+            border: 1px solid rgba(255, 152, 0, 0.4);
+        }
+
+        /* Re-Sync Button */
+        .resync-btn {
+            display: none;
+            width: 100%;
+            padding: 8px 12px;
+            margin-top: 6px;
+            background: rgba(255, 152, 0, 0.15);
+            border: 1px solid rgba(255, 152, 0, 0.4);
+            color: #ff9800;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            transition: all 0.2s;
+        }
+        .resync-btn:hover {
+            background: rgba(255, 152, 0, 0.3);
+        }
+
+        /* Ready Check Overlay */
+        .sync-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 999999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+        }
+        .sync-overlay.active { display: flex; }
+        .sync-overlay h2 {
+            color: #fff;
+            font-size: 22px;
+            margin: 0;
+            text-align: center;
+        }
+        .sync-overlay p {
+            color: rgba(255,255,255,0.7);
+            font-size: 15px;
+            margin: 0;
+            text-align: center;
+        }
+        .sync-overlay .ready-count {
+            color: #ff9800;
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .sync-overlay .ready-btn {
+            padding: 14px 40px;
+            font-size: 16px;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: #00c853;
+            color: #fff;
+            transition: all 0.2s;
+        }
+        .sync-overlay .ready-btn:hover { background: #00e676; }
+        .sync-overlay .ready-btn:disabled {
+            background: rgba(255,255,255,0.2);
+            cursor: default;
+        }
+        .sync-overlay .force-start-btn {
+            padding: 10px 24px;
+            font-size: 13px;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 6px;
+            cursor: pointer;
+            background: transparent;
+            color: rgba(255,255,255,0.6);
+            transition: all 0.2s;
+        }
+        .sync-overlay .force-start-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+
+        /* Countdown Overlay */
+        .countdown-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 9999999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+        }
+        .countdown-overlay.active { display: flex; }
+        .countdown-overlay .countdown-number {
+            font-size: 120px;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 0 0 40px rgba(255,152,0,0.6);
+            animation: countdownPulse 1s ease-in-out;
+        }
+        .countdown-overlay .countdown-label {
+            color: rgba(255,255,255,0.6);
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        @keyframes countdownPulse {
+            0% { transform: scale(1.3); opacity: 0.5; }
+            50% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+
         /* ============= END WATCHPARTY STYLES ============= */
 
         /* ============= THEME SYSTEM ============= */
@@ -12320,6 +12458,7 @@
                 <div style="display: flex; align-items: center; gap: 6px; flex: 1; justify-content: center;">
                     <span class="watchparty-room-code" id="watchpartyRoomCodeLabel">Code:</span>
                     <div class="room-code-display" id="watchpartyRoomCode" onclick="copyRoomCode()" title="Click to copy">------</div>
+                    <span class="sync-status-badge" id="syncStatusBadge"></span>
                 </div>
                 <button class="watchparty-close" onclick="event.stopPropagation(); leaveWatchparty();">×</button>
             </div>
@@ -12349,6 +12488,7 @@
         <div class="watchparty-users">
             <div class="watchparty-users-title">Watching (<span id="userCount">0</span>)</div>
             <div id="watchpartyUserList"></div>
+            <button class="resync-btn" id="resyncBtn" onclick="triggerResync()">Re-Sync All Users</button>
         </div>
 
         <div class="watchparty-chat">
@@ -12364,6 +12504,21 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Ready Check Overlay -->
+    <div class="sync-overlay" id="readyCheckOverlay">
+        <h2>Coordinated Sync</h2>
+        <p>Wait for the video to buffer, then click Ready</p>
+        <span class="ready-count" id="readyCount">0/0 Ready</span>
+        <button class="ready-btn" id="readyBtn" onclick="markReady()">I'm Ready</button>
+        <button class="force-start-btn" id="forceStartBtn" style="display:none;" onclick="forceStartCountdown()">Start Anyway</button>
+    </div>
+
+    <!-- Countdown Overlay -->
+    <div class="countdown-overlay" id="countdownOverlay">
+        <div class="countdown-number" id="countdownNumber">5</div>
+        <div class="countdown-label">Syncing playback...</div>
     </div>
 
     <script>
@@ -12775,6 +12930,13 @@
         let isHost = false;
         let username = null;
         let watchpartyUsers = [];
+
+        // Coordinated sync variables
+        let partySyncMode = 'none'; // 'full', 'coordinated', 'none'
+        let partySourceLocked = false;
+        let previousVideoSource = null;
+        let countdownTimer = null;
+        let userIsReady = false;
 
         // User color system for chat - vibrant colors matching app design
         const userColors = [
@@ -15009,6 +15171,13 @@
         }
 
         function selectVideoSource(source) {
+            // Block source changes during watchparty
+            if (partySourceLocked) {
+                showStatus('Source is locked to VidSrc during watchparty for sync support');
+                closeSourceSelector();
+                return;
+            }
+
             videoSource = source;
             localStorage.setItem('videoSource', videoSource);
             updateVideoSourceButton();
@@ -15064,7 +15233,11 @@
                 'superembed': 'SuperEmbed',
                 'moviesapi': 'MoviesAPI'
             };
-            btnText.textContent = `Source: ${sourceNames[videoSource] || 'VidSrc'}`;
+            if (partySourceLocked) {
+                btnText.textContent = 'Source: VidSrc (Party)';
+            } else {
+                btnText.textContent = `Source: ${sourceNames[videoSource] || 'VidSrc'}`;
+            }
 
             // Update checkmarks
             updateSourceCheckmarks();
@@ -15326,6 +15499,30 @@
 
             // Start tracking watch progress
             startProgressTracking();
+
+            // Detect sync mode when in a watchparty
+            if (watchpartyActive) {
+                const playerVideo = document.getElementById('playerVideo');
+                const isDirectStream = playerVideo && playerVideo.style.display !== 'none';
+                const newMode = isDirectStream ? 'full' : 'coordinated';
+
+                if (newMode !== partySyncMode) {
+                    partySyncMode = newMode;
+                    updateSyncStatusBadge();
+
+                    // Host reports sync mode to server
+                    if (isHost && socket) {
+                        socket.emit('set_sync_mode', { mode: newMode });
+                    }
+
+                    // If coordinated mode and host, auto-trigger ready check
+                    if (newMode === 'coordinated' && isHost) {
+                        setTimeout(() => {
+                            if (socket) socket.emit('ready_check');
+                        }, 1000);
+                    }
+                }
+            }
         }
 
         // Prevent VidKing player from auto-fullscreening on mobile
@@ -17437,6 +17634,12 @@
                     }
                 }
 
+                // Pick up current sync mode from room
+                if (data.sync_mode && data.sync_mode !== 'none') {
+                    partySyncMode = data.sync_mode;
+                    updateSyncStatusBadge();
+                }
+
                 // Sync content if joining as guest
                 console.log('[Party Joined] Is host:', isHost, 'Content:', data.content);
                 if (!isHost && data.content && data.content.id) {
@@ -17683,6 +17886,53 @@
                 resetWatchparty();
             });
 
+            // ============= COORDINATED SYNC LISTENERS =============
+
+            socket.on('sync_mode_changed', (data) => {
+                console.log('[Sync] Mode changed to:', data.mode);
+                partySyncMode = data.mode;
+                updateSyncStatusBadge();
+            });
+
+            socket.on('ready_check_started', (data) => {
+                console.log('[Sync] Ready check started, total:', data.total);
+                userIsReady = false;
+                const overlay = document.getElementById('readyCheckOverlay');
+                const readyBtn = document.getElementById('readyBtn');
+                const forceBtn = document.getElementById('forceStartBtn');
+                const countEl = document.getElementById('readyCount');
+
+                countEl.textContent = `0/${data.total} Ready`;
+                readyBtn.disabled = false;
+                readyBtn.textContent = "I'm Ready";
+                forceBtn.style.display = isHost ? 'block' : 'none';
+                overlay.classList.add('active');
+            });
+
+            socket.on('user_ready_update', (data) => {
+                console.log('[Sync] User ready:', data.username, `(${data.ready_count}/${data.total})`);
+                const countEl = document.getElementById('readyCount');
+                countEl.textContent = `${data.ready_count}/${data.total} Ready`;
+
+                // Auto-start countdown when all ready
+                if (data.ready_count >= data.total && isHost) {
+                    setTimeout(() => {
+                        if (socket) socket.emit('start_countdown');
+                    }, 500);
+                }
+            });
+
+            socket.on('countdown_start', (data) => {
+                console.log('[Sync] Countdown starting');
+                document.getElementById('readyCheckOverlay').classList.remove('active');
+                startCountdownSequence();
+            });
+
+            socket.on('resync_triggered', (data) => {
+                console.log('[Sync] Re-sync triggered');
+                startCountdownSequence();
+            });
+
         }
 
         function showWatchpartyMenu() {
@@ -17730,6 +17980,9 @@
                 showError('Unable to connect to server. Please try again.');
                 return;
             }
+
+            // Lock source to VidSrc for best sync support
+            lockSourceForParty();
 
             let contentData = null;
 
@@ -17788,6 +18041,9 @@
                 return;
             }
 
+            // Lock source to VidSrc for best sync support
+            lockSourceForParty();
+
             socket.emit('join_party', {
                 room_code: roomCode,
                 username: username
@@ -17842,6 +18098,119 @@
             resetWatchparty();
         }
 
+        // ============= COORDINATED SYNC HELPERS =============
+
+        function lockSourceForParty() {
+            if (videoSource !== 'vidsrc') {
+                previousVideoSource = videoSource;
+                videoSource = 'vidsrc';
+                localStorage.setItem('videoSource', 'vidsrc');
+            } else {
+                previousVideoSource = null;
+            }
+            partySourceLocked = true;
+            updateVideoSourceButton();
+
+            // Reload current content with VidSrc if something is playing
+            if (currentContentId && previousVideoSource) {
+                if (currentContentType === 'movie') {
+                    playMovie(currentContentId, 0);
+                } else if (currentContentType === 'tv' && currentSelectedSeason && currentSelectedEpisode) {
+                    playTVEpisode(currentContentId, currentSelectedSeason, currentSelectedEpisode, 0);
+                }
+            }
+        }
+
+        function unlockSourceAfterParty() {
+            partySourceLocked = false;
+            if (previousVideoSource) {
+                videoSource = previousVideoSource;
+                localStorage.setItem('videoSource', previousVideoSource);
+                previousVideoSource = null;
+            }
+            updateVideoSourceButton();
+        }
+
+        function updateSyncStatusBadge() {
+            const badge = document.getElementById('syncStatusBadge');
+            if (!badge) return;
+
+            badge.className = 'sync-status-badge';
+
+            if (partySyncMode === 'full') {
+                badge.textContent = 'FULL SYNC';
+                badge.classList.add('full');
+            } else if (partySyncMode === 'coordinated') {
+                badge.textContent = 'COORD SYNC';
+                badge.classList.add('coordinated');
+            } else {
+                badge.style.display = 'none';
+                return;
+            }
+
+            // Show/hide re-sync button (host only, coordinated mode only)
+            const resyncBtn = document.getElementById('resyncBtn');
+            if (resyncBtn) {
+                resyncBtn.style.display = (partySyncMode === 'coordinated' && isHost) ? 'block' : 'none';
+            }
+        }
+
+        function markReady() {
+            if (!socket || userIsReady) return;
+            userIsReady = true;
+            socket.emit('user_ready');
+            const readyBtn = document.getElementById('readyBtn');
+            readyBtn.disabled = true;
+            readyBtn.textContent = 'Waiting...';
+        }
+
+        function forceStartCountdown() {
+            if (!socket || !isHost) return;
+            socket.emit('start_countdown');
+        }
+
+        function triggerResync() {
+            if (!socket || !isHost) return;
+            socket.emit('resync');
+        }
+
+        function startCountdownSequence() {
+            const overlay = document.getElementById('countdownOverlay');
+            const numberEl = document.getElementById('countdownNumber');
+            let count = 5;
+
+            overlay.classList.add('active');
+            numberEl.textContent = count;
+
+            if (countdownTimer) clearInterval(countdownTimer);
+
+            countdownTimer = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    numberEl.textContent = count;
+                } else if (count === 0) {
+                    numberEl.textContent = 'GO!';
+                    reloadIframeForSync();
+                } else {
+                    clearInterval(countdownTimer);
+                    countdownTimer = null;
+                    overlay.classList.remove('active');
+                }
+            }, 1000);
+        }
+
+        function reloadIframeForSync() {
+            const playerIframe = document.getElementById('contentPlayer');
+            if (playerIframe && playerIframe.style.display !== 'none' && playerIframe.src) {
+                const currentSrc = playerIframe.src;
+                console.log('[Sync] Reloading iframe for coordinated sync:', currentSrc);
+                playerIframe.src = 'about:blank';
+                setTimeout(() => {
+                    playerIframe.src = currentSrc;
+                }, 200);
+            }
+        }
+
         function resetWatchparty() {
             watchpartyActive = false;
             watchpartyRoomCode = null;
@@ -17854,6 +18223,21 @@
 
             // Stop drift correction
             stopDriftCorrection();
+
+            // Reset coordinated sync state
+            partySyncMode = 'none';
+            userIsReady = false;
+            if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+            document.getElementById('readyCheckOverlay').classList.remove('active');
+            document.getElementById('countdownOverlay').classList.remove('active');
+            updateSyncStatusBadge();
+
+            // Hide re-sync button
+            const resyncBtn = document.getElementById('resyncBtn');
+            if (resyncBtn) resyncBtn.style.display = 'none';
+
+            // Unlock and restore previous video source
+            unlockSourceAfterParty();
 
             showStatus('Left watchparty');
         }
