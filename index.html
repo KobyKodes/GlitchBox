@@ -2200,6 +2200,17 @@
             }
         }
 
+        @keyframes dockPanelIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px) scale(0.92);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0) scale(1);
+            }
+        }
+
         .container {
             animation: fadeInUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
@@ -2768,6 +2779,20 @@
         .theme-selector-panel.active {
             display: flex;
             animation: slideInFromRight 0.3s ease-out;
+        }
+
+        /* Dock-active: reposition theme panel above dock */
+        body.glass-dock-active .theme-selector-panel {
+            right: auto !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            bottom: 110px !important;
+            z-index: 199999 !important;
+        }
+
+        body.glass-dock-active .theme-selector-panel.active {
+            animation: dockPanelIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.4) !important;
+            transform: translateX(-50%) !important;
         }
 
         .theme-selector-title {
@@ -7976,6 +8001,22 @@
             animation: slideInFromRight 0.3s ease-out;
         }
 
+        /* Dock-active: reposition effects panel above dock */
+        body.glass-dock-active #bgEffectsPanel {
+            right: auto !important;
+            left: 50% !important;
+            top: auto !important;
+            transform: translateX(-50%) !important;
+            bottom: 110px !important;
+            z-index: 199999 !important;
+            transform-origin: bottom center !important;
+        }
+
+        body.glass-dock-active #bgEffectsPanel.active {
+            animation: dockPanelIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.4) !important;
+            transform: translateX(-50%) !important;
+        }
+
         /* Season & Episode Panel Animations */
         #seasonPanel,
         #episodePanel {
@@ -10842,6 +10883,15 @@
             visibility: visible !important;
         }
 
+        /* Logout button in dock panel — no pill styling */
+        .user-menu-dropdown.dock-panel .user-menu-item:last-child {
+            background: none !important;
+            border: none !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+        }
+
         /* Watchlist panel - dock driven */
         .watchlist-slide-panel.dock-panel {
             position: fixed !important;
@@ -10878,7 +10928,7 @@
             transform-origin: bottom center !important;
             opacity: 0 !important;
             visibility: hidden !important;
-            width: 400px !important;
+            width: 500px !important;
             max-width: 94vw !important;
             max-height: 70vh !important;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.4) !important;
