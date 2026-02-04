@@ -7,7 +7,6 @@ Provides REST API for movie search and streaming URL generation
 # IMPORTANT: Eventlet monkey patching MUST be done before any other imports
 import eventlet
 eventlet.monkey_patch()
-import eventlet.tpool
 
 from flask import Flask, request, jsonify, render_template_string, send_file, Response, send_from_directory
 from flask_cors import CORS
@@ -119,11 +118,6 @@ atexit.register(save_all_caches)
 watchparty_rooms = {}  # {room_code: {host: sid, users: {sid: username}, content: {}, state: {}}}
 user_rooms = {}  # {sid: room_code}
 
-# Bingeflix scraper cache and concurrency control
-bingeflix_cache = {}  # {cache_key: {data: ..., timestamp: ...}}
-bingeflix_m3u8_cache = {}  # {stream_id: {content: str, referer: str, base_url: str, timestamp: float}}
-BINGEFLIX_CACHE_TTL = 15 * 60  # 15 minutes
-bingeflix_lock = eventlet.semaphore.Semaphore(1)
 
 class TMDBService:
     def __init__(self):
@@ -1447,115 +1441,6 @@ def get_tv_recommendations(tv_id):
     results = tmdb.get_tv_recommendations(tv_id, page)
     return jsonify(results)
 
-def extract_bingeflix_stream(tmdb_id, content_type='movie', season=None, episode=None):
-    """
-    Extract m3u8 stream from bingeflix.tv via standalone Playwright subprocess.
-    Returns dict with type/url/source/subtitles or None on failure.
-    """
-    cache_key = f"{tmdb_id}_{content_type}_{season}_{episode}"
-
-    # Check cache first
-    cached = bingeflix_cache.get(cache_key)
-    if cached and (time.time() - cached['timestamp']) < BINGEFLIX_CACHE_TTL:
-        print(f"[Bingeflix] Cache hit for {cache_key}")
-        return cached['data']
-
-    # Try to acquire semaphore (non-blocking) - only one browser at a time
-    if not bingeflix_lock.acquire(blocking=False):
-        print(f"[Bingeflix] Another scrape in progress, skipping")
-        return None
-
-    try:
-        # Build subprocess command
-        cmd = [sys.executable, 'bingeflix_scraper.py', str(tmdb_id), content_type]
-        if content_type == 'tv' and season and episode:
-            cmd.extend([str(season), str(episode)])
-
-        print(f"[Bingeflix] Running: {' '.join(cmd)}")
-
-        # Run subprocess via tpool to avoid blocking eventlet
-        result = eventlet.tpool.execute(
-            subprocess.run,
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=90,
-            cwd=os.path.dirname(os.path.abspath(__file__))
-        )
-
-        # Log stderr (debug output from scraper)
-        if result.stderr:
-            for line in result.stderr.strip().split('\n'):
-                print(f"[Bingeflix] {line}")
-
-        if result.returncode != 0:
-            print(f"[Bingeflix] Scraper exited with code {result.returncode}")
-            return None
-
-        # Parse JSON from stdout
-        try:
-            data = json.loads(result.stdout.strip())
-        except json.JSONDecodeError as e:
-            print(f"[Bingeflix] Failed to parse JSON output: {e}")
-            print(f"[Bingeflix] stdout was: {result.stdout[:500]}")
-            return None
-
-        if not data.get('success') or not data.get('hls_url'):
-            print(f"[Bingeflix] Scraper failed: {data.get('error', 'unknown')}")
-            return None
-
-        hls_url = data['hls_url']
-        hls_content = data.get('hls_content')
-        referer = data.get('referer', 'https://bingeflix.tv/')
-        subtitles = data.get('subtitles', [])
-
-        print(f"[Bingeflix] Found stream: {hls_url}")
-        print(f"[Bingeflix] Referer: {referer}")
-        print(f"[Bingeflix] Subtitles: {len(subtitles)} tracks")
-        print(f"[Bingeflix] Has m3u8 content: {hls_content is not None}")
-
-        if hls_content:
-            # Cache the m3u8 content and serve it directly (avoids CDN re-fetch/redirect issues)
-            stream_id = f"{tmdb_id}_{content_type}_{season}_{episode}"
-            base_url = hls_url.rsplit('/', 1)[0] + '/'
-            bingeflix_m3u8_cache[stream_id] = {
-                'content': hls_content,
-                'referer': referer,
-                'base_url': base_url,
-                'timestamp': time.time()
-            }
-            proxied_url = f"/api/hls/bingeflix/{quote(stream_id, safe='')}"
-            print(f"[Bingeflix] Serving cached m3u8 via {proxied_url}")
-        else:
-            # Fallback to standard proxy if we couldn't capture content
-            proxied_url = f"/api/hls/proxy?url={quote(hls_url, safe='')}&referer={quote(referer, safe='')}"
-
-        stream_data = {
-            'type': 'direct',
-            'url': proxied_url,
-            'source': 'bingeflix',
-            'subtitles': subtitles,
-            'original_url': hls_url,
-            'referer': referer
-        }
-
-        # Cache successful result
-        bingeflix_cache[cache_key] = {
-            'data': stream_data,
-            'timestamp': time.time()
-        }
-
-        return stream_data
-
-    except subprocess.TimeoutExpired:
-        print(f"[Bingeflix] Scraper timed out (90s)")
-        return None
-    except Exception as e:
-        print(f"[Bingeflix] Error: {e}")
-        return None
-    finally:
-        bingeflix_lock.release()
-
 
 def call_vidsrc_scraper(tmdb_id, content_type='movie', season=None, episode=None):
     """
@@ -1613,17 +1498,11 @@ def call_vidsrc_scraper(tmdb_id, content_type='movie', season=None, episode=None
         return None
 
 
-def extract_vidsrc_stream(tmdb_id, content_type='movie', season=None, episode=None, party=False):
+def extract_vidsrc_stream(tmdb_id, content_type='movie', season=None, episode=None):
     """
     Extract direct stream URL from VidSrc
-    Tries Bingeflix first (party only), then Playwright scraper, then BeautifulSoup, then embed fallback.
+    Tries Playwright scraper, then BeautifulSoup, then embed fallback.
     """
-    # Tier 0: Try Bingeflix scraper (only for watchparty - needs direct stream for sync)
-    if party:
-        bingeflix_result = extract_bingeflix_stream(tmdb_id, content_type, season, episode)
-        if bingeflix_result:
-            return bingeflix_result
-
     # Tier 1: Try Playwright-based scraper service
     scraper_result = call_vidsrc_scraper(tmdb_id, content_type, season, episode)
     if scraper_result:
@@ -1738,9 +1617,8 @@ def generate_stream_url(movie_id):
         vidking_url = f"https://www.vidking.net/embed/movie/{movie_id}"
         vidsrc_url = f"https://vidsrc.to/embed/movie/{movie_id}"
 
-        # Try to get direct stream (party=True triggers Bingeflix scraper for watchparty sync)
-        is_party = request.args.get('party', '').lower() in ('1', 'true')
-        stream_info = extract_vidsrc_stream(movie_id, 'movie', party=is_party)
+        # Try to get direct stream
+        stream_info = extract_vidsrc_stream(movie_id, 'movie')
 
         # Defensive: ensure stream_info has the expected structure
         subtitles = []
@@ -1786,9 +1664,8 @@ def generate_tv_stream_url(tv_id):
         vidking_url = f"https://www.vidking.net/embed/tv/{tv_id}/{season}/{episode}"
         vidsrc_url = f"https://vidsrc.to/embed/tv/{tv_id}/{season}/{episode}"
 
-        # Try to get direct stream (party=True triggers Bingeflix scraper for watchparty sync)
-        is_party = request.args.get('party', '').lower() in ('1', 'true')
-        stream_info = extract_vidsrc_stream(tv_id, 'tv', season, episode, party=is_party)
+        # Try to get direct stream
+        stream_info = extract_vidsrc_stream(tv_id, 'tv', season, episode)
 
         # Defensive: ensure stream_info has the expected structure
         subtitles = []
@@ -2259,59 +2136,6 @@ def convert_srt_to_vtt(srt_content):
         vtt_lines.append(line)
 
     return '\n'.join(vtt_lines)
-
-# ============= BINGEFLIX CACHED M3U8 ENDPOINT =============
-
-@app.route('/api/hls/bingeflix/<stream_id>', methods=['GET', 'OPTIONS'])
-def serve_bingeflix_m3u8(stream_id):
-    """
-    Serve cached m3u8 content from Bingeflix scraper.
-    Rewrites segment URLs to go through the HLS proxy.
-    """
-    if request.method == 'OPTIONS':
-        response = Response()
-        response.headers['Access-Control-Allow-Origin'] = '*'
-        response.headers['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
-        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Range'
-        return response
-
-    cached = bingeflix_m3u8_cache.get(stream_id)
-    if not cached or (time.time() - cached['timestamp']) > BINGEFLIX_CACHE_TTL:
-        print(f"[Bingeflix M3U8] Cache miss or expired for {stream_id}")
-        return jsonify({"error": "Stream not found or expired"}), 404
-
-    content = cached['content']
-    base_url = cached['base_url']
-    referer = cached['referer']
-
-    # Rewrite URLs in the m3u8 to go through the proxy
-    lines = content.split('\n')
-    new_lines = []
-    for line in lines:
-        stripped = line.strip()
-        if stripped and not stripped.startswith('#'):
-            # This is a URL (segment or sub-playlist)
-            if stripped.startswith('http'):
-                segment_url = stripped
-            else:
-                segment_url = base_url + stripped
-            proxied = f"/api/hls/proxy?url={quote(segment_url, safe='')}&referer={quote(referer, safe='')}"
-            new_lines.append(proxied)
-        else:
-            new_lines.append(line)
-
-    rewritten = '\n'.join(new_lines)
-
-    return Response(
-        rewritten,
-        mimetype='application/vnd.apple.mpegurl',
-        headers={
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Range',
-            'Cache-Control': 'no-cache',
-        }
-    )
 
 # ============= HLS PROXY (for VidNest streams) =============
 
@@ -2878,8 +2702,10 @@ def handle_user_ready():
             }, room=room_code)
 
 @socketio.on('start_countdown')
-def handle_start_countdown():
+def handle_start_countdown(data=None):
     """Host triggers the coordinated countdown"""
+    if data is None:
+        data = {}
     sid = request.sid
 
     if sid in user_rooms:
@@ -2893,12 +2719,15 @@ def handle_start_countdown():
             print(f"[Sync] Countdown started in room {room_code}")
 
             emit('countdown_start', {
-                'timestamp': timestamp
+                'timestamp': timestamp,
+                'currentTime': data.get('currentTime', 0)
             }, room=room_code)
 
 @socketio.on('resync')
-def handle_resync():
+def handle_resync(data=None):
     """Host triggers a re-sync (new countdown) for all users"""
+    if data is None:
+        data = {}
     sid = request.sid
 
     if sid in user_rooms:
@@ -2910,7 +2739,8 @@ def handle_resync():
             print(f"[Sync] Re-sync triggered in room {room_code}")
 
             emit('resync_triggered', {
-                'timestamp': timestamp
+                'timestamp': timestamp,
+                'currentTime': data.get('currentTime', 0)
             }, room=room_code)
 
 # ============= END WATCHPARTY EVENTS =============

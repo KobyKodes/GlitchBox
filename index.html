@@ -14998,8 +14998,7 @@
             console.log(`[Play Movie] Watchparty active: ${watchpartyActive}, Is host: ${isHost}`);
 
             try {
-                const partyParam = watchpartyActive ? '?party=true' : '';
-                const response = await fetch(`${API_BASE_URL}/stream/${movieId}${partyParam}`);
+                const response = await fetch(`${API_BASE_URL}/stream/${movieId}`);
                 const data = await response.json();
 
                 console.log('[Play Movie] API Response:', data); // Debug: see full API response
@@ -15072,8 +15071,7 @@
 
         async function playTVEpisode(tvId, season, episode, startTime = null) {
             try {
-                const partyParam = watchpartyActive ? '&party=true' : '';
-                const response = await fetch(`${API_BASE_URL}/tv/stream/${tvId}?season=${season}&episode=${episode}${partyParam}`);
+                const response = await fetch(`${API_BASE_URL}/tv/stream/${tvId}?season=${season}&episode=${episode}`);
                 const data = await response.json();
 
                 console.log('API Response:', data); // Debug: see full API response
@@ -15203,7 +15201,7 @@
         function selectVideoSource(source) {
             // Block source changes during watchparty
             if (partySourceLocked) {
-                showStatus('Source is locked to VidSrc during watchparty for sync support');
+                showStatus('Source is locked to VidKing during watchparty for sync support');
                 closeSourceSelector();
                 return;
             }
@@ -15264,7 +15262,7 @@
                 'moviesapi': 'MoviesAPI'
             };
             if (partySourceLocked) {
-                btnText.textContent = 'Source: VidSrc (Party)';
+                btnText.textContent = 'Source: VidKing (Party)';
             } else {
                 btnText.textContent = `Source: ${sourceNames[videoSource] || 'VidSrc'}`;
             }
@@ -15552,14 +15550,7 @@
 
                 console.log('Player iframe src set to:', playerIframe.src);
 
-                // For iframe embeds, we need to manually track play/pause since we can't access iframe internals
-                // But we CAN receive sync commands from others
-                if (watchpartyActive) {
-                    console.log('[Watchparty] Iframe loaded - can receive sync but cannot auto-send');
-                    console.warn('[Watchparty] ⚠ For best watchparty experience, use VidSrc source (direct stream)');
-                    showStatus('⚠ Limited sync with this source - Switch to VidSrc for full sync', 'warning');
-                } else {
-                }
+                // VidKing postMessage events provide full sync capability for iframes
             }
 
             // Prevent iframe from auto-fullscreening on mobile
@@ -15571,8 +15562,7 @@
             // Detect sync mode when in a watchparty
             if (watchpartyActive) {
                 const playerVideo = document.getElementById('playerVideo');
-                const isDirectStream = playerVideo && playerVideo.style.display !== 'none';
-                const newMode = isDirectStream ? 'full' : 'coordinated';
+                const newMode = 'full'; // VidKing postMessage events enable full sync for iframes too
 
                 if (newMode !== partySyncMode) {
                     partySyncMode = newMode;
@@ -15581,13 +15571,6 @@
                     // Host reports sync mode to server
                     if (isHost && socket) {
                         socket.emit('set_sync_mode', { mode: newMode });
-                    }
-
-                    // If coordinated mode and host, auto-trigger ready check
-                    if (newMode === 'coordinated' && isHost) {
-                        setTimeout(() => {
-                            if (socket) socket.emit('ready_check');
-                        }, 1000);
                     }
                 }
             }
@@ -17852,26 +17835,17 @@
 
             socket.on('playback_play', (data) => {
                 console.log('[Sync] Received playback_play from', data.username, 'at', data.currentTime);
+                vidkingHostTime = data.currentTime;
                 const playerVideo = document.getElementById('playerVideo');
-                const playerIframe = document.getElementById('contentPlayer');
 
                 isSyncing = true; // Prevent sync loop
 
                 if (playerVideo && playerVideo.style.display !== 'none') {
-                    // Direct video element
                     playerVideo.currentTime = data.currentTime;
                     playerVideo.play().catch(e => console.log('[Sync] Play prevented:', e));
-                } else if (playerIframe && playerIframe.style.display !== 'none') {
-                    // For iframes, try postMessage (works with some embeds)
-                    try {
-                        playerIframe.contentWindow.postMessage({
-                            action: 'play',
-                            currentTime: data.currentTime
-                        }, '*');
-                    } catch (e) {
-                        console.log('[Sync] Cannot control iframe:', e);
-                    }
                 }
+                // For iframes, VidKing postMessage handles outgoing sync;
+                // incoming play is informational (guest can re-sync to catch up)
 
                 showStatus(`▶ ${data.username} played`);
                 setTimeout(() => { isSyncing = false; }, 500);
@@ -17879,26 +17853,17 @@
 
             socket.on('playback_pause', (data) => {
                 console.log('[Sync] Received playback_pause from', data.username, 'at', data.currentTime);
+                vidkingHostTime = data.currentTime;
                 const playerVideo = document.getElementById('playerVideo');
-                const playerIframe = document.getElementById('contentPlayer');
 
                 isSyncing = true; // Prevent sync loop
 
                 if (playerVideo && playerVideo.style.display !== 'none') {
-                    // Direct video element
                     playerVideo.currentTime = data.currentTime;
                     playerVideo.pause();
-                } else if (playerIframe && playerIframe.style.display !== 'none') {
-                    // For iframes, try postMessage
-                    try {
-                        playerIframe.contentWindow.postMessage({
-                            action: 'pause',
-                            currentTime: data.currentTime
-                        }, '*');
-                    } catch (e) {
-                        console.log('[Sync] Cannot control iframe:', e);
-                    }
                 }
+                // For iframes, VidKing postMessage handles outgoing sync;
+                // incoming pause is informational (guest can re-sync to catch up)
 
                 showStatus(`⏸ ${data.username} paused`);
                 setTimeout(() => { isSyncing = false; }, 500);
@@ -17906,25 +17871,15 @@
 
             socket.on('playback_seek', (data) => {
                 console.log('[Sync] Received playback_seek from', data.username, 'to', data.currentTime);
+                vidkingHostTime = data.currentTime;
                 const playerVideo = document.getElementById('playerVideo');
-                const playerIframe = document.getElementById('contentPlayer');
 
                 isSyncing = true; // Prevent sync loop
 
                 if (playerVideo && playerVideo.style.display !== 'none') {
-                    // Direct video element
                     playerVideo.currentTime = data.currentTime;
-                } else if (playerIframe && playerIframe.style.display !== 'none') {
-                    // For iframes, try postMessage
-                    try {
-                        playerIframe.contentWindow.postMessage({
-                            action: 'seek',
-                            currentTime: data.currentTime
-                        }, '*');
-                    } catch (e) {
-                        console.log('[Sync] Cannot control iframe:', e);
-                    }
                 }
+                // For iframes, guest can re-sync to vidkingHostTime via Sync button
 
                 showStatus(`⏩ ${data.username} seeked`);
                 setTimeout(() => { isSyncing = false; }, 500);
@@ -17985,19 +17940,21 @@
                 // Auto-start countdown when all ready
                 if (data.ready_count >= data.total && isHost) {
                     setTimeout(() => {
-                        if (socket) socket.emit('start_countdown');
+                        if (socket) socket.emit('start_countdown', { currentTime: vidkingHostTime });
                     }, 500);
                 }
             });
 
             socket.on('countdown_start', (data) => {
                 console.log('[Sync] Countdown starting');
+                vidkingHostTime = data.currentTime || vidkingHostTime;
                 document.getElementById('readyCheckOverlay').classList.remove('active');
                 startCountdownSequence();
             });
 
             socket.on('resync_triggered', (data) => {
                 console.log('[Sync] Re-sync triggered');
+                vidkingHostTime = data.currentTime || vidkingHostTime;
                 startCountdownSequence();
             });
 
@@ -18176,17 +18133,17 @@
         // ============= COORDINATED SYNC HELPERS =============
 
         function lockSourceForParty() {
-            if (videoSource !== 'vidsrc') {
+            if (videoSource !== 'vidking') {
                 previousVideoSource = videoSource;
-                videoSource = 'vidsrc';
-                localStorage.setItem('videoSource', 'vidsrc');
+                videoSource = 'vidking';
+                localStorage.setItem('videoSource', 'vidking');
             } else {
                 previousVideoSource = null;
             }
             partySourceLocked = true;
             updateVideoSourceButton();
 
-            // Reload current content with VidSrc if something is playing
+            // Reload current content with VidKing if something is playing
             if (currentContentId && previousVideoSource) {
                 if (currentContentType === 'movie') {
                     playMovie(currentContentId, 0);
@@ -18241,12 +18198,12 @@
 
         function forceStartCountdown() {
             if (!socket || !isHost) return;
-            socket.emit('start_countdown');
+            socket.emit('start_countdown', { currentTime: vidkingHostTime });
         }
 
         function triggerResync() {
             if (!socket || !isHost) return;
-            socket.emit('resync');
+            socket.emit('resync', { currentTime: vidkingHostTime });
         }
 
         function startCountdownSequence() {
@@ -18265,7 +18222,7 @@
                     numberEl.textContent = count;
                 } else if (count === 0) {
                     numberEl.textContent = 'GO!';
-                    reloadIframeForSync();
+                    reloadIframeForSync(vidkingHostTime);
                 } else {
                     clearInterval(countdownTimer);
                     countdownTimer = null;
@@ -18274,29 +18231,27 @@
             }, 1000);
         }
 
-        function reloadIframeForSync() {
+        function reloadIframeForSync(startTime) {
             const playerIframe = document.getElementById('contentPlayer');
             const playerVideo = document.getElementById('playerVideo');
 
             if (playerVideo && playerVideo.style.display !== 'none') {
-                // Direct stream: just play the video
-                console.log('[Sync] Playing direct stream for coordinated sync');
+                // Direct stream: seek to startTime and play
+                if (startTime) playerVideo.currentTime = startTime;
+                console.log('[Sync] Playing direct stream at', startTime || 0);
                 playerVideo.play().catch(e => console.log('[Sync] Autoplay prevented:', e));
             } else if (playerIframe && playerIframe.style.display !== 'none' && playerIframe.src) {
-                // Embed iframe: reload with autoplay parameter
-                let currentSrc = playerIframe.src;
-                console.log('[Sync] Reloading iframe for coordinated sync:', currentSrc);
+                // Embed iframe: reload with timestamp and autoplay
+                console.log('[Sync] Reloading iframe for sync at', startTime || 0);
                 try {
-                    const url = new URL(currentSrc);
+                    let url = new URL(playerIframe.src);
+                    if (startTime) url.searchParams.set('t', Math.floor(startTime));
                     url.searchParams.set('autoplay', '1');
-                    currentSrc = url.toString();
+                    playerIframe.src = 'about:blank';
+                    setTimeout(() => { playerIframe.src = url.toString(); }, 200);
                 } catch (e) {
-                    console.log('[Sync] Could not add autoplay param:', e);
+                    console.log('[Sync] Could not reload iframe:', e);
                 }
-                playerIframe.src = 'about:blank';
-                setTimeout(() => {
-                    playerIframe.src = currentSrc;
-                }, 200);
             }
         }
 
@@ -18744,6 +18699,37 @@
             initSocket();
         });
 
+
+        // Global state for VidKing sync
+        let vidkingHostTime = 0;
+        let vidkingDuration = 0;
+
+        window.addEventListener('message', function(event) {
+            if (!event.data || event.data.type !== 'PLAYER_EVENT') return;
+            const { event: playerEvent, currentTime, duration } = event.data.data;
+
+            // Always track time from timeupdate
+            if (playerEvent === 'timeupdate') {
+                vidkingHostTime = currentTime;
+                vidkingDuration = duration || vidkingDuration;
+            }
+
+            // Only emit sync events if we're in a watchparty
+            if (!watchpartyActive || !socket) return;
+            if (isSyncing) return; // prevent loops
+
+            switch (playerEvent) {
+                case 'play':
+                    socket.emit('playback_play', { currentTime });
+                    break;
+                case 'pause':
+                    socket.emit('playback_pause', { currentTime });
+                    break;
+                case 'seeked':
+                    socket.emit('playback_seek', { currentTime });
+                    break;
+            }
+        });
 
         // Setup video sync listeners for watchparty
         let isSyncing = false; // Flag to prevent sync loops
