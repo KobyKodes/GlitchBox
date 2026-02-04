@@ -1613,15 +1613,16 @@ def call_vidsrc_scraper(tmdb_id, content_type='movie', season=None, episode=None
         return None
 
 
-def extract_vidsrc_stream(tmdb_id, content_type='movie', season=None, episode=None):
+def extract_vidsrc_stream(tmdb_id, content_type='movie', season=None, episode=None, party=False):
     """
     Extract direct stream URL from VidSrc
-    Tries Bingeflix first, then Playwright scraper, then BeautifulSoup, then embed fallback.
+    Tries Bingeflix first (party only), then Playwright scraper, then BeautifulSoup, then embed fallback.
     """
-    # Tier 0: Try Bingeflix scraper (local Playwright subprocess)
-    bingeflix_result = extract_bingeflix_stream(tmdb_id, content_type, season, episode)
-    if bingeflix_result:
-        return bingeflix_result
+    # Tier 0: Try Bingeflix scraper (only for watchparty - needs direct stream for sync)
+    if party:
+        bingeflix_result = extract_bingeflix_stream(tmdb_id, content_type, season, episode)
+        if bingeflix_result:
+            return bingeflix_result
 
     # Tier 1: Try Playwright-based scraper service
     scraper_result = call_vidsrc_scraper(tmdb_id, content_type, season, episode)
@@ -1737,8 +1738,9 @@ def generate_stream_url(movie_id):
         vidking_url = f"https://www.vidking.net/embed/movie/{movie_id}"
         vidsrc_url = f"https://vidsrc.to/embed/movie/{movie_id}"
 
-        # Try to get direct stream
-        stream_info = extract_vidsrc_stream(movie_id, 'movie')
+        # Try to get direct stream (party=True triggers Bingeflix scraper for watchparty sync)
+        is_party = request.args.get('party', '').lower() in ('1', 'true')
+        stream_info = extract_vidsrc_stream(movie_id, 'movie', party=is_party)
 
         # Defensive: ensure stream_info has the expected structure
         subtitles = []
@@ -1784,8 +1786,9 @@ def generate_tv_stream_url(tv_id):
         vidking_url = f"https://www.vidking.net/embed/tv/{tv_id}/{season}/{episode}"
         vidsrc_url = f"https://vidsrc.to/embed/tv/{tv_id}/{season}/{episode}"
 
-        # Try to get direct stream
-        stream_info = extract_vidsrc_stream(tv_id, 'tv', season, episode)
+        # Try to get direct stream (party=True triggers Bingeflix scraper for watchparty sync)
+        is_party = request.args.get('party', '').lower() in ('1', 'true')
+        stream_info = extract_vidsrc_stream(tv_id, 'tv', season, episode, party=is_party)
 
         # Defensive: ensure stream_info has the expected structure
         subtitles = []

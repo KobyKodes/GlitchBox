@@ -14998,7 +14998,8 @@
             console.log(`[Play Movie] Watchparty active: ${watchpartyActive}, Is host: ${isHost}`);
 
             try {
-                const response = await fetch(`${API_BASE_URL}/stream/${movieId}`);
+                const partyParam = watchpartyActive ? '?party=true' : '';
+                const response = await fetch(`${API_BASE_URL}/stream/${movieId}${partyParam}`);
                 const data = await response.json();
 
                 console.log('[Play Movie] API Response:', data); // Debug: see full API response
@@ -15071,7 +15072,8 @@
 
         async function playTVEpisode(tvId, season, episode, startTime = null) {
             try {
-                const response = await fetch(`${API_BASE_URL}/tv/stream/${tvId}?season=${season}&episode=${episode}`);
+                const partyParam = watchpartyActive ? '&party=true' : '';
+                const response = await fetch(`${API_BASE_URL}/tv/stream/${tvId}?season=${season}&episode=${episode}${partyParam}`);
                 const data = await response.json();
 
                 console.log('API Response:', data); // Debug: see full API response
