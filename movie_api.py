@@ -7,6 +7,7 @@ Provides REST API for movie search and streaming URL generation
 # IMPORTANT: Eventlet monkey patching MUST be done before any other imports
 import eventlet
 eventlet.monkey_patch()
+import eventlet.tpool
 
 from flask import Flask, request, jsonify, render_template_string, send_file, Response, send_from_directory
 from flask_cors import CORS
