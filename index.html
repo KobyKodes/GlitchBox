@@ -15055,7 +15055,10 @@
                         content: {
                             id: movieId,
                             title: data.title,
-                            type: 'movie'
+                            type: 'movie',
+                            stream_url: streamUrl,
+                            stream_type: streamType,
+                            subtitles: subtitles
                         }
                     });
                 }
@@ -15136,7 +15139,10 @@
                             title: data.title,
                             type: 'tv',
                             season: season,
-                            episode: episode
+                            episode: episode,
+                            stream_url: streamUrl,
+                            stream_type: streamType,
+                            subtitles: subtitles
                         }
                     });
                 }
@@ -18442,13 +18448,43 @@
                 return;
             }
 
-            const { id, title, type, season, episode } = content;
+            const { id, title, type, season, episode, stream_url, stream_type, subtitles } = content;
 
-            console.log(`[Content Sync] Syncing ${type}: ${title}`, { id, season, episode });
+            console.log(`[Content Sync] Syncing ${type}: ${title}`, { id, season, episode, stream_type });
             showStatus(`Syncing content: ${title}`);
 
             try {
-                // Load the same content as the host
+                // If host provided stream data directly, use it (ensures same player type)
+                if (stream_url && stream_type) {
+                    console.log(`[Content Sync] Using host's stream directly: ${stream_type}`);
+
+                    // Show player section
+                    const playerSection = document.getElementById('playerSection');
+                    if (playerSection) {
+                        playerSection.style.display = 'block';
+                    }
+
+                    // Load content directly with host's stream URL
+                    currentContentUrl = stream_url;
+                    loadPlayerContent(stream_url, null, stream_type, subtitles || []);
+
+                    // Update UI for TV shows
+                    if (type === 'tv' && season && episode) {
+                        currentSelectedSeason = season;
+                        currentSelectedEpisode = episode;
+                        const seasonBtn = document.getElementById('seasonButtonText');
+                        const episodeBtn = document.getElementById('episodeButtonText');
+                        if (seasonBtn) seasonBtn.textContent = `Season ${season}`;
+                        if (episodeBtn) episodeBtn.textContent = `Episode ${episode}`;
+                    }
+
+                    console.log(`[Content Sync] Direct stream loaded successfully`);
+                    return;
+                }
+
+                // Fallback: Load content normally (makes own API call)
+                console.log('[Content Sync] No stream data from host, fetching from API...');
+
                 if (type === 'tv') {
                     if (season && episode) {
                         console.log(`[Content Sync] Loading TV show: ${title} S${season}E${episode}`);
