@@ -23,7 +23,7 @@ from datetime import datetime, timedelta
 import json
 import atexit
 import re
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import urlparse, parse_qs, quote
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from pymongo import MongoClient
 from bson.objectid import ObjectId
@@ -1463,13 +1463,21 @@ def call_vidsrc_scraper(tmdb_id, content_type='movie', season=None, episode=None
             hls_url = info.get('hls_url')
             if hls_url:
                 subtitles = info.get('subtitles', [])
+                referer = info.get('referer', 'https://vidnest.fun/')
                 print(f"[VidSrc Scraper] Found stream from {domain}: {hls_url}")
                 print(f"[VidSrc Scraper] Subtitles: {len(subtitles)} tracks")
+                print(f"[VidSrc Scraper] Referer: {referer}")
+
+                # Create proxied URL to handle Referer header
+                proxied_url = f"/api/hls/proxy?url={quote(hls_url, safe='')}&referer={quote(referer, safe='')}"
+
                 return {
                     'type': 'direct',
-                    'url': hls_url,
+                    'url': proxied_url,
                     'source': domain,
-                    'subtitles': subtitles
+                    'subtitles': subtitles,
+                    'original_url': hls_url,  # Keep original for debugging
+                    'referer': referer
                 }
 
         print(f"[VidSrc Scraper] No domains returned a valid hls_url")
@@ -2124,6 +2132,109 @@ def convert_srt_to_vtt(srt_content):
         vtt_lines.append(line)
 
     return '\n'.join(vtt_lines)
+
+# ============= HLS PROXY (for VidNest streams) =============
+
+@app.route('/api/hls/proxy', methods=['GET', 'OPTIONS'])
+def proxy_hls():
+    """
+    Proxy HLS m3u8 and video segments with proper Referer header.
+    Usage: /api/hls/proxy?url=<m3u8_url>&referer=<referer_url>
+    """
+    if request.method == 'OPTIONS':
+        response = Response()
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Range'
+        return response
+
+    url = request.args.get('url')
+    referer = request.args.get('referer', 'https://vidnest.fun/')
+
+    if not url:
+        return jsonify({"error": "URL parameter is required"}), 400
+
+    try:
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36',
+            'Referer': referer,
+            'Origin': referer.rstrip('/'),
+        }
+
+        # Forward range header if present (for video segments)
+        if 'Range' in request.headers:
+            headers['Range'] = request.headers['Range']
+
+        resp = requests.get(url, headers=headers, timeout=30, stream=True, allow_redirects=True)
+        resp.raise_for_status()
+
+        content_type = resp.headers.get('Content-Type', 'application/octet-stream')
+
+        # If it's an m3u8 file, rewrite URLs to go through proxy
+        if '.m3u8' in url or 'application/vnd.apple.mpegurl' in content_type or 'application/x-mpegurl' in content_type:
+            content = resp.text
+
+            # Get base URL for relative paths
+            base_url = url.rsplit('/', 1)[0] + '/'
+
+            # Rewrite URLs in the m3u8
+            lines = content.split('\n')
+            new_lines = []
+            for line in lines:
+                line = line.strip()
+                if line and not line.startswith('#'):
+                    # This is a URL (segment or sub-playlist)
+                    if line.startswith('http'):
+                        segment_url = line
+                    else:
+                        segment_url = base_url + line
+                    # Rewrite to go through proxy
+                    proxied_url = f"/api/hls/proxy?url={requests.utils.quote(segment_url)}&referer={requests.utils.quote(referer)}"
+                    new_lines.append(proxied_url)
+                else:
+                    new_lines.append(line)
+
+            content = '\n'.join(new_lines)
+
+            return Response(
+                content,
+                mimetype='application/vnd.apple.mpegurl',
+                headers={
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type, Range',
+                    'Cache-Control': 'no-cache',
+                }
+            )
+        else:
+            # For video segments, stream directly
+            response_headers = {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type, Range',
+                'Content-Type': content_type,
+            }
+
+            # Forward content-length and accept-ranges
+            if 'Content-Length' in resp.headers:
+                response_headers['Content-Length'] = resp.headers['Content-Length']
+            if 'Accept-Ranges' in resp.headers:
+                response_headers['Accept-Ranges'] = resp.headers['Accept-Ranges']
+            if 'Content-Range' in resp.headers:
+                response_headers['Content-Range'] = resp.headers['Content-Range']
+
+            return Response(
+                resp.iter_content(chunk_size=8192),
+                status=resp.status_code,
+                headers=response_headers
+            )
+
+    except requests.exceptions.RequestException as e:
+        print(f"[HLS Proxy] Error fetching {url}: {e}")
+        return jsonify({"error": str(e)}), 502
+    except Exception as e:
+        print(f"[HLS Proxy] Error: {e}")
+        return jsonify({"error": str(e)}), 500
 
 # ============= WATCHPARTY SOCKETIO EVENTS =============
 
