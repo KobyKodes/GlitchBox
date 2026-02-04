@@ -34,20 +34,24 @@ def scrape(tmdb_id, content_type='movie', season=None, episode=None):
     def handle_response(response):
         nonlocal hls_url, hls_content, referer
         url = response.url
-        # Capture m3u8 master/playlist URLs
-        if '.m3u8' in url and hls_url is None:
-            log(f"Intercepted m3u8: {url}")
-            hls_url = url
+        # Capture m3u8 master/playlist URLs - skip redirects (3xx), only capture final response
+        if '.m3u8' in url and response.status >= 200 and response.status < 300:
+            log(f"Intercepted m3u8 (status {response.status}): {url}")
             # Capture the response body so we don't need to re-fetch from CDN
             try:
                 hls_content = response.text()
                 log(f"Captured m3u8 content ({len(hls_content)} bytes)")
             except Exception as e:
                 log(f"Could not capture m3u8 body: {e}")
-            # Extract referer from request headers
+            # Use the final URL (after redirect) as hls_url
+            hls_url = url
+            # Extract referer from the original request (walk up redirect chain)
             try:
-                req_headers = response.request.headers
-                referer = req_headers.get('referer', '')
+                req = response.request
+                # Walk up to the original request to get the referer
+                while req.redirected_from:
+                    req = req.redirected_from
+                referer = req.headers.get('referer', '')
                 log(f"Referer from request: {referer}")
             except Exception:
                 pass
