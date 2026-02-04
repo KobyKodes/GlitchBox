@@ -27,16 +27,23 @@ def scrape(tmdb_id, content_type='movie', season=None, episode=None):
     from playwright.sync_api import sync_playwright
 
     hls_url = None
+    hls_content = None
     referer = None
     subtitles = []
 
     def handle_response(response):
-        nonlocal hls_url, referer
+        nonlocal hls_url, hls_content, referer
         url = response.url
         # Capture m3u8 master/playlist URLs
         if '.m3u8' in url and hls_url is None:
             log(f"Intercepted m3u8: {url}")
             hls_url = url
+            # Capture the response body so we don't need to re-fetch from CDN
+            try:
+                hls_content = response.text()
+                log(f"Captured m3u8 content ({len(hls_content)} bytes)")
+            except Exception as e:
+                log(f"Could not capture m3u8 body: {e}")
             # Extract referer from request headers
             try:
                 req_headers = response.request.headers
@@ -177,12 +184,15 @@ def scrape(tmdb_id, content_type='movie', season=None, episode=None):
         if not referer:
             referer = 'https://bingeflix.tv/'
 
-        return {
+        result = {
             'success': True,
             'hls_url': hls_url,
             'subtitles': subtitles,
             'referer': referer,
         }
+        if hls_content:
+            result['hls_content'] = hls_content
+        return result
     else:
         return {
             'success': False,

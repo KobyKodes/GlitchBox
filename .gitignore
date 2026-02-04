@@ -37,6 +37,9 @@ Thumbs.db
 vidsrc-scraper/node_modules/
 vidsrc-scraper/.env
 
+# Playwright browsers
+.pw-browsers/
+
 # Distribution
 dist/
 build/

@@ -121,6 +121,7 @@ user_rooms = {}  # {sid: room_code}
 
 # Bingeflix scraper cache and concurrency control
 bingeflix_cache = {}  # {cache_key: {data: ..., timestamp: ...}}
+bingeflix_m3u8_cache = {}  # {stream_id: {content: str, referer: str, base_url: str, timestamp: float}}
 BINGEFLIX_CACHE_TTL = 15 * 60  # 15 minutes
 bingeflix_lock = eventlet.semaphore.Semaphore(1)
 
@@ -1504,15 +1505,30 @@ def extract_bingeflix_stream(tmdb_id, content_type='movie', season=None, episode
             return None
 
         hls_url = data['hls_url']
+        hls_content = data.get('hls_content')
         referer = data.get('referer', 'https://bingeflix.tv/')
         subtitles = data.get('subtitles', [])
 
         print(f"[Bingeflix] Found stream: {hls_url}")
         print(f"[Bingeflix] Referer: {referer}")
         print(f"[Bingeflix] Subtitles: {len(subtitles)} tracks")
+        print(f"[Bingeflix] Has m3u8 content: {hls_content is not None}")
 
-        # Build proxied URL
-        proxied_url = f"/api/hls/proxy?url={quote(hls_url, safe='')}&referer={quote(referer, safe='')}"
+        if hls_content:
+            # Cache the m3u8 content and serve it directly (avoids CDN re-fetch/redirect issues)
+            stream_id = f"{tmdb_id}_{content_type}_{season}_{episode}"
+            base_url = hls_url.rsplit('/', 1)[0] + '/'
+            bingeflix_m3u8_cache[stream_id] = {
+                'content': hls_content,
+                'referer': referer,
+                'base_url': base_url,
+                'timestamp': time.time()
+            }
+            proxied_url = f"/api/hls/bingeflix/{quote(stream_id, safe='')}"
+            print(f"[Bingeflix] Serving cached m3u8 via {proxied_url}")
+        else:
+            # Fallback to standard proxy if we couldn't capture content
+            proxied_url = f"/api/hls/proxy?url={quote(hls_url, safe='')}&referer={quote(referer, safe='')}"
 
         stream_data = {
             'type': 'direct',
@@ -2240,6 +2256,59 @@ def convert_srt_to_vtt(srt_content):
         vtt_lines.append(line)
 
     return '\n'.join(vtt_lines)
+
+# ============= BINGEFLIX CACHED M3U8 ENDPOINT =============
+
+@app.route('/api/hls/bingeflix/<stream_id>', methods=['GET', 'OPTIONS'])
+def serve_bingeflix_m3u8(stream_id):
+    """
+    Serve cached m3u8 content from Bingeflix scraper.
+    Rewrites segment URLs to go through the HLS proxy.
+    """
+    if request.method == 'OPTIONS':
+        response = Response()
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Range'
+        return response
+
+    cached = bingeflix_m3u8_cache.get(stream_id)
+    if not cached or (time.time() - cached['timestamp']) > BINGEFLIX_CACHE_TTL:
+        print(f"[Bingeflix M3U8] Cache miss or expired for {stream_id}")
+        return jsonify({"error": "Stream not found or expired"}), 404
+
+    content = cached['content']
+    base_url = cached['base_url']
+    referer = cached['referer']
+
+    # Rewrite URLs in the m3u8 to go through the proxy
+    lines = content.split('\n')
+    new_lines = []
+    for line in lines:
+        stripped = line.strip()
+        if stripped and not stripped.startswith('#'):
+            # This is a URL (segment or sub-playlist)
+            if stripped.startswith('http'):
+                segment_url = stripped
+            else:
+                segment_url = base_url + stripped
+            proxied = f"/api/hls/proxy?url={quote(segment_url, safe='')}&referer={quote(referer, safe='')}"
+            new_lines.append(proxied)
+        else:
+            new_lines.append(line)
+
+    rewritten = '\n'.join(new_lines)
+
+    return Response(
+        rewritten,
+        mimetype='application/vnd.apple.mpegurl',
+        headers={
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Range',
+            'Cache-Control': 'no-cache',
+        }
+    )
 
 # ============= HLS PROXY (for VidNest streams) =============
 

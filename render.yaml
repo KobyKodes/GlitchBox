@@ -2,13 +2,13 @@ services:
   - type: web
     name: retroflix
     env: python
-    buildCommand: pip install -r requirements.txt && playwright install chromium && playwright install-deps
+    buildCommand: pip install -r requirements.txt && PLAYWRIGHT_BROWSERS_PATH=/opt/render/project/src/.pw-browsers playwright install chromium && playwright install-deps || true
     startCommand: gunicorn --worker-class eventlet -w 1 --bind 0.0.0.0:$PORT movie_api:app
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
       - key: PLAYWRIGHT_BROWSERS_PATH
-        value: /opt/render/.cache/ms-playwright
+        value: /opt/render/project/src/.pw-browsers
       - key: TMDB_API_KEY
         sync: false
       - key: OMDB_API_KEY
