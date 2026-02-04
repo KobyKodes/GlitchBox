@@ -11890,7 +11890,7 @@
                         <p>Search for movies or TV shows above, or browse popular content</p>
                     </div>
                 </div>
-                <iframe id="contentPlayer" src="about:blank" allowfullscreen webkitallowfullscreen mozallowfullscreen allow="fullscreen" style="display: none;"></iframe>
+                <iframe id="contentPlayer" src="about:blank" allowfullscreen webkitallowfullscreen mozallowfullscreen allow="autoplay; fullscreen" style="display: none;"></iframe>
                 <video id="playerVideo" controls style="display: none; width: 100%; height: 100%; max-width: 100%; background: #000; object-fit: contain;"></video>
             </div>
 
@@ -18221,9 +18221,23 @@
 
         function reloadIframeForSync() {
             const playerIframe = document.getElementById('contentPlayer');
-            if (playerIframe && playerIframe.style.display !== 'none' && playerIframe.src) {
-                const currentSrc = playerIframe.src;
+            const playerVideo = document.getElementById('playerVideo');
+
+            if (playerVideo && playerVideo.style.display !== 'none') {
+                // Direct stream: just play the video
+                console.log('[Sync] Playing direct stream for coordinated sync');
+                playerVideo.play().catch(e => console.log('[Sync] Autoplay prevented:', e));
+            } else if (playerIframe && playerIframe.style.display !== 'none' && playerIframe.src) {
+                // Embed iframe: reload with autoplay parameter
+                let currentSrc = playerIframe.src;
                 console.log('[Sync] Reloading iframe for coordinated sync:', currentSrc);
+                try {
+                    const url = new URL(currentSrc);
+                    url.searchParams.set('autoplay', '1');
+                    currentSrc = url.toString();
+                } catch (e) {
+                    console.log('[Sync] Could not add autoplay param:', e);
+                }
                 playerIframe.src = 'about:blank';
                 setTimeout(() => {
                     playerIframe.src = currentSrc;
@@ -18617,6 +18631,11 @@
             // VidKing uses 't' parameter for timestamp (like YouTube)
             // Add it in the format most embedded players support
             url.searchParams.set('t', timeInSeconds);
+
+            // Add autoplay for watchparty sync
+            if (watchpartyActive) {
+                url.searchParams.set('autoplay', '1');
+            }
 
             const player = document.getElementById('contentPlayer');
             const newUrl = url.toString();
