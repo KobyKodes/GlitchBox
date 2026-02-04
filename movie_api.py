@@ -35,6 +35,9 @@ load_dotenv(os.path.join(os.path.dirname(__file__), 'backend', '.env'))
 
 # Load API keys from environment variables (secure for production)
 TMDB_API_KEY = os.environ.get('TMDB_API_KEY', 'e577f3394a629d69efa3a9414e172237')
+
+# VidSrc scraper service URL (Playwright-based, runs on port 4000)
+VIDSRC_SCRAPER_URL = os.environ.get('VIDSRC_SCRAPER_URL', 'http://localhost:4000')
 OMDB_API_KEY = os.environ.get('OMDB_API_KEY', 'ecbf499d')
 
 app = Flask(__name__)
@@ -1435,11 +1438,65 @@ def get_tv_recommendations(tv_id):
     results = tmdb.get_tv_recommendations(tv_id, page)
     return jsonify(results)
 
+def call_vidsrc_scraper(tmdb_id, content_type='movie', season=None, episode=None):
+    """
+    Call the vidsrc-scraper Node.js service (Playwright-based) to get m3u8 streams.
+    Returns dict with type/url/source/subtitles or None on failure.
+    """
+    try:
+        params = {'tmdb_id': tmdb_id, 'type': content_type}
+        if content_type == 'tv':
+            params['season'] = season
+            params['episode'] = episode
+
+        print(f"[VidSrc Scraper] Calling scraper: {VIDSRC_SCRAPER_URL}/extract with params={params}")
+        resp = requests.get(f"{VIDSRC_SCRAPER_URL}/extract", params=params, timeout=60)
+        resp.raise_for_status()
+        data = resp.json()
+
+        if not data.get('success') or not data.get('results'):
+            print(f"[VidSrc Scraper] No successful results from scraper")
+            return None
+
+        # Iterate domains, pick first with a valid hls_url
+        for domain, info in data['results'].items():
+            hls_url = info.get('hls_url')
+            if hls_url:
+                subtitles = info.get('subtitles', [])
+                print(f"[VidSrc Scraper] Found stream from {domain}: {hls_url}")
+                print(f"[VidSrc Scraper] Subtitles: {len(subtitles)} tracks")
+                return {
+                    'type': 'direct',
+                    'url': hls_url,
+                    'source': domain,
+                    'subtitles': subtitles
+                }
+
+        print(f"[VidSrc Scraper] No domains returned a valid hls_url")
+        return None
+
+    except requests.exceptions.ConnectionError:
+        print(f"[VidSrc Scraper] Scraper service not running at {VIDSRC_SCRAPER_URL}")
+        return None
+    except requests.exceptions.Timeout:
+        print(f"[VidSrc Scraper] Scraper request timed out (60s)")
+        return None
+    except Exception as e:
+        print(f"[VidSrc Scraper] Error: {e}")
+        return None
+
+
 def extract_vidsrc_stream(tmdb_id, content_type='movie', season=None, episode=None):
     """
     Extract direct stream URL from VidSrc
-    Returns .m3u8 URL if successful, embed URL as fallback
+    Tries Playwright scraper first, then BeautifulSoup, then embed fallback.
     """
+    # Tier 1: Try Playwright-based scraper service
+    scraper_result = call_vidsrc_scraper(tmdb_id, content_type, season, episode)
+    if scraper_result:
+        return scraper_result
+
+    # Tier 2: Fall back to BeautifulSoup extraction
     try:
         from bs4 import BeautifulSoup
 
@@ -1552,9 +1609,11 @@ def generate_stream_url(movie_id):
         stream_info = extract_vidsrc_stream(movie_id, 'movie')
 
         # Defensive: ensure stream_info has the expected structure
+        subtitles = []
         if stream_info and isinstance(stream_info, dict):
             stream_url = stream_info.get('url', vidsrc_url)
             stream_type = stream_info.get('type', 'embed')
+            subtitles = stream_info.get('subtitles', [])
             print(f"[API] Movie {movie_id} - Stream URL: {stream_url}, Type: {stream_type}")
         else:
             print(f"[API] Movie {movie_id} - No stream info, using fallback")
@@ -1567,6 +1626,7 @@ def generate_stream_url(movie_id):
             "year": movie.get('release_date', '')[:4] if movie.get('release_date') else None,
             "stream_url": stream_url,
             "stream_type": stream_type,
+            "subtitles": subtitles,
             "vidking_url": vidking_url,
             "vidsrc_url": vidsrc_url,
             "movie_details": movie
@@ -1596,9 +1656,11 @@ def generate_tv_stream_url(tv_id):
         stream_info = extract_vidsrc_stream(tv_id, 'tv', season, episode)
 
         # Defensive: ensure stream_info has the expected structure
+        subtitles = []
         if stream_info and isinstance(stream_info, dict):
             stream_url = stream_info.get('url', vidsrc_url)
             stream_type = stream_info.get('type', 'embed')
+            subtitles = stream_info.get('subtitles', [])
             print(f"[API] TV {tv_id} S{season}E{episode} - Stream URL: {stream_url}, Type: {stream_type}")
         else:
             print(f"[API] TV {tv_id} S{season}E{episode} - No stream info, using fallback")
@@ -1613,6 +1675,7 @@ def generate_tv_stream_url(tv_id):
             "episode": episode,
             "stream_url": stream_url,
             "stream_type": stream_type,
+            "subtitles": subtitles,
             "vidking_url": vidking_url,
             "vidsrc_url": vidsrc_url,
             "show_details": show

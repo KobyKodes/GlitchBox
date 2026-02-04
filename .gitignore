@@ -33,6 +33,10 @@ Thumbs.db
 *.log
 /tmp/
 
+# VidSrc scraper
+vidsrc-scraper/node_modules/
+vidsrc-scraper/.env
+
 # Distribution
 dist/
 build/

@@ -8968,7 +8968,8 @@
                 }
 
                 // Load with appropriate player (video element for direct, iframe for embed)
-                loadPlayerContent(streamUrl, startTime, streamType);
+                const subtitles = data.subtitles || [];
+                loadPlayerContent(streamUrl, startTime, streamType, subtitles);
 
                 // Broadcast content change to watchparty if host
                 if (watchpartyActive && isHost && socket) {
@@ -9037,7 +9038,8 @@
                 }
 
                 // Load with appropriate player (video element for direct, iframe for embed)
-                loadPlayerContent(streamUrl, startTime, streamType);
+                const subtitles = data.subtitles || [];
+                loadPlayerContent(streamUrl, startTime, streamType, subtitles);
 
                 // Show next episode button and check if there's a next episode
                 updateNextEpisodeButton();
@@ -9281,7 +9283,7 @@
             playTVEpisode(currentContentId, currentSelectedSeason, currentSelectedEpisode);
         }
 
-        function loadPlayerContent(url, startTime = null, streamType = 'embed') {
+        function loadPlayerContent(url, startTime = null, streamType = 'embed', subtitles = []) {
             const playerIframe = document.getElementById('contentPlayer');
             const playerVideo = document.getElementById('playerVideo');
             const placeholder = document.getElementById('playerPlaceholder');
@@ -9336,6 +9338,24 @@
                         window.hls.on(Hls.Events.MANIFEST_PARSED, function() {
                             console.log('HLS manifest parsed, ready to play');
 
+                            // Add subtitle tracks from scraper
+                            const existingTracks = playerVideo.querySelectorAll('track');
+                            existingTracks.forEach(t => t.remove());
+
+                            if (subtitles && subtitles.length > 0) {
+                                console.log(`[Subtitles] Adding ${subtitles.length} subtitle tracks`);
+                                subtitles.forEach((subUrl, idx) => {
+                                    const track = document.createElement('track');
+                                    track.kind = 'subtitles';
+                                    track.src = `${API_BASE_URL}/subtitles/proxy?url=${encodeURIComponent(subUrl)}`;
+                                    const langMatch = subUrl.match(/[._-](\w{2})\.(vtt|srt)/) || subUrl.match(/\/(\w{2})\.(vtt|srt)/);
+                                    track.srclang = langMatch ? langMatch[1] : 'en';
+                                    track.label = langMatch ? langMatch[1].toUpperCase() : (idx === 0 ? 'English' : `Track ${idx + 1}`);
+                                    if (idx === 0) track.default = true;
+                                    playerVideo.appendChild(track);
+                                });
+                            }
+
                             // Seek to start time if provided
                             if (startTime !== null && startTime > 0) {
                                 playerVideo.currentTime = startTime;
@@ -9370,7 +9390,24 @@
                     }
                     // Check if the browser supports HLS natively (Safari)
                     else if (playerVideo.canPlayType('application/vnd.apple.mpegurl')) {
+                        // Remove existing tracks and add subtitles
+                        const existingTracks = playerVideo.querySelectorAll('track');
+                        existingTracks.forEach(t => t.remove());
+
                         playerVideo.src = url;
+
+                        if (subtitles && subtitles.length > 0) {
+                            subtitles.forEach((subUrl, idx) => {
+                                const track = document.createElement('track');
+                                track.kind = 'subtitles';
+                                track.src = `${API_BASE_URL}/subtitles/proxy?url=${encodeURIComponent(subUrl)}`;
+                                const langMatch = subUrl.match(/[._-](\w{2})\.(vtt|srt)/) || subUrl.match(/\/(\w{2})\.(vtt|srt)/);
+                                track.srclang = langMatch ? langMatch[1] : 'en';
+                                track.label = langMatch ? langMatch[1].toUpperCase() : (idx === 0 ? 'English' : `Track ${idx + 1}`);
+                                if (idx === 0) track.default = true;
+                                playerVideo.appendChild(track);
+                            });
+                        }
 
                         if (startTime !== null && startTime > 0) {
                             playerVideo.addEventListener('loadedmetadata', function() {
