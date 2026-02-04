@@ -34,27 +34,45 @@ def scrape(tmdb_id, content_type='movie', season=None, episode=None):
     def handle_response(response):
         nonlocal hls_url, hls_content, referer
         url = response.url
-        # Capture m3u8 master/playlist URLs - skip redirects (3xx), only capture final response
-        if '.m3u8' in url and response.status >= 200 and response.status < 300:
-            log(f"Intercepted m3u8 (status {response.status}): {url}")
-            # Capture the response body so we don't need to re-fetch from CDN
+        if '.m3u8' not in url:
+            return
+
+        status = response.status
+        log(f"M3U8 response (status {status}): {url}")
+
+        if status >= 300 and status < 400:
+            # Redirect response - capture URL but can't read body
+            if hls_url is None:
+                hls_url = url
+                try:
+                    referer = response.request.headers.get('referer', '')
+                    log(f"Referer from redirect request: {referer}")
+                except Exception:
+                    pass
+            return
+
+        if status >= 200 and status < 300:
+            # Success - capture body and override URL with final destination
+            log(f"Got 200 m3u8 response, capturing body")
+            hls_url = url
             try:
                 hls_content = response.text()
                 log(f"Captured m3u8 content ({len(hls_content)} bytes)")
             except Exception as e:
                 log(f"Could not capture m3u8 body: {e}")
-            # Use the final URL (after redirect) as hls_url
-            hls_url = url
-            # Extract referer from the original request (walk up redirect chain)
             try:
                 req = response.request
-                # Walk up to the original request to get the referer
                 while req.redirected_from:
                     req = req.redirected_from
                 referer = req.headers.get('referer', '')
-                log(f"Referer from request: {referer}")
+                log(f"Referer from original request: {referer}")
             except Exception:
                 pass
+        else:
+            # Error response (404, etc.)
+            log(f"M3U8 error response: {status}")
+            if hls_url is None:
+                hls_url = url
 
     def handle_response_subtitles(response):
         nonlocal subtitles
