@@ -23,6 +23,8 @@ from datetime import datetime, timedelta
 import json
 import atexit
 import re
+import subprocess
+import time
 from urllib.parse import urlparse, parse_qs, quote
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from pymongo import MongoClient
@@ -115,6 +117,11 @@ atexit.register(save_all_caches)
 # Watchparty storage
 watchparty_rooms = {}  # {room_code: {host: sid, users: {sid: username}, content: {}, state: {}}}
 user_rooms = {}  # {sid: room_code}
+
+# Bingeflix scraper cache and concurrency control
+bingeflix_cache = {}  # {cache_key: {data: ..., timestamp: ...}}
+BINGEFLIX_CACHE_TTL = 15 * 60  # 15 minutes
+bingeflix_lock = eventlet.semaphore.Semaphore(1)
 
 class TMDBService:
     def __init__(self):
@@ -1438,6 +1445,101 @@ def get_tv_recommendations(tv_id):
     results = tmdb.get_tv_recommendations(tv_id, page)
     return jsonify(results)
 
+def extract_bingeflix_stream(tmdb_id, content_type='movie', season=None, episode=None):
+    """
+    Extract m3u8 stream from bingeflix.tv via standalone Playwright subprocess.
+    Returns dict with type/url/source/subtitles or None on failure.
+    """
+    cache_key = f"{tmdb_id}_{content_type}_{season}_{episode}"
+
+    # Check cache first
+    cached = bingeflix_cache.get(cache_key)
+    if cached and (time.time() - cached['timestamp']) < BINGEFLIX_CACHE_TTL:
+        print(f"[Bingeflix] Cache hit for {cache_key}")
+        return cached['data']
+
+    # Try to acquire semaphore (non-blocking) - only one browser at a time
+    if not bingeflix_lock.acquire(blocking=False):
+        print(f"[Bingeflix] Another scrape in progress, skipping")
+        return None
+
+    try:
+        # Build subprocess command
+        cmd = [sys.executable, 'bingeflix_scraper.py', str(tmdb_id), content_type]
+        if content_type == 'tv' and season and episode:
+            cmd.extend([str(season), str(episode)])
+
+        print(f"[Bingeflix] Running: {' '.join(cmd)}")
+
+        # Run subprocess via tpool to avoid blocking eventlet
+        result = eventlet.tpool.execute(
+            subprocess.run,
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=90,
+            cwd=os.path.dirname(os.path.abspath(__file__))
+        )
+
+        # Log stderr (debug output from scraper)
+        if result.stderr:
+            for line in result.stderr.strip().split('\n'):
+                print(f"[Bingeflix] {line}")
+
+        if result.returncode != 0:
+            print(f"[Bingeflix] Scraper exited with code {result.returncode}")
+            return None
+
+        # Parse JSON from stdout
+        try:
+            data = json.loads(result.stdout.strip())
+        except json.JSONDecodeError as e:
+            print(f"[Bingeflix] Failed to parse JSON output: {e}")
+            print(f"[Bingeflix] stdout was: {result.stdout[:500]}")
+            return None
+
+        if not data.get('success') or not data.get('hls_url'):
+            print(f"[Bingeflix] Scraper failed: {data.get('error', 'unknown')}")
+            return None
+
+        hls_url = data['hls_url']
+        referer = data.get('referer', 'https://bingeflix.tv/')
+        subtitles = data.get('subtitles', [])
+
+        print(f"[Bingeflix] Found stream: {hls_url}")
+        print(f"[Bingeflix] Referer: {referer}")
+        print(f"[Bingeflix] Subtitles: {len(subtitles)} tracks")
+
+        # Build proxied URL
+        proxied_url = f"/api/hls/proxy?url={quote(hls_url, safe='')}&referer={quote(referer, safe='')}"
+
+        stream_data = {
+            'type': 'direct',
+            'url': proxied_url,
+            'source': 'bingeflix',
+            'subtitles': subtitles,
+            'original_url': hls_url,
+            'referer': referer
+        }
+
+        # Cache successful result
+        bingeflix_cache[cache_key] = {
+            'data': stream_data,
+            'timestamp': time.time()
+        }
+
+        return stream_data
+
+    except subprocess.TimeoutExpired:
+        print(f"[Bingeflix] Scraper timed out (90s)")
+        return None
+    except Exception as e:
+        print(f"[Bingeflix] Error: {e}")
+        return None
+    finally:
+        bingeflix_lock.release()
+
+
 def call_vidsrc_scraper(tmdb_id, content_type='movie', season=None, episode=None):
     """
     Call the vidsrc-scraper Node.js service (Playwright-based) to get m3u8 streams.
@@ -1497,8 +1599,13 @@ def call_vidsrc_scraper(tmdb_id, content_type='movie', season=None, episode=None
 def extract_vidsrc_stream(tmdb_id, content_type='movie', season=None, episode=None):
     """
     Extract direct stream URL from VidSrc
-    Tries Playwright scraper first, then BeautifulSoup, then embed fallback.
+    Tries Bingeflix first, then Playwright scraper, then BeautifulSoup, then embed fallback.
     """
+    # Tier 0: Try Bingeflix scraper (local Playwright subprocess)
+    bingeflix_result = extract_bingeflix_stream(tmdb_id, content_type, season, episode)
+    if bingeflix_result:
+        return bingeflix_result
+
     # Tier 1: Try Playwright-based scraper service
     scraper_result = call_vidsrc_scraper(tmdb_id, content_type, season, episode)
     if scraper_result:

@@ -18054,12 +18054,19 @@
 
             // Include content data if available
             if (currentContentId) {
+                // Determine stream type based on current player state
+                const playerVideo = document.getElementById('playerVideo');
+                const isDirectStream = playerVideo && playerVideo.style.display !== 'none';
+                const currentStreamType = isDirectStream ? 'direct' : 'embed';
+
                 contentData = {
                     id: currentContentId,
                     title: currentContentData?.title || currentContentData?.name || 'Unknown',
                     type: currentContentType,
                     posterUrl: currentContentData?.poster_url || '',
-                    url: currentContentUrl
+                    url: currentContentUrl,
+                    stream_url: currentContentUrl,
+                    stream_type: currentStreamType
                 };
 
                 // Add season/episode for TV shows
@@ -18449,14 +18456,17 @@
             }
 
             const { id, title, type, season, episode, stream_url, stream_type, subtitles } = content;
+            // Also check for 'url' field (used when party is created vs content synced)
+            const actualStreamUrl = stream_url || content.url;
+            const actualStreamType = stream_type || (actualStreamUrl && actualStreamUrl.includes('.m3u8') ? 'direct' : null);
 
-            console.log(`[Content Sync] Syncing ${type}: ${title}`, { id, season, episode, stream_type });
+            console.log(`[Content Sync] Syncing ${type}: ${title}`, { id, season, episode, stream_type: actualStreamType, url: actualStreamUrl });
             showStatus(`Syncing content: ${title}`);
 
             try {
                 // If host provided stream data directly, use it (ensures same player type)
-                if (stream_url && stream_type) {
-                    console.log(`[Content Sync] Using host's stream directly: ${stream_type}`);
+                if (actualStreamUrl && actualStreamType) {
+                    console.log(`[Content Sync] Using host's stream directly: ${actualStreamType}`);
 
                     // Show player section
                     const playerSection = document.getElementById('playerSection');
@@ -18465,8 +18475,8 @@
                     }
 
                     // Load content directly with host's stream URL
-                    currentContentUrl = stream_url;
-                    loadPlayerContent(stream_url, null, stream_type, subtitles || []);
+                    currentContentUrl = actualStreamUrl;
+                    loadPlayerContent(actualStreamUrl, null, actualStreamType, subtitles || []);
 
                     // Update UI for TV shows
                     if (type === 'tv' && season && episode) {
