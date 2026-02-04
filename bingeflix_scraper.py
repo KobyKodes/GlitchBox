@@ -26,13 +26,11 @@ def log(msg):
 def scrape(tmdb_id, content_type='movie', season=None, episode=None):
     from playwright.sync_api import sync_playwright
 
-    hls_url = None
-    hls_content = None
-    referer = None
+    # Collect ALL m3u8 responses - the player may try multiple servers
+    m3u8_responses = []  # [{url, content, referer, status}]
     subtitles = []
 
     def handle_response(response):
-        nonlocal hls_url, hls_content, referer
         url = response.url
         if '.m3u8' not in url:
             return
@@ -40,47 +38,36 @@ def scrape(tmdb_id, content_type='movie', season=None, episode=None):
         status = response.status
         log(f"M3U8 response (status {status}): {url}")
 
-        if status >= 300 and status < 400:
-            # Redirect response - capture URL but can't read body
-            if hls_url is None:
-                hls_url = url
-                try:
-                    referer = response.request.headers.get('referer', '')
-                    log(f"Referer from redirect request: {referer}")
-                except Exception:
-                    pass
-            return
+        entry = {'url': url, 'content': None, 'referer': None, 'status': status}
 
+        # Try to capture response body (only works for non-redirect responses)
         if status >= 200 and status < 300:
-            # Success - capture body and override URL with final destination
-            log(f"Got 200 m3u8 response, capturing body")
-            hls_url = url
             try:
-                hls_content = response.text()
-                log(f"Captured m3u8 content ({len(hls_content)} bytes)")
+                body = response.text()
+                if body and '#EXTM3U' in body:
+                    entry['content'] = body
+                    log(f"Captured valid m3u8 content ({len(body)} bytes)")
+                else:
+                    log(f"Response body is not a valid m3u8")
             except Exception as e:
-                log(f"Could not capture m3u8 body: {e}")
-            try:
-                req = response.request
-                while req.redirected_from:
-                    req = req.redirected_from
-                referer = req.headers.get('referer', '')
-                log(f"Referer from original request: {referer}")
-            except Exception:
-                pass
-        else:
-            # Error response (404, etc.)
-            log(f"M3U8 error response: {status}")
-            if hls_url is None:
-                hls_url = url
+                log(f"Could not read body: {e}")
+
+        # Extract referer from the original request in the redirect chain
+        try:
+            req = response.request
+            while req.redirected_from:
+                req = req.redirected_from
+            entry['referer'] = req.headers.get('referer', '')
+        except Exception:
+            pass
+
+        m3u8_responses.append(entry)
 
     def handle_response_subtitles(response):
-        nonlocal subtitles
         url = response.url
         # Capture subtitle files
         if any(ext in url for ext in ['.vtt', '.srt']):
             log(f"Intercepted subtitle: {url}")
-            # Try to determine language from URL
             lang = 'unknown'
             lang_match = re.search(r'[/.](\w{2,3})\.(vtt|srt)', url)
             if lang_match:
@@ -129,28 +116,33 @@ def scrape(tmdb_id, content_type='movie', season=None, episode=None):
         page.on('response', handle_response)
         page.on('response', handle_response_subtitles)
 
+        play_selectors = [
+            'button[aria-label="Play"]',
+            '.play-button',
+            '.btn-play',
+            '[class*="play"]',
+            'button:has(svg)',
+            '.jw-icon-playback',
+            '#player',
+            '.player-wrapper',
+            'video',
+        ]
+
+        def has_good_m3u8():
+            """Check if we have an m3u8 with actual content (not just a URL)."""
+            return any(r['content'] for r in m3u8_responses)
+
         try:
             log("Navigating to page...")
             page.goto(target_url, wait_until='domcontentloaded', timeout=30000)
             log("Page loaded, waiting for m3u8...")
 
-            # Wait a bit for initial network activity
+            # Wait for initial network activity
             page.wait_for_timeout(3000)
 
-            # If no m3u8 yet, try clicking play buttons
-            if not hls_url:
+            # Try clicking play buttons
+            if not m3u8_responses:
                 log("No m3u8 yet, looking for play buttons...")
-                play_selectors = [
-                    'button[aria-label="Play"]',
-                    '.play-button',
-                    '.btn-play',
-                    '[class*="play"]',
-                    'button:has(svg)',
-                    '.jw-icon-playback',
-                    '#player',
-                    '.player-wrapper',
-                    'video',
-                ]
                 for selector in play_selectors:
                     try:
                         el = page.query_selector(selector)
@@ -158,13 +150,13 @@ def scrape(tmdb_id, content_type='movie', season=None, episode=None):
                             log(f"Clicking: {selector}")
                             el.click()
                             page.wait_for_timeout(2000)
-                            if hls_url:
+                            if m3u8_responses:
                                 break
                     except Exception:
                         continue
 
-            # If still no m3u8, try clicking on iframes that might contain the player
-            if not hls_url:
+            # Try iframes
+            if not m3u8_responses:
                 log("Checking iframes for player...")
                 frames = page.frames
                 for frame in frames:
@@ -179,20 +171,29 @@ def scrape(tmdb_id, content_type='movie', season=None, episode=None):
                                     log(f"Clicking in frame: {selector}")
                                     el.click()
                                     page.wait_for_timeout(2000)
-                                    if hls_url:
+                                    if m3u8_responses:
                                         break
                             except Exception:
                                 continue
-                        if hls_url:
+                        if m3u8_responses:
                             break
                     except Exception:
                         continue
 
-            # Final wait - poll for m3u8 up to 60s total
-            if not hls_url:
-                log("Waiting longer for m3u8 to appear...")
+            # We have at least one m3u8 URL - wait a bit more for the player
+            # to potentially try fallback servers (which might have valid content)
+            if m3u8_responses and not has_good_m3u8():
+                log("Have m3u8 URL(s) but no body yet, waiting for fallback servers...")
                 start = time.time()
-                while not hls_url and (time.time() - start) < 45:
+                while not has_good_m3u8() and (time.time() - start) < 15:
+                    page.wait_for_timeout(2000)
+                    log(f"Waiting for fallback... ({len(m3u8_responses)} responses so far, {int(time.time() - start)}s)")
+
+            # If no m3u8 at all, wait longer
+            if not m3u8_responses:
+                log("No m3u8 found, waiting longer...")
+                start = time.time()
+                while not m3u8_responses and (time.time() - start) < 30:
                     page.wait_for_timeout(2000)
                     log(f"Still waiting... ({int(time.time() - start)}s elapsed)")
 
@@ -201,25 +202,39 @@ def scrape(tmdb_id, content_type='movie', season=None, episode=None):
         finally:
             browser.close()
 
-    if hls_url:
-        # If no referer was captured, use a sensible default
-        if not referer:
-            referer = 'https://bingeflix.tv/'
+    # Pick the best m3u8 response
+    log(f"Total m3u8 responses collected: {len(m3u8_responses)}")
+    for i, r in enumerate(m3u8_responses):
+        log(f"  [{i}] status={r['status']} has_content={r['content'] is not None} url={r['url'][:80]}...")
 
-        result = {
-            'success': True,
-            'hls_url': hls_url,
-            'subtitles': subtitles,
-            'referer': referer,
-        }
-        if hls_content:
-            result['hls_content'] = hls_content
-        return result
-    else:
-        return {
-            'success': False,
-            'error': 'No m3u8 URL intercepted within timeout',
-        }
+    if not m3u8_responses:
+        return {'success': False, 'error': 'No m3u8 URL intercepted within timeout'}
+
+    # Prefer responses with actual m3u8 content, then 200 status, then any
+    best = None
+    for r in m3u8_responses:
+        if r['content']:
+            best = r
+            break
+    if not best:
+        for r in m3u8_responses:
+            if r['status'] >= 200 and r['status'] < 300:
+                best = r
+                break
+    if not best:
+        best = m3u8_responses[0]
+
+    referer = best['referer'] or 'https://bingeflix.tv/'
+
+    result = {
+        'success': True,
+        'hls_url': best['url'],
+        'subtitles': subtitles,
+        'referer': referer,
+    }
+    if best['content']:
+        result['hls_content'] = best['content']
+    return result
 
 
 def main():
