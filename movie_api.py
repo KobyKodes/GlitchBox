@@ -2743,6 +2743,28 @@ def handle_resync(data=None):
                 'currentTime': data.get('currentTime', 0)
             }, room=room_code)
 
+@socketio.on('manual_sync')
+def handle_manual_sync(data=None):
+    """Any user syncs everyone else to their current playback position"""
+    if data is None:
+        data = {}
+    sid = request.sid
+
+    if sid in user_rooms:
+        room_code = user_rooms[sid]
+        room = watchparty_rooms.get(room_code)
+
+        if room:
+            current_time = data.get('currentTime', 0)
+            username = room['users'].get(sid, 'Unknown')
+            room['state']['currentTime'] = current_time
+            print(f"[Sync] Manual sync by {username} at {current_time}s in room {room_code}")
+
+            emit('manual_sync', {
+                'currentTime': current_time,
+                'username': username
+            }, room=room_code, skip_sid=sid)
+
 # ============= END WATCHPARTY EVENTS =============
 
 # ============= SUPEREMBED STREAMING =============

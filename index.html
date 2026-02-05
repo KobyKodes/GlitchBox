@@ -12508,7 +12508,7 @@
         <div class="watchparty-users">
             <div class="watchparty-users-title">Watching (<span id="userCount">0</span>)</div>
             <div id="watchpartyUserList"></div>
-            <button class="resync-btn" id="resyncBtn" onclick="triggerResync()">Re-Sync All Users</button>
+            <button class="resync-btn" id="syncBtn" onclick="triggerSync()">Sync Everyone to Me</button>
         </div>
 
         <div class="watchparty-chat">
@@ -17883,6 +17883,15 @@
                 }
             });
 
+            socket.on('manual_sync', (data) => {
+                console.log('[Sync] Manual sync from', data.username, 'at', data.currentTime);
+                vidkingHostTime = data.currentTime;
+                isSyncing = true;
+                reloadIframeForSync(data.currentTime, true);
+                showStatus(`Synced to ${data.username}'s position`);
+                setTimeout(() => { isSyncing = false; }, 1000);
+            });
+
             socket.on('party_left', () => {
                 resetWatchparty();
             });
@@ -18158,10 +18167,10 @@
                 return;
             }
 
-            // Show/hide re-sync button (host only, coordinated mode only)
-            const resyncBtn = document.getElementById('resyncBtn');
-            if (resyncBtn) {
-                resyncBtn.style.display = (partySyncMode === 'coordinated' && isHost) ? 'block' : 'none';
+            // Show sync button for all users in full sync mode
+            const syncBtn = document.getElementById('syncBtn');
+            if (syncBtn) {
+                syncBtn.style.display = (partySyncMode === 'full') ? 'block' : 'none';
             }
         }
 
@@ -18179,9 +18188,10 @@
             socket.emit('start_countdown', { currentTime: vidkingHostTime });
         }
 
-        function triggerResync() {
-            if (!socket || !isHost) return;
-            socket.emit('resync', { currentTime: vidkingHostTime });
+        function triggerSync() {
+            if (!socket || !watchpartyActive) return;
+            socket.emit('manual_sync', { currentTime: vidkingHostTime });
+            showStatus('Syncing everyone to your position...');
         }
 
         function startCountdownSequence() {
@@ -18269,9 +18279,9 @@
             document.getElementById('countdownOverlay').classList.remove('active');
             updateSyncStatusBadge();
 
-            // Hide re-sync button
-            const resyncBtn = document.getElementById('resyncBtn');
-            if (resyncBtn) resyncBtn.style.display = 'none';
+            // Hide sync button
+            const syncBtn = document.getElementById('syncBtn');
+            if (syncBtn) syncBtn.style.display = 'none';
 
             // Unlock and restore previous video source
             unlockSourceAfterParty();
