@@ -17836,53 +17836,31 @@
             socket.on('playback_play', (data) => {
                 console.log('[Sync] Received playback_play from', data.username, 'at', data.currentTime);
                 vidkingHostTime = data.currentTime;
-                const playerVideo = document.getElementById('playerVideo');
 
-                isSyncing = true; // Prevent sync loop
-
-                if (playerVideo && playerVideo.style.display !== 'none') {
-                    playerVideo.currentTime = data.currentTime;
-                    playerVideo.play().catch(e => console.log('[Sync] Play prevented:', e));
-                }
-                // For iframes, VidKing postMessage handles outgoing sync;
-                // incoming play is informational (guest can re-sync to catch up)
-
+                isSyncing = true;
+                reloadIframeForSync(data.currentTime, true);
                 showStatus(`▶ ${data.username} played`);
-                setTimeout(() => { isSyncing = false; }, 500);
+                setTimeout(() => { isSyncing = false; }, 1000);
             });
 
             socket.on('playback_pause', (data) => {
                 console.log('[Sync] Received playback_pause from', data.username, 'at', data.currentTime);
                 vidkingHostTime = data.currentTime;
-                const playerVideo = document.getElementById('playerVideo');
 
-                isSyncing = true; // Prevent sync loop
-
-                if (playerVideo && playerVideo.style.display !== 'none') {
-                    playerVideo.currentTime = data.currentTime;
-                    playerVideo.pause();
-                }
-                // For iframes, VidKing postMessage handles outgoing sync;
-                // incoming pause is informational (guest can re-sync to catch up)
-
+                isSyncing = true;
+                reloadIframeForSync(data.currentTime, false);
                 showStatus(`⏸ ${data.username} paused`);
-                setTimeout(() => { isSyncing = false; }, 500);
+                setTimeout(() => { isSyncing = false; }, 1000);
             });
 
             socket.on('playback_seek', (data) => {
                 console.log('[Sync] Received playback_seek from', data.username, 'to', data.currentTime);
                 vidkingHostTime = data.currentTime;
-                const playerVideo = document.getElementById('playerVideo');
 
-                isSyncing = true; // Prevent sync loop
-
-                if (playerVideo && playerVideo.style.display !== 'none') {
-                    playerVideo.currentTime = data.currentTime;
-                }
-                // For iframes, guest can re-sync to vidkingHostTime via Sync button
-
+                isSyncing = true;
+                reloadIframeForSync(data.currentTime, true);
                 showStatus(`⏩ ${data.username} seeked`);
-                setTimeout(() => { isSyncing = false; }, 500);
+                setTimeout(() => { isSyncing = false; }, 1000);
             });
 
             socket.on('sync_status', (data) => {
@@ -18231,27 +18209,42 @@
             }, 1000);
         }
 
-        function reloadIframeForSync(startTime) {
+        let iframeReloadTimer = null; // Debounce iframe reloads
+
+        function reloadIframeForSync(startTime, autoPlay = true) {
             const playerIframe = document.getElementById('contentPlayer');
             const playerVideo = document.getElementById('playerVideo');
 
             if (playerVideo && playerVideo.style.display !== 'none') {
-                // Direct stream: seek to startTime and play
+                // Direct stream: seek to startTime and play/pause
                 if (startTime) playerVideo.currentTime = startTime;
-                console.log('[Sync] Playing direct stream at', startTime || 0);
-                playerVideo.play().catch(e => console.log('[Sync] Autoplay prevented:', e));
-            } else if (playerIframe && playerIframe.style.display !== 'none' && playerIframe.src) {
-                // Embed iframe: reload with timestamp and autoplay
-                console.log('[Sync] Reloading iframe for sync at', startTime || 0);
-                try {
-                    let url = new URL(playerIframe.src);
-                    if (startTime) url.searchParams.set('t', Math.floor(startTime));
-                    url.searchParams.set('autoplay', '1');
-                    playerIframe.src = 'about:blank';
-                    setTimeout(() => { playerIframe.src = url.toString(); }, 200);
-                } catch (e) {
-                    console.log('[Sync] Could not reload iframe:', e);
+                if (autoPlay) {
+                    playerVideo.play().catch(e => console.log('[Sync] Autoplay prevented:', e));
+                } else {
+                    playerVideo.pause();
                 }
+                console.log('[Sync] Direct stream', autoPlay ? 'playing' : 'paused', 'at', startTime || 0);
+            } else if (playerIframe && playerIframe.style.display !== 'none' && playerIframe.src) {
+                // Debounce rapid reloads (e.g. play then immediate pause)
+                if (iframeReloadTimer) clearTimeout(iframeReloadTimer);
+                iframeReloadTimer = setTimeout(() => {
+                    iframeReloadTimer = null;
+                    try {
+                        let url = new URL(playerIframe.src);
+                        // Use VidKing's progress param for start time
+                        if (startTime) url.searchParams.set('progress', Math.floor(startTime));
+                        if (autoPlay) {
+                            url.searchParams.set('autoPlay', 'true');
+                        } else {
+                            url.searchParams.delete('autoPlay');
+                        }
+                        console.log('[Sync] Reloading iframe at', startTime || 0, autoPlay ? '(autoplay)' : '(paused)');
+                        playerIframe.src = 'about:blank';
+                        setTimeout(() => { playerIframe.src = url.toString(); }, 200);
+                    } catch (e) {
+                        console.log('[Sync] Could not reload iframe:', e);
+                    }
+                }, 300);
             }
         }
 
