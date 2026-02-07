@@ -20383,7 +20383,7 @@
         let currentSportsSourceIndex = 0; // Track which source is currently selected
 
         // TopStreams additional source
-        const TOPSTREAMS_SCRAPE_URL = 'https://corsproxy.io/?url=' + encodeURIComponent('https://live2.totalsportek777.com/');
+        const TOPSTREAMS_SCRAPE_URL = 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://live2.totalsportek777.com/');
         const TOPSTREAMS_EMBED_BASE = 'https://topstreams.info/d/';
         let topstreamsMatchCache = null;
 
@@ -20497,13 +20497,13 @@
         // Map UI category slugs to TopStreams section heading patterns
         function mapCategoryToTopStreams(uiCategory) {
             const map = {
-                'football': ['premier league', 'la liga', 'serie a', 'bundesliga', 'ligue 1', 'champions league', 'europa league', 'fa cup', 'efl', 'carabao', 'copa del rey', 'coppa italia', 'dfb pokal', 'coupe de france', 'eredivisie', 'liga portugal', 'super lig', 'mls', 'saudi pro league', 'world cup', 'euro 20', 'afcon', 'copa america', 'concacaf', 'football'],
+                'football': ['premier league', 'la liga', 'serie a', 'bundesliga', 'ligue', 'champions league', 'europa league', 'fa cup', 'efl', 'carabao', 'copa del rey', 'coppa italia', 'dfb pokal', 'eredivisie', 'primeiraliga', 'super lig', 'superlig', 'swiss super league', 'mls', 'saudi pro league', 'world cup', 'euro 20', 'afcon', 'copa america', 'concacaf', 'england', 'japan j1', 'division 1', 'club friendly', 'olympic', 'football'],
                 'basketball': ['nba', 'euroleague', 'basketball'],
                 'american-football': ['nfl', 'american football', 'ncaa football'],
                 'hockey': ['nhl', 'ice hockey', 'hockey'],
                 'baseball': ['mlb', 'baseball'],
                 'motor-sports': ['formula 1', 'f1', 'motogp', 'nascar', 'indycar', 'motor'],
-                'fight': ['ufc', 'boxing', 'mma', 'bellator', 'pfl', 'wwe'],
+                'fight': ['ufc', 'boxing', 'mma', 'bellator', 'pfl', 'wwe', 'fight'],
                 'tennis': ['tennis', 'atp', 'wta', 'australian open', 'french open', 'wimbledon', 'us open'],
                 'rugby': ['rugby', 'six nations'],
                 'golf': ['golf', 'pga', 'masters'],
@@ -20520,47 +20520,77 @@
             const response = await fetchWithTimeout(TOPSTREAMS_SCRAPE_URL, 15000);
             const html = await response.text();
 
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
             const matches = [];
+
+            // One div-main-box contains all leagues. Walk headings (.my-1)
+            // and match links sequentially to associate each match with its league.
+            const container = doc.querySelector('.div-main-box') || doc.body;
             let currentSection = 'other';
 
-            // Split HTML into lines and parse structure
-            const lines = html.split('\n');
-            for (const line of lines) {
-                // Detect section headings (h2/h3 tags with league/sport names)
-                const headingMatch = line.match(/<h[23][^>]*>([^<]+)<\/h[23]>/i);
-                if (headingMatch) {
-                    currentSection = headingMatch[1].trim().toLowerCase();
+            const allElements = container.querySelectorAll('.my-1, a[href*="-vs-"]');
+            for (const el of allElements) {
+                // Section heading: .my-1 div contains a span with league name
+                if (el.classList.contains('my-1')) {
+                    const span = el.querySelector('span');
+                    if (span) currentSection = span.textContent.trim().toLowerCase();
                     continue;
                 }
 
-                // Match links like href="/{Team1}-vs-{Team2}/{EventId}"
-                const linkMatch = line.match(/href=["']\/([^"']+)-vs-([^"'\/]+)\/(\d+)["']/i);
-                if (linkMatch) {
-                    const team1Raw = linkMatch[1].replace(/-/g, ' ').trim();
-                    const team2Raw = linkMatch[2].replace(/-/g, ' ').trim();
-                    const eventId = linkMatch[3];
+                // Match link
+                const href = el.getAttribute('href') || '';
+                const idMatch = href.match(/\/(\d+)\s*$/);
+                if (!idMatch) continue;
+                const eventId = idMatch[1];
 
-                    // Try to extract status text near the link
-                    const statusMatch = line.match(/class=["'][^"']*status[^"']*["'][^>]*>([^<]+)</i) ||
-                                        line.match(/class=["'][^"']*time[^"']*["'][^>]*>([^<]+)</i) ||
-                                        line.match(/<span[^>]*>([^<]*(?:Started|Live|from now|ET|GMT|PM|AM)[^<]*)<\/span>/i);
-                    const status = statusMatch ? statusMatch[1].trim() : '';
+                const teamDivs = el.querySelectorAll('.col-12');
+                const team1 = teamDivs[0] ? teamDivs[0].textContent.trim() : '';
+                const team2 = teamDivs[1] ? teamDivs[1].textContent.trim() : '';
+                if (!team1 || !team2) continue;
 
-                    // Capitalize team names
-                    const capitalize = str => str.replace(/\b\w/g, c => c.toUpperCase());
-                    const team1 = capitalize(team1Raw);
-                    const team2 = capitalize(team2Raw);
+                const statusEl = el.querySelector('.col-3 span');
+                const status = statusEl ? statusEl.textContent.replace(/\s+/g, ' ').trim() : '';
 
-                    matches.push({
-                        id: eventId,
-                        title: `${team1} vs ${team2}`,
-                        category: currentSection,
-                        teams: { home: { name: team1 }, away: { name: team2 } },
-                        sources: [{ embedUrl: TOPSTREAMS_EMBED_BASE + eventId, _provider: 'topstreams' }],
-                        _provider: 'topstreams',
-                        _status: status
-                    });
-                }
+                matches.push({
+                    id: eventId,
+                    title: `${team1} vs ${team2}`,
+                    category: currentSection,
+                    teams: { home: { name: team1 }, away: { name: team2 } },
+                    sources: [{ embedUrl: TOPSTREAMS_EMBED_BASE + eventId, _provider: 'topstreams' }],
+                    _provider: 'topstreams',
+                    _status: status
+                });
+            }
+
+            // Also parse "Important Games" section (top-tournament, uses a.competition)
+            const importantLinks = doc.querySelectorAll('.top-tournament a.competition[href*="-vs-"]');
+            for (const link of importantLinks) {
+                const href = link.getAttribute('href') || '';
+                const idMatch = href.match(/\/(\d+)\s*$/);
+                if (!idMatch) continue;
+                const eventId = idMatch[1];
+
+                // Skip if already found in a league section
+                if (matches.some(m => m.id === eventId)) continue;
+
+                const teamDivs = link.querySelectorAll('.col-12');
+                const team1 = teamDivs[0] ? teamDivs[0].textContent.trim() : '';
+                const team2 = teamDivs[1] ? teamDivs[1].textContent.trim() : '';
+                if (!team1 || !team2) continue;
+
+                const statusEl = link.querySelector('.col-3 span');
+                const status = statusEl ? statusEl.textContent.replace(/\s+/g, ' ').trim() : '';
+
+                matches.push({
+                    id: eventId,
+                    title: `${team1} vs ${team2}`,
+                    category: 'featured',
+                    teams: { home: { name: team1 }, away: { name: team2 } },
+                    sources: [{ embedUrl: TOPSTREAMS_EMBED_BASE + eventId, _provider: 'topstreams' }],
+                    _provider: 'topstreams',
+                    _status: status
+                });
             }
 
             topstreamsMatchCache = matches;
