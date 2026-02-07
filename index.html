@@ -20382,9 +20382,10 @@
         let currentSportsMatch = null; // Store the current match being played
         let currentSportsSourceIndex = 0; // Track which source is currently selected
 
-        // SportSRC additional source
-        const SPORTSRC_BASE_URL = 'https://api.sportsrc.org/';
-        let sportsrcDetailCache = {};
+        // TopStreams additional source
+        const TOPSTREAMS_SCRAPE_URL = 'https://corsproxy.io/?url=' + encodeURIComponent('https://live2.totalsportek777.com/');
+        const TOPSTREAMS_EMBED_BASE = 'https://topstreams.info/d/';
+        let topstreamsMatchCache = null;
 
         // Timeout wrapper for fetch — rejects if not done in time
         function fetchWithTimeout(url, ms = 5000) {
@@ -20438,14 +20439,14 @@
                     return { sports, matches };
                 })();
 
-                const sportsrcPromise = (category && category !== 'other') ? (async () => {
-                    const srcCategory = sportsrcCategoryFor(category);
-                    const response = await fetch(`${SPORTSRC_BASE_URL}?data=matches&category=${encodeURIComponent(srcCategory)}`);
-                    const matches = await response.json();
-                    return (Array.isArray(matches) ? matches : []).map(m => normalizeSportSRCMatch(m, srcCategory));
-                })() : Promise.resolve([]);
+                const topstreamsPromise = (async () => {
+                    const allTs = await scrapeTopStreamsMatches();
+                    if (!category || category === 'other') return allTs;
+                    const patterns = mapCategoryToTopStreams(category);
+                    return allTs.filter(m => patterns.some(p => m.category.includes(p)));
+                })();
 
-                const [westreamResult, sportsrcResult] = await Promise.allSettled([westreamPromise, sportsrcPromise]);
+                const [westreamResult, topstreamsResult] = await Promise.allSettled([westreamPromise, topstreamsPromise]);
 
                 // Process westream results
                 let westreamMatches = [];
@@ -20456,16 +20457,16 @@
                     console.warn('Westream fetch failed:', westreamResult.reason);
                 }
 
-                // Process SportSRC results
-                let sportsrcMatches = [];
-                if (sportsrcResult.status === 'fulfilled') {
-                    sportsrcMatches = sportsrcResult.value;
+                // Process TopStreams results
+                let topstreamsMatches = [];
+                if (topstreamsResult.status === 'fulfilled') {
+                    topstreamsMatches = topstreamsResult.value;
                 } else {
-                    console.warn('SportSRC fetch failed:', sportsrcResult.reason);
+                    console.warn('TopStreams fetch failed:', topstreamsResult.reason);
                 }
 
                 // Merge both sources
-                allSportsMatches = mergeMatchLists(westreamMatches, sportsrcMatches);
+                allSportsMatches = mergeMatchLists(westreamMatches, topstreamsMatches);
 
                 // If a category was selected, find the matching sport ID for API calls
                 if (category && currentSportType) {
@@ -20493,70 +20494,94 @@
             }
         }
 
-        // Map UI category slugs to SportSRC category IDs
-        function sportsrcCategoryFor(uiCategory) {
+        // Map UI category slugs to TopStreams section heading patterns
+        function mapCategoryToTopStreams(uiCategory) {
             const map = {
-                'american-football': 'american-football',
-                'motor-sports': 'motor-sports',
-                'hockey': 'ice-hockey'
+                'football': ['premier league', 'la liga', 'serie a', 'bundesliga', 'ligue 1', 'champions league', 'europa league', 'fa cup', 'efl', 'carabao', 'copa del rey', 'coppa italia', 'dfb pokal', 'coupe de france', 'eredivisie', 'liga portugal', 'super lig', 'mls', 'saudi pro league', 'world cup', 'euro 20', 'afcon', 'copa america', 'concacaf', 'football'],
+                'basketball': ['nba', 'euroleague', 'basketball'],
+                'american-football': ['nfl', 'american football', 'ncaa football'],
+                'hockey': ['nhl', 'ice hockey', 'hockey'],
+                'baseball': ['mlb', 'baseball'],
+                'motor-sports': ['formula 1', 'f1', 'motogp', 'nascar', 'indycar', 'motor'],
+                'fight': ['ufc', 'boxing', 'mma', 'bellator', 'pfl', 'wwe'],
+                'tennis': ['tennis', 'atp', 'wta', 'australian open', 'french open', 'wimbledon', 'us open'],
+                'rugby': ['rugby', 'six nations'],
+                'golf': ['golf', 'pga', 'masters'],
+                'cricket': ['cricket', 'ipl', 'test match'],
+                'darts': ['darts', 'pdc']
             };
-            return map[uiCategory] || uiCategory;
+            return map[uiCategory] || [uiCategory];
         }
 
-        // Normalize a SportSRC match to match westream's shape
-        function normalizeSportSRCMatch(match, category) {
-            return {
-                id: match.id,
-                title: match.title,
-                category: match.category || category,
-                date: match.date ? new Date(match.date).toISOString() : null,
-                teams: match.teams || null,
-                image: match.poster || null,
-                thumbnail: match.poster || null,
-                sources: null, // lazy-loaded via detail endpoint
-                _provider: 'sportsrc',
-                _sportsrcCategory: match.category || category
-            };
+        // Scrape TopStreams matches from totalsportek page (one page has all sports)
+        async function scrapeTopStreamsMatches() {
+            if (topstreamsMatchCache) return topstreamsMatchCache;
+
+            const response = await fetchWithTimeout(TOPSTREAMS_SCRAPE_URL, 15000);
+            const html = await response.text();
+
+            const matches = [];
+            let currentSection = 'other';
+
+            // Split HTML into lines and parse structure
+            const lines = html.split('\n');
+            for (const line of lines) {
+                // Detect section headings (h2/h3 tags with league/sport names)
+                const headingMatch = line.match(/<h[23][^>]*>([^<]+)<\/h[23]>/i);
+                if (headingMatch) {
+                    currentSection = headingMatch[1].trim().toLowerCase();
+                    continue;
+                }
+
+                // Match links like href="/{Team1}-vs-{Team2}/{EventId}"
+                const linkMatch = line.match(/href=["']\/([^"']+)-vs-([^"'\/]+)\/(\d+)["']/i);
+                if (linkMatch) {
+                    const team1Raw = linkMatch[1].replace(/-/g, ' ').trim();
+                    const team2Raw = linkMatch[2].replace(/-/g, ' ').trim();
+                    const eventId = linkMatch[3];
+
+                    // Try to extract status text near the link
+                    const statusMatch = line.match(/class=["'][^"']*status[^"']*["'][^>]*>([^<]+)</i) ||
+                                        line.match(/class=["'][^"']*time[^"']*["'][^>]*>([^<]+)</i) ||
+                                        line.match(/<span[^>]*>([^<]*(?:Started|Live|from now|ET|GMT|PM|AM)[^<]*)<\/span>/i);
+                    const status = statusMatch ? statusMatch[1].trim() : '';
+
+                    // Capitalize team names
+                    const capitalize = str => str.replace(/\b\w/g, c => c.toUpperCase());
+                    const team1 = capitalize(team1Raw);
+                    const team2 = capitalize(team2Raw);
+
+                    matches.push({
+                        id: eventId,
+                        title: `${team1} vs ${team2}`,
+                        category: currentSection,
+                        teams: { home: { name: team1 }, away: { name: team2 } },
+                        sources: [{ embedUrl: TOPSTREAMS_EMBED_BASE + eventId, _provider: 'topstreams' }],
+                        _provider: 'topstreams',
+                        _status: status
+                    });
+                }
+            }
+
+            topstreamsMatchCache = matches;
+            return matches;
         }
 
-        // Lazy-load sources for a SportSRC match via the detail endpoint
-        async function fetchSportSRCDetail(match) {
-            const cacheKey = `${match._sportsrcCategory}:${match.id}`;
-            if (sportsrcDetailCache[cacheKey]) return sportsrcDetailCache[cacheKey];
-
-            const url = `${SPORTSRC_BASE_URL}?data=detail&category=${encodeURIComponent(match._sportsrcCategory)}&id=${encodeURIComponent(match.id)}`;
-            const response = await fetch(url);
-            const json = await response.json();
-
-            const sources = (json.data?.sources || []).map(s => ({
-                id: s.id,
-                source: s.source,
-                streamNo: s.streamNo,
-                embedUrl: s.embedUrl,
-                hd: s.hd,
-                viewers: s.viewers,
-                _provider: 'sportsrc'
-            }));
-
-            sportsrcDetailCache[cacheKey] = sources;
-            return sources;
-        }
-
-        // Merge westream and SportSRC match lists, deduplicating by title
-        function mergeMatchLists(westreamMatches, sportsrcMatches) {
+        // Merge westream and TopStreams match lists, deduplicating by title
+        function mergeMatchLists(westreamMatches, topstreamsMatches) {
             const merged = westreamMatches.map(m => ({ ...m, _provider: m._provider || 'westream' }));
 
-            for (const srcMatch of sportsrcMatches) {
-                const titleLower = (srcMatch.title || '').toLowerCase();
+            for (const tsMatch of topstreamsMatches) {
+                const titleLower = (tsMatch.title || '').toLowerCase();
                 const duplicate = merged.find(m => {
                     const mTitle = (m.title || '').toLowerCase();
                     return mTitle === titleLower && titleLower.length > 0;
                 });
 
                 if (duplicate) {
-                    duplicate._sportsrcDuplicate = srcMatch;
+                    duplicate._topstreamsDuplicate = tsMatch;
                 } else {
-                    merged.push(srcMatch);
+                    merged.push(tsMatch);
                 }
             }
 
@@ -20601,7 +20626,7 @@
                         return await response.json();
                     })();
 
-                    // Find the UI category slug for SportSRC
+                    // Filter TopStreams cached matches by current sport
                     const uiCategory = Object.entries({
                         'football': 'Football', 'basketball': 'Basketball',
                         'american-football': 'American Football', 'hockey': 'Ice Hockey',
@@ -20610,21 +20635,21 @@
                         'golf': 'Golf', 'cricket': 'Cricket', 'darts': 'Darts'
                     }).find(([, v]) => v === currentSportType || v.toLowerCase() === String(currentSportType).toLowerCase())?.[0];
 
-                    const sportsrcPromise = uiCategory ? (async () => {
-                        const srcCat = sportsrcCategoryFor(uiCategory);
-                        const response = await fetch(`${SPORTSRC_BASE_URL}?data=matches&category=${encodeURIComponent(srcCat)}`);
-                        const matches = await response.json();
-                        return (Array.isArray(matches) ? matches : []).map(m => normalizeSportSRCMatch(m, srcCat));
-                    })() : Promise.resolve([]);
+                    const topstreamsPromise = (async () => {
+                        const allTs = topstreamsMatchCache || await scrapeTopStreamsMatches();
+                        if (!uiCategory) return allTs;
+                        const patterns = mapCategoryToTopStreams(uiCategory);
+                        return allTs.filter(m => patterns.some(p => m.category.includes(p)));
+                    })();
 
-                    const [wsResult, srcResult] = await Promise.allSettled([westreamPromise, sportsrcPromise]);
+                    const [wsResult, tsResult] = await Promise.allSettled([westreamPromise, topstreamsPromise]);
 
                     const wsMatches = wsResult.status === 'fulfilled' ? wsResult.value : [];
-                    const srcMatches = srcResult.status === 'fulfilled' ? srcResult.value : [];
+                    const tsMatches = tsResult.status === 'fulfilled' ? tsResult.value : [];
                     if (wsResult.status === 'rejected') console.warn('Westream sport fetch failed:', wsResult.reason);
-                    if (srcResult.status === 'rejected') console.warn('SportSRC sport fetch failed:', srcResult.reason);
+                    if (tsResult.status === 'rejected') console.warn('TopStreams sport fetch failed:', tsResult.reason);
 
-                    sportMatches = mergeMatchLists(Array.isArray(wsMatches) ? wsMatches : [], srcMatches);
+                    sportMatches = mergeMatchLists(Array.isArray(wsMatches) ? wsMatches : [], tsMatches);
                 } else {
                     sportMatches = allSportsMatches;
                 }
@@ -20637,23 +20662,21 @@
                     const liveResponse = await fetchWithTimeout(`${WESTREAM_BASE_URL}/matches/live`);
                     const allLiveMatches = await liveResponse.json();
 
-                    // Also include SportSRC matches that are within ~2 hours of now as "live"
-                    const now = Date.now();
-                    const twoHours = 2 * 60 * 60 * 1000;
-                    const liveSportsrc = sportMatches.filter(m =>
-                        m._provider === 'sportsrc' && m.date &&
-                        Math.abs(new Date(m.date).getTime() - now) < twoHours
+                    // Also include TopStreams matches whose status indicates live
+                    const liveTopstreams = sportMatches.filter(m =>
+                        m._provider === 'topstreams' && m._status &&
+                        /started|live|playing|progress/i.test(m._status)
                     );
 
                     let combinedLive = mergeMatchLists(
                         Array.isArray(allLiveMatches) ? allLiveMatches : [],
-                        liveSportsrc
+                        liveTopstreams
                     );
 
                     if (currentSportType) {
                         filteredMatches = combinedLive.filter(match =>
                             match.category === currentSportType ||
-                            match._provider === 'sportsrc'
+                            match._provider === 'topstreams'
                         );
                     } else {
                         filteredMatches = combinedLive;
@@ -20917,29 +20940,13 @@
                 return;
             }
 
-            // Lazy-load sources for SportSRC matches
-            if (match.sources === null && match._provider === 'sportsrc') {
-                showStatus('Loading stream sources...');
-                try {
-                    match.sources = await fetchSportSRCDetail(match);
-                } catch (e) {
-                    console.error('Failed to load SportSRC sources:', e);
-                    showError('Failed to load stream sources');
-                    return;
+            // If match exists in both APIs, append TopStreams source
+            if (match._topstreamsDuplicate && !match._topstreamsDuplicate._sourcesAppended) {
+                const tsSources = match._topstreamsDuplicate.sources || [];
+                if (tsSources.length > 0) {
+                    match.sources = [...(match.sources || []), ...tsSources];
                 }
-            }
-
-            // If match exists in both APIs, also fetch SportSRC sources and append
-            if (match._sportsrcDuplicate && !match._sportsrcDuplicate._sourcesFetched) {
-                try {
-                    const extraSources = await fetchSportSRCDetail(match._sportsrcDuplicate);
-                    if (extraSources.length > 0) {
-                        match.sources = [...(match.sources || []), ...extraSources];
-                    }
-                    match._sportsrcDuplicate._sourcesFetched = true;
-                } catch (e) {
-                    console.warn('Failed to load extra SportSRC sources:', e);
-                }
+                match._topstreamsDuplicate._sourcesAppended = true;
             }
 
             // Get streaming source
@@ -20957,7 +20964,7 @@
 
             // Build the embed URL based on provider
             let embedUrl;
-            if (selectedSource._provider === 'sportsrc') {
+            if (selectedSource._provider === 'topstreams') {
                 embedUrl = selectedSource.embedUrl;
             } else {
                 const source = selectedSource.source;
@@ -21083,8 +21090,8 @@
                 // Get source name with provider tag (only show tag if mixed providers)
                 const currentSource = sources[currentSportsSourceIndex];
                 const sourceName = currentSource?.source?.toUpperCase() || `Source ${currentSportsSourceIndex + 1}`;
-                const hasMultipleProviders = sources.some(s => s._provider === 'sportsrc') && sources.some(s => !s._provider || s._provider === 'westream');
-                const providerTag = hasMultipleProviders ? (currentSource?._provider === 'sportsrc' ? '[SRC] ' : '[WS] ') : '';
+                const hasMultipleProviders = sources.some(s => s._provider === 'topstreams') && sources.some(s => !s._provider || s._provider === 'westream');
+                const providerTag = hasMultipleProviders ? (currentSource?._provider === 'topstreams' ? '[TS] ' : '[WS] ') : '';
 
                 btnText.textContent = `${providerTag}${sourceName} (${currentSportsSourceIndex + 1}/${sources.length})`;
             } else {
@@ -21117,8 +21124,8 @@
 
                 const currentSource = sources[currentSportsSourceIndex];
                 const sourceName = currentSource.source.toUpperCase();
-                const hasMultipleProviders = sources.some(s => s._provider === 'sportsrc') && sources.some(s => !s._provider || s._provider === 'westream');
-                const providerTag = hasMultipleProviders ? (currentSource._provider === 'sportsrc' ? '[SRC] ' : '[WS] ') : '';
+                const hasMultipleProviders = sources.some(s => s._provider === 'topstreams') && sources.some(s => !s._provider || s._provider === 'westream');
+                const providerTag = hasMultipleProviders ? (currentSource._provider === 'topstreams' ? '[TS] ' : '[WS] ') : '';
                 showStatus(`Switched to ${providerTag}${sourceName} (${currentSportsSourceIndex + 1}/${sources.length})`);
             } else {
                 showError('Unable to switch source');
