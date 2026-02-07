@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <meta http-equiv="Permissions-Policy" content="fullscreen=*">
     <title>GlitchBox - Stream Movies & TV Shows</title>
-    <link rel="icon" type="image/png" href="Icons/GlitchBoxIcon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="Icons/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="Icons/favicon-16x16.png" />
     <link rel="apple-touch-icon" href="Icons/GlitchBoxIcon.png" />
+    <link rel="manifest" href="manifest.json" />
 
     <!-- IMPORTANT: Define all onclick handler functions FIRST before any HTML is parsed -->
 
@@ -24078,5 +24080,6 @@
     // ============= END LIQUID GLASS DOCK CONTROLLER =============
     </script>
 
+<script>if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
 </body>
 </html>
