@@ -4537,18 +4537,12 @@
             }
 
             .watchlist-trigger-btn {
-                padding: 10px 16px;
-                font-size: 15px;
+                padding: 10px 12px;
             }
 
             .watchlist-trigger-btn img {
                 width: 18px !important;
                 height: 18px !important;
-            }
-
-            .watchlist-slide-panel {
-                width: calc(100vw - 40px);
-                max-width: 340px;
             }
 
             /* Live container - tablet */
@@ -4731,10 +4725,7 @@
             }
 
             .watchlist-trigger-btn {
-                padding: 8px 12px;
-                font-size: 14px;
-                border-radius: 8px;
-                gap: 6px;
+                padding: 8px 10px;
             }
 
             .watchlist-trigger-btn img {
@@ -4742,10 +4733,15 @@
                 height: 16px !important;
             }
 
-            .watchlist-slide-panel {
-                width: calc(100vw - 24px);
-                max-width: none;
-                left: -8px;
+            .wl-pill {
+                font-size: 17px;
+                padding: 8px 16px;
+            }
+
+            .wl-item-pill {
+                font-size: 15px;
+                padding: 6px 14px;
+                max-width: 240px;
             }
 
             /* Live container - mobile */
@@ -5977,279 +5973,287 @@
         }
 
         .watchlist-trigger-btn {
+            font-family: 'VT323', monospace;
+            padding: 12px 16px;
+            background: transparent;
+            border: none;
+            color: var(--primary-color, #00ff9f);
+            font-size: 24px;
+            cursor: pointer;
+            border-radius: 50px;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 12px 18px;
-            background: var(--bg-elevated, #3A352E);
-            border: 1px solid var(--border-subtle, rgba(245, 166, 35, 0.15));
-            border-radius: 12px;
-            color: var(--text-primary, #F5F0E8);
-            font-family: 'Outfit', sans-serif;
-            font-size: 15px;
-            font-weight: 500;
-            cursor: pointer;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            justify-content: center;
+            gap: 8px;
+            box-shadow: none;
+            position: relative;
+            z-index: 2;
         }
 
         .watchlist-trigger-btn:hover {
-            background: var(--primary-color, #F5A623);
-            color: var(--bg-dark, #1A1714);
-            border-color: var(--primary-color, #F5A623);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(245, 166, 35, 0.25);
-        }
-
-        .watchlist-trigger-btn svg {
-            transition: transform 0.2s ease;
-        }
-
-        .watchlist-trigger-btn:hover svg {
             transform: scale(1.1);
         }
 
-        .watchlist-trigger-label {
-            letter-spacing: 0.02em;
+        .watchlist-trigger-btn img {
+            image-rendering: pixelated;
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
         }
 
-        /* Slide Panel */
+        .watchlist-trigger-btn.menu-open img {
+            transform: rotate(45deg);
+            opacity: 0.9;
+        }
+
+        /* Watchlist Dropdown - transparent flex column of floating pills */
         .watchlist-slide-panel {
             position: absolute;
-            top: calc(100% + 12px);
-            left: 0;
-            width: 380px;
-            max-height: 75vh;
-            background: linear-gradient(145deg, #1a1408 0%, #0f0c05 100%);
-            border: 3px solid var(--primary-color, #F5A623);
-            border-radius: 12px;
-            box-shadow: 0 0 30px rgba(245, 166, 35, 0.3);
-            opacity: 0;
-            visibility: hidden;
-            transform: translateX(-100%);
-            transform-origin: top left;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: hidden;
+            top: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
             flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            pointer-events: none;
+            z-index: 1;
+            max-height: 80vh;
+            overflow-y: auto;
+            overflow-x: visible;
+            padding: 4px 0;
+            /* Hide scrollbar */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
+        .watchlist-slide-panel::-webkit-scrollbar { display: none; }
 
         .watchlist-slide-panel.active {
-            opacity: 1;
-            visibility: visible;
-            transform: translateX(0);
+            pointer-events: auto;
         }
 
-        /* Panel Header */
-        .watchlist-slide-header {
-            padding: 20px 24px 16px;
-            border-bottom: 1px solid var(--border-subtle, rgba(245, 166, 35, 0.1));
-            background: linear-gradient(180deg, rgba(245, 166, 35, 0.04) 0%, transparent 100%);
-        }
-
-        .watchlist-slide-title-row {
+        /* Lists container inside the dropdown */
+        .watchlist-slide-lists {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
+            gap: 8px;
+            width: 100%;
         }
 
-        .watchlist-slide-title {
-            font-family: 'Outfit', sans-serif;
+        /* Each watchlist name = a floating pill (identical to .user-menu-item) */
+        .wl-pill {
+            font-family: 'VT323', monospace;
+            padding: 10px 22px;
+            background: rgba(15, 15, 30, 0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1.5px solid rgba(0, 255, 159, 0.25);
+            color: var(--primary-color, #00ff9f);
             font-size: 20px;
-            font-weight: 600;
-            color: var(--text-primary, #F5F0E8);
-            margin: 0;
-            letter-spacing: -0.01em;
+            cursor: pointer;
+            border-radius: 50px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            white-space: nowrap;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 10px rgba(0, 255, 159, 0.1);
+            opacity: 0;
+            transform: translateY(12px) scale(0.8);
+            filter: blur(8px);
+            transition: opacity 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        filter 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        background 0.2s ease,
+                        border-color 0.2s ease,
+                        box-shadow 0.2s ease;
+            position: relative;
         }
 
-        .watchlist-slide-close {
-            width: 36px;
-            height: 36px;
+        .watchlist-slide-panel.active .wl-pill {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0px);
+        }
+
+        /* Staggered animation delays */
+        .watchlist-slide-panel.active .wl-pill:nth-child(1) { transition-delay: 0.04s; }
+        .watchlist-slide-panel.active .wl-pill:nth-child(2) { transition-delay: 0.08s; }
+        .watchlist-slide-panel.active .wl-pill:nth-child(3) { transition-delay: 0.12s; }
+        .watchlist-slide-panel.active .wl-pill:nth-child(4) { transition-delay: 0.16s; }
+        .watchlist-slide-panel.active .wl-pill:nth-child(5) { transition-delay: 0.20s; }
+        .watchlist-slide-panel.active .wl-pill:nth-child(6) { transition-delay: 0.24s; }
+        .watchlist-slide-panel.active .wl-pill:nth-child(7) { transition-delay: 0.28s; }
+        .watchlist-slide-panel.active .wl-pill:nth-child(8) { transition-delay: 0.32s; }
+
+        .wl-pill:hover {
+            background: rgba(0, 255, 159, 0.15);
+            border-color: var(--primary-color, #00ff9f);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5), 0 0 18px rgba(0, 255, 159, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* Active/selected list pill */
+        .wl-pill.wl-active {
+            background: rgba(0, 255, 159, 0.2);
+            border-color: var(--primary-color, #00ff9f);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 255, 159, 0.35);
+        }
+
+        /* Pill count badge */
+        .wl-pill-count {
+            font-size: 14px;
+            opacity: 0.6;
+            margin-left: 2px;
+        }
+
+        /* Pill action buttons (rename/delete) - appear on hover */
+        .wl-pill-actions {
+            display: flex;
+            gap: 2px;
+            margin-left: 4px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .wl-pill:hover .wl-pill-actions { opacity: 1; }
+
+        .wl-pill-action {
+            width: 22px;
+            height: 22px;
             display: flex;
             align-items: center;
             justify-content: center;
             background: transparent;
             border: none;
-            border-radius: 10px;
-            color: var(--text-secondary, #A39E94);
+            border-radius: 50%;
+            color: inherit;
             cursor: pointer;
+            padding: 0;
+            opacity: 0.5;
             transition: all 0.15s ease;
         }
+        .wl-pill-action:hover { opacity: 1; }
+        .wl-pill-action.wl-delete:hover { color: #ff6b6b; }
+        .wl-pill-action.wl-rename:hover { color: var(--accent-color, #00d9ff); }
+        .wl-pill-action svg { width: 12px; height: 12px; }
 
-        .watchlist-slide-close:hover {
-            background: rgba(245, 166, 35, 0.12);
-            color: var(--text-primary, #F5F0E8);
+        /* Create new list pill - dashed border variant */
+        .wl-pill-create {
+            border-style: dashed;
+            border-color: rgba(0, 255, 159, 0.35);
+            color: var(--primary-color, #00ff9f);
+            font-size: 18px;
+            opacity: 0;
+            transform: translateY(12px) scale(0.8);
+            filter: blur(8px);
+        }
+        .watchlist-slide-panel.active .wl-pill-create {
+            opacity: 0.7;
+            transform: translateY(0) scale(1);
+            filter: blur(0px);
+        }
+        .wl-pill-create:hover {
+            opacity: 1 !important;
+            border-style: solid;
+            background: rgba(0, 255, 159, 0.1);
         }
 
-        /* Lists View */
-        .watchlist-slide-lists {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
-        }
-
-        .watchlist-slide-list-card {
+        /* Item cards that expand below a selected list pill */
+        .wl-items-container {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 14px;
-            padding: 16px;
-            margin-bottom: 8px;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid transparent;
-            border-radius: 14px;
+            gap: 6px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .wl-item-pill {
+            font-family: 'VT323', monospace;
+            padding: 8px 18px;
+            background: rgba(15, 15, 30, 0.82);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            color: #fff;
+            font-size: 17px;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .watchlist-slide-list-card:hover {
-            background: rgba(245, 166, 35, 0.08);
-            border-color: rgba(245, 166, 35, 0.2);
-            transform: translateX(4px);
-        }
-
-        .watchlist-slide-list-icon {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, var(--primary-color, #F5A623) 0%, var(--primary-muted, #D4912A) 100%);
-            border-radius: 12px;
+            border-radius: 50px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: var(--bg-dark, #1A1714);
-            font-size: 20px;
-            box-shadow: 0 4px 12px rgba(245, 166, 35, 0.25);
-        }
-
-        .watchlist-slide-list-icon svg {
-            width: 22px;
-            height: 22px;
-        }
-
-        .watchlist-slide-list-details {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .watchlist-slide-list-name {
-            font-family: 'Outfit', sans-serif;
-            font-size: 16px;
-            font-weight: 500;
-            color: var(--text-primary, #F5F0E8);
-            margin-bottom: 4px;
+            gap: 10px;
             white-space: nowrap;
+            box-shadow: 0 3px 16px rgba(0, 0, 0, 0.35), 0 0 8px rgba(0, 217, 255, 0.08);
+            opacity: 0;
+            transform: translateY(10px) scale(0.85);
+            filter: blur(6px);
+            transition: opacity 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        filter 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        background 0.2s ease,
+                        border-color 0.2s ease;
+            max-width: 280px;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        .watchlist-slide-list-count {
-            font-family: 'Outfit', sans-serif;
-            font-size: 13px;
-            color: var(--text-secondary, #A39E94);
-        }
-
-        .watchlist-slide-list-arrow {
-            color: var(--text-secondary, #A39E94);
-            opacity: 0;
-            transform: translateX(-8px);
-            transition: all 0.2s ease;
-        }
-
-        .watchlist-slide-list-card:hover .watchlist-slide-list-arrow {
+        .wl-item-pill.wl-item-visible {
             opacity: 1;
-            transform: translateX(0);
+            transform: translateY(0) scale(1);
+            filter: blur(0px);
         }
 
-        /* Delete list button - subtle, appears on hover */
-        .watchlist-slide-list-delete {
-            position: absolute;
-            top: 50%;
-            right: 40px;
-            transform: translateY(-50%);
+        .wl-item-pill:hover {
+            background: rgba(0, 217, 255, 0.12);
+            border-color: var(--accent-color, #00d9ff);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 14px rgba(0, 217, 255, 0.2);
+            transform: scale(1.04);
+        }
+
+        .wl-item-poster {
             width: 28px;
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: transparent;
-            border: none;
+            height: 42px;
             border-radius: 6px;
-            color: var(--text-secondary, #666);
-            cursor: pointer;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .wl-item-title {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 180px;
+        }
+
+        .wl-item-type {
+            font-size: 12px;
+            padding: 2px 8px;
+            background: rgba(0, 217, 255, 0.15);
+            border-radius: 20px;
+            color: var(--accent-color, #00d9ff);
+            flex-shrink: 0;
+        }
+
+        /* Empty list message pill */
+        .wl-empty-pill {
+            font-family: 'VT323', monospace;
+            padding: 8px 18px;
+            background: rgba(15, 15, 30, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 16px;
+            border-radius: 50px;
             opacity: 0;
-            transition: all 0.2s ease;
-            z-index: 2;
+            transform: translateY(10px) scale(0.85);
+            filter: blur(6px);
+            transition: opacity 0.25s ease, transform 0.25s ease, filter 0.25s ease;
         }
-
-        .watchlist-slide-list-delete svg {
-            width: 14px;
-            height: 14px;
-            transition: transform 0.2s ease;
-        }
-
-        .watchlist-slide-list-card {
-            position: relative;
-        }
-
-        .watchlist-slide-list-card:hover .watchlist-slide-list-delete {
-            opacity: 0.5;
-        }
-
-        .watchlist-slide-list-delete:hover {
-            opacity: 1 !important;
-            color: #ff6b6b;
-            background: rgba(255, 107, 107, 0.1);
-        }
-
-        .watchlist-slide-list-delete:hover svg {
-            transform: scale(1.1);
-        }
-
-        .watchlist-slide-list-delete:active svg {
-            transform: scale(0.95);
-        }
-
-        .watchlist-slide-list-rename {
-            position: absolute;
-            top: 50%;
-            right: 68px;
-            transform: translateY(-50%);
-            width: 28px;
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: transparent;
-            border: none;
-            border-radius: 6px;
-            color: var(--text-secondary, #666);
-            cursor: pointer;
-            opacity: 0;
-            transition: all 0.2s ease;
-            z-index: 2;
-        }
-
-        .watchlist-slide-list-rename svg {
-            width: 14px;
-            height: 14px;
-            transition: transform 0.2s ease;
-        }
-
-        .watchlist-slide-list-card:hover .watchlist-slide-list-rename {
-            opacity: 0.5;
-        }
-
-        .watchlist-slide-list-rename:hover {
-            opacity: 1 !important;
-            color: var(--primary-color, #00ff9f);
-            background: rgba(0, 255, 159, 0.1);
-        }
-
-        .watchlist-slide-list-rename:hover svg {
-            transform: scale(1.1);
-        }
-
-        .watchlist-slide-list-rename:active svg {
-            transform: scale(0.95);
+        .wl-empty-pill.wl-item-visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0px);
         }
 
         /* Rename list modal */
@@ -6535,169 +6539,10 @@
             color: #0f0f1e;
         }
 
-        /* Items View */
-        .watchlist-slide-items {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
-        }
-
-        .watchlist-slide-back {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 14px;
-            margin-bottom: 16px;
-            background: rgba(245, 166, 35, 0.08);
-            border: 1px solid rgba(245, 166, 35, 0.15);
-            border-radius: 10px;
-            color: var(--primary-color, #F5A623);
-            font-family: 'Outfit', sans-serif;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.15s ease;
-        }
-
-        .watchlist-slide-back:hover {
-            background: rgba(245, 166, 35, 0.15);
-            border-color: rgba(245, 166, 35, 0.3);
-        }
-
-        .watchlist-slide-items-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        /* Individual Item Card */
-        .watchlist-item-card {
-            display: flex;
-            gap: 14px;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid transparent;
-            border-radius: 14px;
-            cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .watchlist-item-card:hover {
-            background: rgba(245, 166, 35, 0.06);
-            border-color: rgba(245, 166, 35, 0.15);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-        }
-
-        .watchlist-item-poster {
-            width: 64px;
-            height: 96px;
-            border-radius: 10px;
-            object-fit: cover;
-            background: var(--bg-medium, #242019);
-            flex-shrink: 0;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        .watchlist-item-info {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            min-width: 0;
-            padding: 4px 0;
-        }
-
-        .watchlist-item-title {
-            font-family: 'Outfit', sans-serif;
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text-primary, #F5F0E8);
-            margin-bottom: 6px;
-            line-height: 1.3;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .watchlist-item-meta {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .watchlist-item-type {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 4px 10px;
-            background: rgba(245, 166, 35, 0.12);
-            border-radius: 6px;
-            font-family: 'Outfit', sans-serif;
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--primary-color, #F5A623);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .watchlist-item-rating {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            font-family: 'Outfit', sans-serif;
-            font-size: 13px;
-            color: var(--text-secondary, #A39E94);
-        }
-
-        .watchlist-item-rating svg {
-            width: 14px;
-            height: 14px;
-            color: #FFD700;
-            fill: #FFD700;
-        }
-
-        .watchlist-item-rating-value {
-            font-weight: 600;
-            color: var(--text-primary, #F5F0E8);
-        }
-
-        /* Empty State */
-        .watchlist-slide-empty {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 48px 24px;
-            text-align: center;
-        }
-
-        .watchlist-slide-empty-icon {
-            width: 72px;
-            height: 72px;
-            margin-bottom: 20px;
-            background: rgba(245, 166, 35, 0.08);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary-color, #F5A623);
-            opacity: 0.6;
-        }
-
-        .watchlist-slide-empty-icon svg {
-            width: 32px;
-            height: 32px;
-        }
-
-        .watchlist-slide-empty-text {
-            font-family: 'Outfit', sans-serif;
-            font-size: 15px;
-            color: var(--text-secondary, #A39E94);
-            line-height: 1.5;
-        }
+        /* Legacy items view classes kept for compatibility */
+        .watchlist-slide-items { display: none; }
+        .watchlist-slide-back { display: none; }
+        .watchlist-slide-items-grid { display: none; }
 
         /* Phosphor theme specific - show watchlist container */
         [data-theme="phosphor"] .watchlist-container {
@@ -7004,37 +6849,8 @@
         }
 
         /* ============= CREATE NEW LIST BUTTON ============= */
-        .watchlist-slide-create-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            width: 100%;
-            padding: 14px 20px;
-            margin-bottom: 16px;
-            background: linear-gradient(135deg, rgba(0, 255, 159, 0.15), rgba(0, 217, 255, 0.15));
-            border: 2px dashed var(--primary-color, #00ff9f);
-            border-radius: 12px;
-            color: var(--primary-color, #00ff9f);
-            font-family: 'VT323', monospace;
-            font-size: 18px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .watchlist-slide-create-btn:hover {
-            background: linear-gradient(135deg, rgba(0, 255, 159, 0.25), rgba(0, 217, 255, 0.25));
-            border-style: solid;
-            transform: translateY(-2px);
-            box-shadow: 0 0 20px rgba(0, 255, 159, 0.4);
-        }
-
-        .watchlist-slide-create-btn svg {
-            width: 20px;
-            height: 20px;
-        }
+        /* Legacy create btn - now uses .wl-pill-create */
+        .watchlist-slide-create-btn { display: none; }
 
         /* ============= LIVE SECTION CONTAINER & PANEL ============= */
         .live-container {
@@ -7148,16 +6964,16 @@
 
         /* J's Special - Colorful Watchlist Button */
         [data-theme="jspecial"] .watchlist-trigger-btn {
-            background: linear-gradient(135deg, #00bfff, #1e90ff);
-            border: 3px solid #00bfff;
-            color: #000;
-            box-shadow: 0 0 20px rgba(0, 191, 255, 0.6);
+            background: transparent;
+            border: none;
+            color: var(--primary-color, #00ff9f);
+            box-shadow: none;
         }
 
         [data-theme="jspecial"] .watchlist-trigger-btn:hover {
-            background: linear-gradient(135deg, #1e90ff, #00bfff);
-            box-shadow: 0 0 30px rgba(0, 191, 255, 0.8);
-            transform: translateY(-3px) scale(1.05);
+            background: transparent;
+            box-shadow: none;
+            transform: scale(1.1);
         }
 
         /* J's Special - Colorful icons (show original colors) */
@@ -7175,38 +6991,7 @@
             box-shadow: 0 0 30px rgba(255, 20, 147, 0.5);
         }
 
-        /* J's Special - Watchlist Slide Panel styling */
-        [data-theme="jspecial"] .watchlist-slide-panel {
-            background: linear-gradient(145deg, rgba(15, 15, 30, 0.98), rgba(30, 15, 45, 0.98));
-            border: 3px solid #00bfff;
-            box-shadow: 0 0 30px rgba(0, 191, 255, 0.5);
-        }
-
-        [data-theme="jspecial"] .watchlist-slide-header {
-            border-bottom-color: rgba(0, 191, 255, 0.4);
-            background: linear-gradient(135deg, rgba(0, 191, 255, 0.2), rgba(30, 144, 255, 0.2));
-        }
-
-        [data-theme="jspecial"] .watchlist-slide-title {
-            color: #ffd700;
-        }
-
-        [data-theme="jspecial"] .watchlist-slide-list-card {
-            border-color: rgba(0, 191, 255, 0.3);
-        }
-
-        [data-theme="jspecial"] .watchlist-slide-list-card:hover {
-            border-color: #00bfff;
-            background: rgba(0, 191, 255, 0.15);
-        }
-
-        [data-theme="jspecial"] .watchlist-slide-list-name {
-            color: #fff;
-        }
-
-        [data-theme="jspecial"] .watchlist-slide-list-count {
-            color: #00bfff;
-        }
+        /* J's Special - Watchlist pills use same style as user menu - no overrides needed */
 
         .live-trigger-btn {
             display: flex;
@@ -11058,22 +10843,19 @@
             left: 50% !important;
             top: auto !important;
             right: auto !important;
-            transform: translateX(-50%) translateY(30px) scale(0.9) !important;
+            transform: translateX(-50%) !important;
             transform-origin: bottom center !important;
-            opacity: 0 !important;
-            visibility: hidden !important;
-            width: 400px !important;
-            max-width: 94vw !important;
+            min-width: 240px !important;
             max-height: 70vh !important;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.4) !important;
             z-index: 199999 !important;
-            border-radius: 16px !important;
-        }
-
-        .watchlist-slide-panel.dock-panel.active {
-            transform: translateX(-50%) translateY(0) scale(1) !important;
-            opacity: 1 !important;
-            visibility: visible !important;
+            background: none !important;
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            padding: 8px !important;
         }
 
         /* Live panel - dock driven */
@@ -11475,37 +11257,11 @@
     <div id="watchlistContainer" class="watchlist-container">
         <button class="watchlist-trigger-btn" id="watchlistTriggerBtn" onclick="toggleWatchlistPanel()">
             <img src="to-do-list.png" alt="My Lists" class="watchlist-icon" style="width: 22px; height: 22px;">
-            <span class="watchlist-trigger-label">My Lists</span>
         </button>
 
         <div class="watchlist-slide-panel" id="watchlistSlidePanel">
-            <div class="watchlist-slide-header">
-                <div class="watchlist-slide-title-row">
-                    <h2 class="watchlist-slide-title" id="watchlistSlideTitle">My Watchlists</h2>
-                    <button class="watchlist-slide-close" onclick="toggleWatchlistPanel()">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M18 6L6 18M6 6l12 12"/>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Lists View -->
             <div class="watchlist-slide-lists" id="watchlistSlideLists">
-                <!-- Lists populated by JS -->
-            </div>
-
-            <!-- Items View (hidden by default) -->
-            <div class="watchlist-slide-items" id="watchlistSlideItems" style="display: none;">
-                <button class="watchlist-slide-back" onclick="showWatchlistListsView()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M19 12H5M12 19l-7-7 7-7"/>
-                    </svg>
-                    Back to Lists
-                </button>
-                <div class="watchlist-slide-items-grid" id="watchlistSlideItemsGrid">
-                    <!-- Items populated by JS -->
-                </div>
+                <!-- Lists populated by JS as floating pills -->
             </div>
         </div>
     </div>
@@ -19735,36 +19491,34 @@
 
         // ============= WATCHLIST PANEL FUNCTIONS =============
         let watchlistPanelOpen = false;
-        let currentWatchlistView = 'lists'; // 'lists' or 'items'
+        let currentWatchlistView = 'lists';
         let selectedListName = '';
 
         window.toggleWatchlistPanel = function() {
             const panel = document.getElementById('watchlistSlidePanel');
+            const btn = document.getElementById('watchlistTriggerBtn');
             if (!panel) return;
 
             watchlistPanelOpen = !watchlistPanelOpen;
 
             if (watchlistPanelOpen) {
                 panel.classList.add('active');
+                if (btn) btn.classList.add('menu-open');
+                selectedListName = '';
+                currentWatchlistView = 'lists';
                 renderWatchlistLists();
             } else {
                 panel.classList.remove('active');
-                // Reset to lists view when closing
-                setTimeout(() => {
-                    showWatchlistListsView();
-                }, 300);
+                if (btn) btn.classList.remove('menu-open');
+                selectedListName = '';
+                currentWatchlistView = 'lists';
             }
         };
 
         window.showWatchlistListsView = function() {
-            const listsContainer = document.getElementById('watchlistSlideLists');
-            const itemsContainer = document.getElementById('watchlistSlideItems');
-            const title = document.getElementById('watchlistSlideTitle');
-
-            if (listsContainer) listsContainer.style.display = 'block';
-            if (itemsContainer) itemsContainer.style.display = 'none';
-            if (title) title.textContent = 'My Watchlists';
+            selectedListName = '';
             currentWatchlistView = 'lists';
+            renderWatchlistLists();
         };
 
         function renderWatchlistLists() {
@@ -19773,66 +19527,53 @@
 
             const listNames = Object.keys(watchlists);
 
-            // Create the "Create New List" button HTML
-            const createBtnHTML = `
-                <button class="watchlist-slide-create-btn" onclick="promptCreateNewList()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 5v14M5 12h14"/>
-                    </svg>
-                    Create New List
-                </button>
-            `;
-
             if (listNames.length === 0) {
                 container.innerHTML = `
-                    ${createBtnHTML}
-                    <div class="watchlist-slide-empty">
-                        <div class="watchlist-slide-empty-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-                            </svg>
-                        </div>
-                        <p class="watchlist-slide-empty-text">No watchlists yet.<br>Start adding movies and shows!</p>
+                    <button class="wl-pill wl-pill-create" onclick="promptCreateNewList()">
+                        <span style="font-size: 20px;">+</span> New List
+                    </button>
+                    <div class="wl-pill" style="border-style: dashed; border-color: rgba(255,255,255,0.15); color: rgba(255,255,255,0.4); cursor: default; font-size: 16px;">
+                        No lists yet
                     </div>
                 `;
                 return;
             }
 
-            const listsHTML = listNames.map(listName => {
+            const pillsHTML = listNames.map(listName => {
                 const items = watchlists[listName] || [];
                 const count = items.length;
                 const escapedName = listName.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                const isActive = selectedListName === listName;
                 return `
-                    <div class="watchlist-slide-list-card" onclick="showWatchlistItems('${escapedName}')">
-                        <div class="watchlist-slide-list-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-                            </svg>
-                        </div>
-                        <div class="watchlist-slide-list-details">
-                            <div class="watchlist-slide-list-name">${listName}</div>
-                            <div class="watchlist-slide-list-count">${count} ${count === 1 ? 'item' : 'items'}</div>
-                        </div>
-                        <button class="watchlist-slide-list-rename" onclick="event.stopPropagation(); promptRenameList('${escapedName}')" title="Rename list">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
-                            </svg>
-                        </button>
-                        <button class="watchlist-slide-list-delete" onclick="event.stopPropagation(); promptDeleteList('${escapedName}')" title="Delete list">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14zM10 11v6M14 11v6"/>
-                            </svg>
-                        </button>
-                        <div class="watchlist-slide-list-arrow">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9 18l6-6-6-6"/>
-                            </svg>
-                        </div>
+                    <div class="wl-pill ${isActive ? 'wl-active' : ''}" onclick="wlToggleList('${escapedName}')">
+                        <span style="font-size: 18px;">📋</span>
+                        ${listName}
+                        <span class="wl-pill-count">(${count})</span>
+                        <span class="wl-pill-actions">
+                            <button class="wl-pill-action wl-rename" onclick="event.stopPropagation(); promptRenameList('${escapedName}')" title="Rename">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+                            </button>
+                            <button class="wl-pill-action wl-delete" onclick="event.stopPropagation(); promptDeleteList('${escapedName}')" title="Delete">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                            </button>
+                        </span>
                     </div>
+                    ${isActive ? '<div class="wl-items-container" id="wlItemsFor_' + listName.replace(/[^a-zA-Z0-9]/g, '_') + '"></div>' : ''}
                 `;
             }).join('');
 
-            container.innerHTML = createBtnHTML + listsHTML;
+            const createPillHTML = `
+                <button class="wl-pill wl-pill-create" onclick="promptCreateNewList()">
+                    <span style="font-size: 20px;">+</span> New List
+                </button>
+            `;
+
+            container.innerHTML = pillsHTML + createPillHTML;
+
+            // If a list is selected, load its items
+            if (selectedListName) {
+                loadWatchlistItemPills(selectedListName);
+            }
         }
 
         // Open the Create New List modal
@@ -20065,95 +19806,66 @@
             }
         });
 
-        window.showWatchlistItems = async function(listName) {
-            const listsContainer = document.getElementById('watchlistSlideLists');
-            const itemsContainer = document.getElementById('watchlistSlideItems');
-            const itemsGrid = document.getElementById('watchlistSlideItemsGrid');
-            const title = document.getElementById('watchlistSlideTitle');
+        // Toggle a list open/closed inline
+        window.wlToggleList = function(listName) {
+            if (selectedListName === listName) {
+                // Collapse — deselect
+                selectedListName = '';
+                currentWatchlistView = 'lists';
+            } else {
+                // Expand this list
+                selectedListName = listName;
+                currentWatchlistView = 'items';
+            }
+            renderWatchlistLists();
+        };
 
-            if (listsContainer) listsContainer.style.display = 'none';
-            if (itemsContainer) itemsContainer.style.display = 'block';
-            if (title) title.textContent = listName;
-
-            selectedListName = listName;
-            currentWatchlistView = 'items';
+        // Load item pills into the expanded container below a list pill
+        async function loadWatchlistItemPills(listName) {
+            const safeId = 'wlItemsFor_' + listName.replace(/[^a-zA-Z0-9]/g, '_');
+            const container = document.getElementById(safeId);
+            if (!container) return;
 
             const items = watchlists[listName] || [];
 
             if (items.length === 0) {
-                itemsGrid.innerHTML = `
-                    <div class="watchlist-slide-empty">
-                        <div class="watchlist-slide-empty-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                <path d="M9 10h.01M15 10h.01M8 14s1.5 2 4 2 4-2 4-2"/>
-                            </svg>
-                        </div>
-                        <p class="watchlist-slide-empty-text">This list is empty.<br>Add some content to get started!</p>
-                    </div>
-                `;
+                container.innerHTML = '<div class="wl-empty-pill">Empty list — add some content!</div>';
+                setTimeout(() => {
+                    container.querySelector('.wl-empty-pill')?.classList.add('wl-item-visible');
+                }, 50);
                 return;
             }
 
-            // Show loading state first
-            itemsGrid.innerHTML = items.map(() => `
-                <div class="watchlist-item-card" style="opacity: 0.5;">
-                    <div class="watchlist-item-poster" style="background: var(--bg-medium);"></div>
-                    <div class="watchlist-item-info">
-                        <div class="watchlist-item-title" style="background: var(--bg-medium); height: 18px; width: 80%; border-radius: 4px;"></div>
-                        <div class="watchlist-item-meta" style="background: var(--bg-medium); height: 14px; width: 60%; border-radius: 4px; margin-top: 8px;"></div>
-                    </div>
-                </div>
-            `).join('');
-
-            // Fetch IMDB ratings for each item
-            const itemsWithRatings = await Promise.all(items.map(async (item) => {
-                let rating = null;
-                try {
-                    // Fetch details to get vote_average (TMDB rating) which we'll display
-                    const endpoint = item.type === 'movie'
-                        ? `https://api.themoviedb.org/3/movie/${item.id}`
-                        : `https://api.themoviedb.org/3/tv/${item.id}`;
-
-                    const response = await fetch(`${endpoint}?api_key=e577f3394a629d69efa3a9414e172237`);
-                    if (response.ok) {
-                        const data = await response.json();
-                        rating = data.vote_average ? data.vote_average.toFixed(1) : null;
-                    }
-                } catch (e) {
-                    console.log('Failed to fetch rating for', item.title);
-                }
-                return { ...item, rating };
-            }));
-
-            // Render items with ratings
-            itemsGrid.innerHTML = itemsWithRatings.map(item => `
-                <div class="watchlist-item-card" onclick="playWatchlistItem(${item.id}, '${item.type}')">
-                    <img class="watchlist-item-poster"
-                         src="${item.posterUrl || 'https://via.placeholder.com/64x96/242019/666?text=No+Image'}"
+            // Render item pills immediately with titles
+            container.innerHTML = items.map((item, i) => `
+                <div class="wl-item-pill" onclick="playWatchlistItem(${item.id}, '${item.type}')" style="transition-delay: ${i * 0.04}s;">
+                    <img class="wl-item-poster"
+                         src="${item.posterUrl || 'https://via.placeholder.com/28x42/0f0f1e/666?text=...'}"
                          alt="${item.title}"
-                         onerror="this.src='https://via.placeholder.com/64x96/242019/666?text=No+Image'">
-                    <div class="watchlist-item-info">
-                        <div class="watchlist-item-title">${item.title}</div>
-                        <div class="watchlist-item-meta">
-                            <span class="watchlist-item-type">${item.type === 'movie' ? 'Movie' : 'TV Show'}</span>
-                            ${item.rating ? `
-                                <span class="watchlist-item-rating">
-                                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                                    <span class="watchlist-item-rating-value">${item.rating}</span>
-                                </span>
-                            ` : ''}
-                        </div>
-                    </div>
+                         onerror="this.style.display='none'">
+                    <span class="wl-item-title">${item.title}</span>
+                    <span class="wl-item-type">${item.type === 'movie' ? 'Film' : 'TV'}</span>
                 </div>
             `).join('');
+
+            // Stagger reveal
+            requestAnimationFrame(() => {
+                const pills = container.querySelectorAll('.wl-item-pill');
+                pills.forEach((pill, i) => {
+                    setTimeout(() => pill.classList.add('wl-item-visible'), i * 40);
+                });
+            });
+        }
+
+        // Keep legacy function name for compatibility
+        window.showWatchlistItems = function(listName) {
+            selectedListName = listName;
+            currentWatchlistView = 'items';
+            renderWatchlistLists();
         };
 
         window.playWatchlistItem = function(id, type) {
-            // Close the panel
             toggleWatchlistPanel();
-
-            // Play content in current page
             playContent(id, '', type);
         };
 
