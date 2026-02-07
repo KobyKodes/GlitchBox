@@ -5962,7 +5962,7 @@
         }
 
         /* ============= PHOSPHOR MODERN - FLOATING WATCHLIST ============= */
-        /* ============= WATCHLIST CONTAINER & PANEL (PHOSPHOR MODERN) ============= */
+        /* ============= WATCHLIST STACKED CARDS PANEL ============= */
         .watchlist-container {
             display: none;
             position: absolute;
@@ -6005,255 +6005,382 @@
             opacity: 0.9;
         }
 
-        /* Watchlist Dropdown - transparent flex column of floating pills */
+        /* Panel — floating dropdown, not fullscreen */
         .watchlist-slide-panel {
             position: absolute;
-            top: calc(100% + 10px);
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
+            top: calc(100% + 12px);
+            left: 0;
+            z-index: 100002;
+            opacity: 0;
+            visibility: hidden;
             pointer-events: none;
-            z-index: 1;
-            max-height: 80vh;
-            overflow-y: auto;
-            overflow-x: visible;
-            padding: 4px 0;
-            /* Hide scrollbar */
-            scrollbar-width: none;
-            -ms-overflow-style: none;
+            transform: translateY(8px);
+            transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                        visibility 0.35s,
+                        transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .watchlist-slide-panel::-webkit-scrollbar { display: none; }
 
         .watchlist-slide-panel.active {
-            pointer-events: auto;
-        }
-
-        /* Lists container inside the dropdown */
-        .watchlist-slide-lists {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            width: 100%;
-        }
-
-        /* Each watchlist name = a floating pill (identical to .user-menu-item) */
-        .wl-pill {
-            font-family: 'VT323', monospace;
-            padding: 10px 22px;
-            background: rgba(15, 15, 30, 0.88);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1.5px solid rgba(0, 255, 159, 0.25);
-            color: var(--primary-color, #00ff9f);
-            font-size: 20px;
-            cursor: pointer;
-            border-radius: 50px;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            white-space: nowrap;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 10px rgba(0, 255, 159, 0.1);
-            opacity: 0;
-            transform: translateY(12px) scale(0.8);
-            filter: blur(8px);
-            transition: opacity 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-                        transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-                        filter 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-                        background 0.2s ease,
-                        border-color 0.2s ease,
-                        box-shadow 0.2s ease;
-            position: relative;
-        }
-
-        .watchlist-slide-panel.active .wl-pill {
             opacity: 1;
-            transform: translateY(0) scale(1);
-            filter: blur(0px);
+            visibility: visible;
+            pointer-events: auto;
+            transform: translateY(0);
         }
 
-        /* Staggered animation delays */
-        .watchlist-slide-panel.active .wl-pill:nth-child(1) { transition-delay: 0.04s; }
-        .watchlist-slide-panel.active .wl-pill:nth-child(2) { transition-delay: 0.08s; }
-        .watchlist-slide-panel.active .wl-pill:nth-child(3) { transition-delay: 0.12s; }
-        .watchlist-slide-panel.active .wl-pill:nth-child(4) { transition-delay: 0.16s; }
-        .watchlist-slide-panel.active .wl-pill:nth-child(5) { transition-delay: 0.20s; }
-        .watchlist-slide-panel.active .wl-pill:nth-child(6) { transition-delay: 0.24s; }
-        .watchlist-slide-panel.active .wl-pill:nth-child(7) { transition-delay: 0.28s; }
-        .watchlist-slide-panel.active .wl-pill:nth-child(8) { transition-delay: 0.32s; }
-
-        .wl-pill:hover {
-            background: rgba(0, 255, 159, 0.15);
-            border-color: var(--primary-color, #00ff9f);
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5), 0 0 18px rgba(0, 255, 159, 0.3);
-            transform: scale(1.05);
-        }
-
-        /* Active/selected list pill */
-        .wl-pill.wl-active {
-            background: rgba(0, 255, 159, 0.2);
-            border-color: var(--primary-color, #00ff9f);
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 255, 159, 0.35);
-        }
-
-        /* Pill count badge */
-        .wl-pill-count {
-            font-size: 14px;
-            opacity: 0.6;
-            margin-left: 2px;
-        }
-
-        /* Pill action buttons (rename/delete) - appear on hover */
-        .wl-pill-actions {
-            display: flex;
-            gap: 2px;
-            margin-left: 4px;
-            opacity: 0;
-            transition: opacity 0.2s ease;
-        }
-        .wl-pill:hover .wl-pill-actions { opacity: 1; }
-
-        .wl-pill-action {
-            width: 22px;
-            height: 22px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: transparent;
-            border: none;
-            border-radius: 50%;
-            color: inherit;
-            cursor: pointer;
-            padding: 0;
-            opacity: 0.5;
-            transition: all 0.15s ease;
-        }
-        .wl-pill-action:hover { opacity: 1; }
-        .wl-pill-action.wl-delete:hover { color: #ff6b6b; }
-        .wl-pill-action.wl-rename:hover { color: var(--accent-color, #00d9ff); }
-        .wl-pill-action svg { width: 12px; height: 12px; }
-
-        /* Create new list pill - dashed border variant */
-        .wl-pill-create {
-            border-style: dashed;
-            border-color: rgba(0, 255, 159, 0.35);
-            color: var(--primary-color, #00ff9f);
-            font-size: 18px;
-            opacity: 0;
-            transform: translateY(12px) scale(0.8);
-            filter: blur(8px);
-        }
-        .watchlist-slide-panel.active .wl-pill-create {
-            opacity: 0.7;
-            transform: translateY(0) scale(1);
-            filter: blur(0px);
-        }
-        .wl-pill-create:hover {
-            opacity: 1 !important;
-            border-style: solid;
-            background: rgba(0, 255, 159, 0.1);
-        }
-
-        /* Item cards that expand below a selected list pill */
-        .wl-items-container {
+        /* Card stack container — flex column with negative-margin overlap */
+        .wl-card-stack {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            width: 100%;
-            overflow: hidden;
+            align-items: flex-start;
+            padding: 8px 0 8px 0;
+            min-width: 320px;
+            overflow: visible;
         }
 
-        .wl-item-pill {
-            font-family: 'VT323', monospace;
-            padding: 8px 18px;
-            background: rgba(15, 15, 30, 0.82);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            border: 1px solid rgba(0, 217, 255, 0.2);
-            color: #fff;
-            font-size: 17px;
+        /* Individual card — stacked via negative margin so only title peeks out */
+        .wl-card {
+            position: relative;
+            width: 300px;
+            padding: 14px 20px;
+            margin-bottom: -14px;
+            background: rgba(10, 10, 22, 0.88);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1.5px solid rgba(0, 255, 159, 0.10);
+            border-radius: 14px;
             cursor: pointer;
-            border-radius: 50px;
+            font-family: 'VT323', monospace;
+            transform-origin: bottom center;
+            transform: skewY(-4deg);
+            transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            user-select: none;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+            z-index: 1;
+        }
+
+        /* Last card in stack — fully visible, no overlap below */
+        .wl-card:last-child {
+            margin-bottom: 0;
+            border-color: rgba(0, 255, 159, 0.22);
+        }
+
+        /* Right-side fade gradient for buried cards */
+        .wl-card::after {
+            content: '';
+            position: absolute;
+            right: -1px;
+            top: -5%;
+            height: 110%;
+            width: 28%;
+            background: linear-gradient(to left, rgba(10, 10, 22, 0.55), transparent);
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        /* Subtle dim overlay for buried cards */
+        .wl-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 14px;
+            background: rgba(10, 10, 22, 0.2);
+            z-index: 1;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+        }
+
+        /* Last card — no dim overlay */
+        .wl-card:last-child::before {
+            opacity: 0;
+        }
+        .wl-card:last-child::after {
+            opacity: 0;
+        }
+
+        /* Hover — pop out of stack, un-skew, show full card + items */
+        .wl-card:hover {
+            transform: skewY(0deg) translateY(-18px) scale(1.04);
+            z-index: 100 !important;
+            border-color: var(--primary-color, #00ff9f);
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6),
+                        0 0 30px rgba(0, 255, 159, 0.12),
+                        inset 0 1px 0 rgba(0, 255, 159, 0.08);
+            overflow: visible;
+        }
+
+        .wl-card:hover::before,
+        .wl-card:hover::after {
+            opacity: 0;
+        }
+
+        /* Active / pinned-open card (click to lock) */
+        .wl-card.wl-card-active {
+            transform: skewY(0deg) translateY(-18px) scale(1.04);
+            border-color: var(--primary-color, #00ff9f);
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6),
+                        0 0 30px rgba(0, 255, 159, 0.12),
+                        inset 0 1px 0 rgba(0, 255, 159, 0.08);
+            z-index: 100 !important;
+            overflow: visible;
+        }
+
+        .wl-card.wl-card-active::before,
+        .wl-card.wl-card-active::after {
+            opacity: 0;
+        }
+
+        /* Card header row */
+        .wl-card-header {
             display: flex;
             align-items: center;
             gap: 10px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .wl-card-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(0, 255, 159, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .wl-card-icon svg {
+            width: 14px;
+            height: 14px;
+            stroke: var(--primary-color, #00ff9f);
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .wl-card-title {
+            font-size: 20px;
+            color: var(--primary-color, #00ff9f);
+            letter-spacing: 0.02em;
+        }
+
+        /* Card description — hidden in stack, revealed on hover/active */
+        .wl-card-desc {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.85);
             white-space: nowrap;
-            box-shadow: 0 3px 16px rgba(0, 0, 0, 0.35), 0 0 8px rgba(0, 217, 255, 0.08);
-            opacity: 0;
-            transform: translateY(10px) scale(0.85);
-            filter: blur(6px);
-            transition: opacity 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
-                        transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
-                        filter 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
-                        background 0.2s ease,
-                        border-color 0.2s ease;
-            max-width: 280px;
             overflow: hidden;
             text-overflow: ellipsis;
+            position: relative;
+            z-index: 2;
+            max-height: 0;
+            opacity: 0;
+            margin-top: 0;
+            transition: max-height 0.35s ease, opacity 0.3s ease 0.05s, margin-top 0.35s ease;
         }
 
-        .wl-item-pill.wl-item-visible {
+        .wl-card:hover .wl-card-desc,
+        .wl-card.wl-card-active .wl-card-desc {
+            max-height: 28px;
             opacity: 1;
-            transform: translateY(0) scale(1);
-            filter: blur(0px);
+            margin-top: 8px;
         }
 
-        .wl-item-pill:hover {
-            background: rgba(0, 217, 255, 0.12);
-            border-color: var(--accent-color, #00d9ff);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 14px rgba(0, 217, 255, 0.2);
-            transform: scale(1.04);
+        /* Card footer — hidden in stack, revealed on hover/active */
+        .wl-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            z-index: 2;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            margin-top: 0;
+            transition: max-height 0.35s ease, opacity 0.3s ease 0.08s, margin-top 0.35s ease;
         }
 
-        .wl-item-poster {
-            width: 28px;
-            height: 42px;
-            border-radius: 6px;
+        .wl-card:hover .wl-card-footer,
+        .wl-card.wl-card-active .wl-card-footer {
+            max-height: 36px;
+            opacity: 1;
+            margin-top: 6px;
+        }
+
+        .wl-card-count {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        .wl-card-actions {
+            display: flex;
+            gap: 4px;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+
+        .wl-card:hover .wl-card-actions,
+        .wl-card.wl-card-active .wl-card-actions {
+            opacity: 1;
+        }
+
+        .wl-card-action-btn {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03);
+            color: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            padding: 0;
+        }
+
+        .wl-card-action-btn:hover {
+            border-color: rgba(255, 255, 255, 0.25);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .wl-card-action-btn.wl-card-delete:hover {
+            border-color: rgba(255, 100, 100, 0.3);
+            color: #ff6b6b;
+        }
+
+        .wl-card-action-btn svg {
+            width: 12px;
+            height: 12px;
+        }
+
+        /* Expanded items list */
+        .wl-card-items {
+            display: none;
+            flex-direction: column;
+            gap: 3px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(0, 255, 159, 0.1);
+            max-height: 220px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 255, 159, 0.15) transparent;
+            position: relative;
+            z-index: 2;
+        }
+
+        .wl-card-items::-webkit-scrollbar { width: 3px; }
+        .wl-card-items::-webkit-scrollbar-track { background: transparent; }
+        .wl-card-items::-webkit-scrollbar-thumb { background: rgba(0, 255, 159, 0.15); border-radius: 2px; }
+
+        .wl-card:hover .wl-card-items,
+        .wl-card.wl-card-active .wl-card-items {
+            display: flex;
+        }
+
+        .wl-card-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 7px 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .wl-card-item:hover {
+            background: rgba(0, 255, 159, 0.06);
+        }
+
+        .wl-card-item-poster {
+            width: 30px;
+            height: 45px;
+            border-radius: 5px;
             object-fit: cover;
             flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.03);
         }
 
-        .wl-item-title {
+        .wl-card-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .wl-card-item-title {
+            font-size: 16px;
+            color: #fff;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            max-width: 180px;
         }
 
-        .wl-item-type {
-            font-size: 12px;
-            padding: 2px 8px;
-            background: rgba(0, 217, 255, 0.15);
+        .wl-card-item-meta {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.3);
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .wl-card-item-type {
+            font-size: 11px;
+            padding: 1px 6px;
+            background: rgba(0, 217, 255, 0.1);
             border-radius: 20px;
             color: var(--accent-color, #00d9ff);
-            flex-shrink: 0;
         }
 
-        /* Empty list message pill */
-        .wl-empty-pill {
-            font-family: 'VT323', monospace;
-            padding: 8px 18px;
-            background: rgba(15, 15, 30, 0.6);
-            backdrop-filter: blur(10px);
-            border: 1px dashed rgba(255, 255, 255, 0.15);
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 16px;
-            border-radius: 50px;
-            opacity: 0;
-            transform: translateY(10px) scale(0.85);
-            filter: blur(6px);
-            transition: opacity 0.25s ease, transform 0.25s ease, filter 0.25s ease;
+        .wl-card-empty {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.25);
+            text-align: center;
+            padding: 14px 0;
         }
-        .wl-empty-pill.wl-item-visible {
+
+        /* New list button */
+        .wl-cards-add-btn {
+            font-family: 'VT323', monospace;
+            padding: 8px 22px;
+            background: transparent;
+            border: 1.5px dashed rgba(0, 255, 159, 0.2);
+            color: var(--primary-color, #00ff9f);
+            font-size: 17px;
+            cursor: pointer;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            opacity: 0.5;
+            white-space: nowrap;
+            margin-top: 6px;
+        }
+
+        .wl-cards-add-btn:hover {
             opacity: 1;
-            transform: translateY(0) scale(1);
-            filter: blur(0px);
+            border-style: solid;
+            background: rgba(0, 255, 159, 0.05);
+        }
+
+        /* Empty state */
+        .wl-cards-empty {
+            font-family: 'VT323', monospace;
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.25);
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        /* Responsive */
+        @media (max-width: 500px) {
+            .wl-card {
+                width: 250px;
+                min-height: 100px;
+                padding: 12px 16px;
+            }
         }
 
         /* Rename list modal */
@@ -10836,19 +10963,18 @@
             -webkit-backdrop-filter: none !important;
         }
 
-        /* Watchlist panel - dock driven */
+        /* Watchlist panel - dock driven (positioned above dock like user menu) */
         .watchlist-slide-panel.dock-panel {
             position: fixed !important;
             bottom: 110px !important;
             left: 50% !important;
             top: auto !important;
             right: auto !important;
-            transform: translateX(-50%) !important;
+            transform: translateX(-50%) translateY(20px) scale(0.92) !important;
             transform-origin: bottom center !important;
-            min-width: 240px !important;
-            max-height: 70vh !important;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.4) !important;
-            z-index: 199999 !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            z-index: 200000 !important;
             background: none !important;
             border: none !important;
             border-radius: 0 !important;
@@ -10856,6 +10982,13 @@
             backdrop-filter: none !important;
             -webkit-backdrop-filter: none !important;
             padding: 8px !important;
+        }
+
+        .watchlist-slide-panel.dock-panel.active {
+            transform: translateX(-50%) translateY(0) scale(1) !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
         }
 
         /* Live panel - dock driven */
@@ -11253,16 +11386,17 @@
         </div>
     </div>
 
-    <!-- Watchlist Button & Panel (Below User Menu) -->
+    <!-- Watchlist Button & Stacked Cards Panel -->
     <div id="watchlistContainer" class="watchlist-container">
         <button class="watchlist-trigger-btn" id="watchlistTriggerBtn" onclick="toggleWatchlistPanel()">
             <img src="to-do-list.png" alt="My Lists" class="watchlist-icon" style="width: 22px; height: 22px;">
         </button>
 
         <div class="watchlist-slide-panel" id="watchlistSlidePanel">
-            <div class="watchlist-slide-lists" id="watchlistSlideLists">
-                <!-- Lists populated by JS as floating pills -->
+            <div class="wl-card-stack" id="watchlistSlideLists">
+                <!-- Cards populated by JS -->
             </div>
+            <button class="wl-cards-add-btn" onclick="event.stopPropagation(); promptCreateNewList()">+ New List</button>
         </div>
     </div>
 
@@ -19489,10 +19623,22 @@
             );
         }
 
-        // ============= WATCHLIST PANEL FUNCTIONS =============
+        // ============= WATCHLIST STACKED CARDS PANEL FUNCTIONS =============
         let watchlistPanelOpen = false;
         let currentWatchlistView = 'lists';
         let selectedListName = '';
+
+        // SVG icons for card headers (cycling)
+        const WL_CARD_ICONS = [
+            '<svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>',
+            '<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
+            '<svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+            '<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
+            '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+            '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
+            '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>',
+            '<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>'
+        ];
 
         window.toggleWatchlistPanel = function() {
             const panel = document.getElementById('watchlistSlidePanel');
@@ -19502,11 +19648,16 @@
             watchlistPanelOpen = !watchlistPanelOpen;
 
             if (watchlistPanelOpen) {
-                panel.classList.add('active');
-                if (btn) btn.classList.add('menu-open');
                 selectedListName = '';
                 currentWatchlistView = 'lists';
+                panel.classList.remove('active');
                 renderWatchlistLists();
+                if (btn) btn.classList.add('menu-open');
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        panel.classList.add('active');
+                    });
+                });
             } else {
                 panel.classList.remove('active');
                 if (btn) btn.classList.remove('menu-open');
@@ -19521,62 +19672,102 @@
             renderWatchlistLists();
         };
 
+        // --- Render stacked cards ---
         function renderWatchlistLists() {
             const container = document.getElementById('watchlistSlideLists');
             if (!container) return;
 
             const listNames = Object.keys(watchlists);
 
+            // If selected list was deleted, deselect
+            if (selectedListName && !listNames.includes(selectedListName)) {
+                selectedListName = '';
+                currentWatchlistView = 'lists';
+            }
+
             if (listNames.length === 0) {
-                container.innerHTML = `
-                    <button class="wl-pill wl-pill-create" onclick="promptCreateNewList()">
-                        <span style="font-size: 20px;">+</span> New List
-                    </button>
-                    <div class="wl-pill" style="border-style: dashed; border-color: rgba(255,255,255,0.15); color: rgba(255,255,255,0.4); cursor: default; font-size: 16px;">
-                        No lists yet
-                    </div>
-                `;
+                container.innerHTML = '<div class="wl-cards-empty">No lists yet</div>';
                 return;
             }
 
-            const pillsHTML = listNames.map(listName => {
+            container.innerHTML = listNames.map((listName, i) => {
                 const items = watchlists[listName] || [];
                 const count = items.length;
                 const escapedName = listName.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                const icon = WL_CARD_ICONS[i % WL_CARD_ICONS.length];
                 const isActive = selectedListName === listName;
+
+                // Always render items so hover can reveal them
+                let itemsHTML = '';
+                if (count === 0) {
+                    itemsHTML = '<div class="wl-card-empty">Empty list — add some content!</div>';
+                } else {
+                    itemsHTML = items.map(item => `
+                        <div class="wl-card-item" onclick="event.stopPropagation(); playWatchlistItem(${item.id}, '${item.type}')">
+                            <img class="wl-card-item-poster"
+                                 src="${item.posterUrl || 'https://via.placeholder.com/30x45/0a0a16/666?text=...'}"
+                                 alt="${item.title}"
+                                 onerror="this.style.display='none'">
+                            <div class="wl-card-item-info">
+                                <div class="wl-card-item-title">${item.title}</div>
+                                <div class="wl-card-item-meta">
+                                    <span class="wl-card-item-type">${item.type === 'movie' ? 'Film' : 'TV'}</span>
+                                    <span>${item.year || ''}</span>
+                                    ${item.rating ? '<span>★ ' + item.rating + '</span>' : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                const descText = count === 0 ? 'Empty list' : count + (count === 1 ? ' item saved' : ' items saved');
+
                 return `
-                    <div class="wl-pill ${isActive ? 'wl-active' : ''}" onclick="wlToggleList('${escapedName}')">
-                        <span style="font-size: 18px;">📋</span>
-                        ${listName}
-                        <span class="wl-pill-count">(${count})</span>
-                        <span class="wl-pill-actions">
-                            <button class="wl-pill-action wl-rename" onclick="event.stopPropagation(); promptRenameList('${escapedName}')" title="Rename">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
-                            </button>
-                            <button class="wl-pill-action wl-delete" onclick="event.stopPropagation(); promptDeleteList('${escapedName}')" title="Delete">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-                            </button>
-                        </span>
+                    <div class="wl-card ${isActive ? 'wl-card-active' : ''}"
+                         style="z-index: ${i + 1};"
+                         onclick="event.stopPropagation(); wlToggleList('${escapedName}')">
+                        <div class="wl-card-header">
+                            <div class="wl-card-icon">${icon}</div>
+                            <div class="wl-card-title">${listName}</div>
+                        </div>
+                        <div class="wl-card-desc">${descText}</div>
+                        <div class="wl-card-footer">
+                            <div class="wl-card-count">${count} item${count !== 1 ? 's' : ''}</div>
+                            <div class="wl-card-actions">
+                                <button class="wl-card-action-btn" onclick="event.stopPropagation(); promptRenameList('${escapedName}')" title="Rename">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+                                </button>
+                                <button class="wl-card-action-btn wl-card-delete" onclick="event.stopPropagation(); promptDeleteList('${escapedName}')" title="Delete">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="wl-card-items">${itemsHTML}</div>
                     </div>
-                    ${isActive ? '<div class="wl-items-container" id="wlItemsFor_' + listName.replace(/[^a-zA-Z0-9]/g, '_') + '"></div>' : ''}
                 `;
             }).join('');
-
-            const createPillHTML = `
-                <button class="wl-pill wl-pill-create" onclick="promptCreateNewList()">
-                    <span style="font-size: 20px;">+</span> New List
-                </button>
-            `;
-
-            container.innerHTML = pillsHTML + createPillHTML;
-
-            // If a list is selected, load its items
-            if (selectedListName) {
-                loadWatchlistItemPills(selectedListName);
-            }
         }
 
-        // Open the Create New List modal
+        // --- Toggle list selection (card click) ---
+        window.wlToggleList = function(listName) {
+            if (selectedListName === listName) {
+                selectedListName = '';
+                currentWatchlistView = 'lists';
+            } else {
+                selectedListName = listName;
+                currentWatchlistView = 'items';
+            }
+            renderWatchlistLists();
+        };
+
+        // Compatibility wrapper
+        async function loadWatchlistItemPills(listName) {
+            selectedListName = listName;
+            currentWatchlistView = 'items';
+            renderWatchlistLists();
+        }
+
+        // --- Modal functions (create, delete, rename) ---
         window.promptCreateNewList = function() {
             const overlay = document.getElementById('createListModalOverlay');
             const input = document.getElementById('createListNameInput');
@@ -19595,7 +19786,6 @@
             }
         }
 
-        // Close the Create New List modal
         window.closeCreateListModal = function() {
             const overlay = document.getElementById('createListModalOverlay');
             if (overlay) {
@@ -19603,7 +19793,6 @@
             }
         }
 
-        // Confirm and create the new list
         window.confirmCreateList = function() {
             const input = document.getElementById('createListNameInput');
             const errorEl = document.getElementById('createListError');
@@ -19612,7 +19801,6 @@
 
             const listName = input.value.trim();
 
-            // Validate empty name
             if (!listName) {
                 input.classList.add('error');
                 errorEl.textContent = 'Please enter a name for your list';
@@ -19621,7 +19809,6 @@
                 return;
             }
 
-            // Check for duplicate names (case-insensitive)
             const existingNames = Object.keys(watchlists).map(name => name.toLowerCase());
             if (existingNames.includes(listName.toLowerCase())) {
                 input.classList.add('error');
@@ -19631,7 +19818,6 @@
                 return;
             }
 
-            // Create the list
             watchlists[listName] = [];
             localStorage.setItem('streamingSite_watchlists', JSON.stringify(watchlists));
             showStatus(`Created new list: ${listName}`);
@@ -19639,7 +19825,6 @@
             closeCreateListModal();
         }
 
-        // Delete list functionality
         let pendingDeleteListName = null;
 
         window.promptDeleteList = function(listName) {
@@ -19669,18 +19854,20 @@
 
             const listName = pendingDeleteListName;
 
-            // Delete the list
             if (watchlists[listName] !== undefined) {
                 delete watchlists[listName];
                 localStorage.setItem('streamingSite_watchlists', JSON.stringify(watchlists));
                 showStatus(`Deleted list: ${listName}`);
+                if (selectedListName === listName) {
+                    selectedListName = '';
+                    currentWatchlistView = 'lists';
+                }
                 renderWatchlistLists();
             }
 
             closeDeleteListModal();
         }
 
-        // Rename list functionality
         let pendingRenameListName = null;
 
         window.promptRenameList = function(listName) {
@@ -19740,7 +19927,6 @@
                 return;
             }
 
-            // Check for duplicate (case-insensitive)
             const duplicate = Object.keys(watchlists).find(
                 name => name.toLowerCase() === newName.toLowerCase() && name !== oldName
             );
@@ -19752,12 +19938,10 @@
                 return;
             }
 
-            // Rename in local watchlists object
             watchlists[newName] = watchlists[oldName];
             delete watchlists[oldName];
             localStorage.setItem('streamingSite_watchlists', JSON.stringify(watchlists));
 
-            // Rename in database for authenticated users
             if (authToken) {
                 try {
                     await apiRequest('/watchlist/rename', {
@@ -19770,6 +19954,10 @@
                 } catch (error) {
                     console.error('Failed to rename list in database:', error);
                 }
+            }
+
+            if (selectedListName === oldName) {
+                selectedListName = newName;
             }
 
             showStatus(`Renamed list to: ${newName}`);
@@ -19786,7 +19974,6 @@
                         confirmCreateList();
                     }
                 });
-                // Clear error state on input
                 createListInput.addEventListener('input', function() {
                     this.classList.remove('error');
                     document.getElementById('createListError')?.classList.remove('visible');
@@ -19806,58 +19993,7 @@
             }
         });
 
-        // Toggle a list open/closed inline
-        window.wlToggleList = function(listName) {
-            if (selectedListName === listName) {
-                // Collapse — deselect
-                selectedListName = '';
-                currentWatchlistView = 'lists';
-            } else {
-                // Expand this list
-                selectedListName = listName;
-                currentWatchlistView = 'items';
-            }
-            renderWatchlistLists();
-        };
-
-        // Load item pills into the expanded container below a list pill
-        async function loadWatchlistItemPills(listName) {
-            const safeId = 'wlItemsFor_' + listName.replace(/[^a-zA-Z0-9]/g, '_');
-            const container = document.getElementById(safeId);
-            if (!container) return;
-
-            const items = watchlists[listName] || [];
-
-            if (items.length === 0) {
-                container.innerHTML = '<div class="wl-empty-pill">Empty list — add some content!</div>';
-                setTimeout(() => {
-                    container.querySelector('.wl-empty-pill')?.classList.add('wl-item-visible');
-                }, 50);
-                return;
-            }
-
-            // Render item pills immediately with titles
-            container.innerHTML = items.map((item, i) => `
-                <div class="wl-item-pill" onclick="playWatchlistItem(${item.id}, '${item.type}')" style="transition-delay: ${i * 0.04}s;">
-                    <img class="wl-item-poster"
-                         src="${item.posterUrl || 'https://via.placeholder.com/28x42/0f0f1e/666?text=...'}"
-                         alt="${item.title}"
-                         onerror="this.style.display='none'">
-                    <span class="wl-item-title">${item.title}</span>
-                    <span class="wl-item-type">${item.type === 'movie' ? 'Film' : 'TV'}</span>
-                </div>
-            `).join('');
-
-            // Stagger reveal
-            requestAnimationFrame(() => {
-                const pills = container.querySelectorAll('.wl-item-pill');
-                pills.forEach((pill, i) => {
-                    setTimeout(() => pill.classList.add('wl-item-visible'), i * 40);
-                });
-            });
-        }
-
-        // Keep legacy function name for compatibility
+        // Legacy compatibility
         window.showWatchlistItems = function(listName) {
             selectedListName = listName;
             currentWatchlistView = 'items';
@@ -19870,12 +20006,21 @@
         };
 
         // Click outside to close watchlist panel
+        let _wlClickLock = false;
         function setupWatchlistClickOutside() {
             document.addEventListener('click', function(event) {
+                if (!watchlistPanelOpen || _wlClickLock) return;
                 const container = document.getElementById('watchlistContainer');
                 const panel = document.getElementById('watchlistSlidePanel');
-
-                if (watchlistPanelOpen && container && !container.contains(event.target)) {
+                // Also check panel bounds for detached elements (DOM rebuild during card click)
+                if (container && !container.contains(event.target)) {
+                    if (panel) {
+                        const rect = panel.getBoundingClientRect();
+                        if (event.clientX >= rect.left && event.clientX <= rect.right &&
+                            event.clientY >= rect.top && event.clientY <= rect.bottom) {
+                            return; // Click was inside the panel area
+                        }
+                    }
                     toggleWatchlistPanel();
                 }
             });
@@ -23689,9 +23834,10 @@
                 case 'lists':
                     var wl = document.getElementById('watchlistSlidePanel');
                     if (wl) {
-                        wl.classList.add('active');
                         window.watchlistPanelOpen = true;
+                        window.selectedListName = '';
                         if (typeof renderWatchlistLists === 'function') renderWatchlistLists();
+                        requestAnimationFrame(function() { requestAnimationFrame(function() { wl.classList.add('active'); }); });
                     }
                     document.getElementById('dockBtnLists').classList.add('dock-active');
                     break;
