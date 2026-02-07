@@ -20386,7 +20386,14 @@
         const SPORTSRC_BASE_URL = 'https://api.sportsrc.org/';
         let sportsrcDetailCache = {};
 
-        // Load sports data from westream API
+        // Timeout wrapper for fetch — rejects if not done in time
+        function fetchWithTimeout(url, ms = 5000) {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), ms);
+            return fetch(url, { signal: controller.signal }).finally(() => clearTimeout(timeout));
+        }
+
+        // Load sports data from both APIs
         async function loadSportsData(category) {
             try {
                 showLoading();
@@ -20424,9 +20431,9 @@
 
                 // Build parallel fetch promises
                 const westreamPromise = (async () => {
-                    const sportsResponse = await fetch(`${WESTREAM_BASE_URL}/sports`);
+                    const sportsResponse = await fetchWithTimeout(`${WESTREAM_BASE_URL}/sports`);
                     const sports = await sportsResponse.json();
-                    const matchesResponse = await fetch(`${WESTREAM_BASE_URL}/matches`);
+                    const matchesResponse = await fetchWithTimeout(`${WESTREAM_BASE_URL}/matches`);
                     const matches = await matchesResponse.json();
                     return { sports, matches };
                 })();
@@ -20590,7 +20597,7 @@
                 // Step 1: Filter by sport type — fetch from both APIs in parallel
                 if (currentSportType) {
                     const westreamPromise = (async () => {
-                        const response = await fetch(`${WESTREAM_BASE_URL}/matches/${currentSportType}`);
+                        const response = await fetchWithTimeout(`${WESTREAM_BASE_URL}/matches/${currentSportType}`);
                         return await response.json();
                     })();
 
@@ -20627,7 +20634,7 @@
 
                 // Step 2: Apply live filter if active
                 if (isLiveFilterActive) {
-                    const liveResponse = await fetch(`${WESTREAM_BASE_URL}/matches/live`);
+                    const liveResponse = await fetchWithTimeout(`${WESTREAM_BASE_URL}/matches/live`);
                     const allLiveMatches = await liveResponse.json();
 
                     // Also include SportSRC matches that are within ~2 hours of now as "live"
@@ -21073,12 +21080,13 @@
             if (sources.length > 1) {
                 btn.style.display = 'inline-block';
 
-                // Get source name with provider tag
+                // Get source name with provider tag (only show tag if mixed providers)
                 const currentSource = sources[currentSportsSourceIndex];
                 const sourceName = currentSource?.source?.toUpperCase() || `Source ${currentSportsSourceIndex + 1}`;
-                const providerTag = currentSource?._provider === 'sportsrc' ? '[SRC]' : '[WS]';
+                const hasMultipleProviders = sources.some(s => s._provider === 'sportsrc') && sources.some(s => !s._provider || s._provider === 'westream');
+                const providerTag = hasMultipleProviders ? (currentSource?._provider === 'sportsrc' ? '[SRC] ' : '[WS] ') : '';
 
-                btnText.textContent = `${providerTag} ${sourceName} (${currentSportsSourceIndex + 1}/${sources.length})`;
+                btnText.textContent = `${providerTag}${sourceName} (${currentSportsSourceIndex + 1}/${sources.length})`;
             } else {
                 btn.style.display = 'none';
             }
@@ -21109,8 +21117,9 @@
 
                 const currentSource = sources[currentSportsSourceIndex];
                 const sourceName = currentSource.source.toUpperCase();
-                const providerTag = currentSource._provider === 'sportsrc' ? '[SRC]' : '[WS]';
-                showStatus(`Switched to ${providerTag} ${sourceName} (${currentSportsSourceIndex + 1}/${sources.length})`);
+                const hasMultipleProviders = sources.some(s => s._provider === 'sportsrc') && sources.some(s => !s._provider || s._provider === 'westream');
+                const providerTag = hasMultipleProviders ? (currentSource._provider === 'sportsrc' ? '[SRC] ' : '[WS] ') : '';
+                showStatus(`Switched to ${providerTag}${sourceName} (${currentSportsSourceIndex + 1}/${sources.length})`);
             } else {
                 showError('Unable to switch source');
             }
