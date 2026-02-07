@@ -1,4 +1,4 @@
-// v4
+// v5
 const CACHE_NAME = 'glitchbox-v1';
 const PRECACHE = [
   '/',
