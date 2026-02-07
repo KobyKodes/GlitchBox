@@ -20465,8 +20465,8 @@
                     console.warn('TopStreams fetch failed:', topstreamsResult.reason);
                 }
 
-                // Merge both sources
-                allSportsMatches = mergeMatchLists(westreamMatches, topstreamsMatches);
+                // Merge both sources (TopStreams primary, westream secondary)
+                allSportsMatches = mergeMatchLists(topstreamsMatches, westreamMatches);
 
                 // If a category was selected, find the matching sport ID for API calls
                 if (category && currentSportType) {
@@ -20597,21 +20597,21 @@
             return matches;
         }
 
-        // Merge westream and TopStreams match lists, deduplicating by title
-        function mergeMatchLists(westreamMatches, topstreamsMatches) {
-            const merged = westreamMatches.map(m => ({ ...m, _provider: m._provider || 'westream' }));
+        // Merge TopStreams (primary) and westream (secondary) match lists, deduplicating by title
+        function mergeMatchLists(topstreamsMatches, westreamMatches) {
+            const merged = topstreamsMatches.map(m => ({ ...m }));
 
-            for (const tsMatch of topstreamsMatches) {
-                const titleLower = (tsMatch.title || '').toLowerCase();
+            for (const wsMatch of westreamMatches) {
+                const titleLower = (wsMatch.title || '').toLowerCase();
                 const duplicate = merged.find(m => {
                     const mTitle = (m.title || '').toLowerCase();
                     return mTitle === titleLower && titleLower.length > 0;
                 });
 
                 if (duplicate) {
-                    duplicate._topstreamsDuplicate = tsMatch;
+                    duplicate._westreamDuplicate = wsMatch;
                 } else {
-                    merged.push(tsMatch);
+                    merged.push({ ...wsMatch, _provider: wsMatch._provider || 'westream' });
                 }
             }
 
@@ -20679,7 +20679,7 @@
                     if (wsResult.status === 'rejected') console.warn('Westream sport fetch failed:', wsResult.reason);
                     if (tsResult.status === 'rejected') console.warn('TopStreams sport fetch failed:', tsResult.reason);
 
-                    sportMatches = mergeMatchLists(Array.isArray(wsMatches) ? wsMatches : [], tsMatches);
+                    sportMatches = mergeMatchLists(tsMatches, Array.isArray(wsMatches) ? wsMatches : []);
                 } else {
                     sportMatches = allSportsMatches;
                 }
@@ -20699,14 +20699,14 @@
                     );
 
                     let combinedLive = mergeMatchLists(
-                        Array.isArray(allLiveMatches) ? allLiveMatches : [],
-                        liveTopstreams
+                        liveTopstreams,
+                        Array.isArray(allLiveMatches) ? allLiveMatches : []
                     );
 
                     if (currentSportType) {
                         filteredMatches = combinedLive.filter(match =>
-                            match.category === currentSportType ||
-                            match._provider === 'topstreams'
+                            match._provider === 'topstreams' ||
+                            match.category === currentSportType
                         );
                     } else {
                         filteredMatches = combinedLive;
@@ -20970,13 +20970,13 @@
                 return;
             }
 
-            // If match exists in both APIs, append TopStreams source
-            if (match._topstreamsDuplicate && !match._topstreamsDuplicate._sourcesAppended) {
-                const tsSources = match._topstreamsDuplicate.sources || [];
-                if (tsSources.length > 0) {
-                    match.sources = [...(match.sources || []), ...tsSources];
+            // If match exists in both APIs, append westream sources as alternatives
+            if (match._westreamDuplicate && !match._westreamDuplicate._sourcesAppended) {
+                const wsSources = (match._westreamDuplicate.sources || []).map(s => ({ ...s, _provider: s._provider || 'westream' }));
+                if (wsSources.length > 0) {
+                    match.sources = [...(match.sources || []), ...wsSources];
                 }
-                match._topstreamsDuplicate._sourcesAppended = true;
+                match._westreamDuplicate._sourcesAppended = true;
             }
 
             // Get streaming source
