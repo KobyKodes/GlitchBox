@@ -2004,7 +2004,7 @@
             }
 
             .detail-item {
-                font-size: 14px;
+                font-size: 19px;
                 margin-bottom: 4px;
                 display: flex;
                 flex-wrap: wrap;
@@ -11873,7 +11873,7 @@
                 <button id="seasonButton" class="bg-animation-toggle" onclick="toggleSeasonPanel()" style="margin-right: 12px;">
                     <span id="seasonButtonText">Season 1</span>
                 </button>
-                <button id="episodeButton" class="bg-animation-toggle" onclick="toggleEpisodePanel()" style="min-width: 400px; text-align: left;">
+                <button id="episodeButton" class="bg-animation-toggle" onclick="toggleEpisodePanel()" style="min-width: 400px; text-align: center;">
                     <span id="episodeButtonText">Episode 1</span>
                 </button>
 
@@ -18708,6 +18708,10 @@
         let vidkingDuration = 0;
 
         window.addEventListener('message', function(event) {
+            // Debug: log all postMessages from iframes
+            if (event.data && typeof event.data === 'object') {
+                console.log('[postMessage]', JSON.stringify(event.data).substring(0, 200));
+            }
             if (!event.data || event.data.type !== 'PLAYER_EVENT') return;
             const { event: playerEvent, currentTime, duration } = event.data.data;
 
@@ -20378,6 +20382,10 @@
         let currentSportsMatch = null; // Store the current match being played
         let currentSportsSourceIndex = 0; // Track which source is currently selected
 
+        // SportSRC additional source
+        const SPORTSRC_BASE_URL = 'https://api.sportsrc.org/';
+        let sportsrcDetailCache = {};
+
         // Load sports data from westream API
         async function loadSportsData(category) {
             try {
@@ -20414,17 +20422,46 @@
                 const liveBtn = document.getElementById('liveSportsBtn');
                 if (liveBtn) liveBtn.classList.remove('active');
 
-                // Fetch available sports
-                const sportsResponse = await fetch(`${WESTREAM_BASE_URL}/sports`);
-                availableSports = await sportsResponse.json();
+                // Build parallel fetch promises
+                const westreamPromise = (async () => {
+                    const sportsResponse = await fetch(`${WESTREAM_BASE_URL}/sports`);
+                    const sports = await sportsResponse.json();
+                    const matchesResponse = await fetch(`${WESTREAM_BASE_URL}/matches`);
+                    const matches = await matchesResponse.json();
+                    return { sports, matches };
+                })();
 
-                // Fetch all matches
-                const matchesResponse = await fetch(`${WESTREAM_BASE_URL}/matches`);
-                allSportsMatches = await matchesResponse.json();
+                const sportsrcPromise = (category && category !== 'other') ? (async () => {
+                    const srcCategory = sportsrcCategoryFor(category);
+                    const response = await fetch(`${SPORTSRC_BASE_URL}?data=matches&category=${encodeURIComponent(srcCategory)}`);
+                    const matches = await response.json();
+                    return (Array.isArray(matches) ? matches : []).map(m => normalizeSportSRCMatch(m, srcCategory));
+                })() : Promise.resolve([]);
+
+                const [westreamResult, sportsrcResult] = await Promise.allSettled([westreamPromise, sportsrcPromise]);
+
+                // Process westream results
+                let westreamMatches = [];
+                if (westreamResult.status === 'fulfilled') {
+                    availableSports = westreamResult.value.sports;
+                    westreamMatches = westreamResult.value.matches;
+                } else {
+                    console.warn('Westream fetch failed:', westreamResult.reason);
+                }
+
+                // Process SportSRC results
+                let sportsrcMatches = [];
+                if (sportsrcResult.status === 'fulfilled') {
+                    sportsrcMatches = sportsrcResult.value;
+                } else {
+                    console.warn('SportSRC fetch failed:', sportsrcResult.reason);
+                }
+
+                // Merge both sources
+                allSportsMatches = mergeMatchLists(westreamMatches, sportsrcMatches);
 
                 // If a category was selected, find the matching sport ID for API calls
                 if (category && currentSportType) {
-                    // Find the matching sport from available sports to get the correct ID for API calls
                     const matchingSport = availableSports.find(sport => {
                         const sportName = sport.name || sport;
                         const sportId = sport.id || sport;
@@ -20434,7 +20471,6 @@
                     });
 
                     if (matchingSport) {
-                        // Use the sport ID for API calls
                         currentSportType = matchingSport.id || matchingSport;
                     }
                 }
@@ -20448,6 +20484,76 @@
                 showError('Failed to load sports data');
                 hideLoading();
             }
+        }
+
+        // Map UI category slugs to SportSRC category IDs
+        function sportsrcCategoryFor(uiCategory) {
+            const map = {
+                'american-football': 'american-football',
+                'motor-sports': 'motor-sports',
+                'hockey': 'ice-hockey'
+            };
+            return map[uiCategory] || uiCategory;
+        }
+
+        // Normalize a SportSRC match to match westream's shape
+        function normalizeSportSRCMatch(match, category) {
+            return {
+                id: match.id,
+                title: match.title,
+                category: match.category || category,
+                date: match.date ? new Date(match.date).toISOString() : null,
+                teams: match.teams || null,
+                image: match.poster || null,
+                thumbnail: match.poster || null,
+                sources: null, // lazy-loaded via detail endpoint
+                _provider: 'sportsrc',
+                _sportsrcCategory: match.category || category
+            };
+        }
+
+        // Lazy-load sources for a SportSRC match via the detail endpoint
+        async function fetchSportSRCDetail(match) {
+            const cacheKey = `${match._sportsrcCategory}:${match.id}`;
+            if (sportsrcDetailCache[cacheKey]) return sportsrcDetailCache[cacheKey];
+
+            const url = `${SPORTSRC_BASE_URL}?data=detail&category=${encodeURIComponent(match._sportsrcCategory)}&id=${encodeURIComponent(match.id)}`;
+            const response = await fetch(url);
+            const json = await response.json();
+
+            const sources = (json.data?.sources || []).map(s => ({
+                id: s.id,
+                source: s.source,
+                streamNo: s.streamNo,
+                embedUrl: s.embedUrl,
+                hd: s.hd,
+                viewers: s.viewers,
+                _provider: 'sportsrc'
+            }));
+
+            sportsrcDetailCache[cacheKey] = sources;
+            return sources;
+        }
+
+        // Merge westream and SportSRC match lists, deduplicating by title
+        function mergeMatchLists(westreamMatches, sportsrcMatches) {
+            const merged = westreamMatches.map(m => ({ ...m, _provider: m._provider || 'westream' }));
+
+            for (const srcMatch of sportsrcMatches) {
+                const titleLower = (srcMatch.title || '').toLowerCase();
+                const duplicate = merged.find(m => {
+                    const mTitle = (m.title || '').toLowerCase();
+                    return mTitle === titleLower && titleLower.length > 0;
+                });
+
+                if (duplicate) {
+                    duplicate._sportsrcDuplicate = srcMatch;
+                } else {
+                    merged.push(srcMatch);
+                }
+            }
+
+            return merged;
         }
 
         // Toggle live filter on/off
@@ -20481,13 +20587,38 @@
             let filteredMatches = [];
 
             try {
-                // Step 1: Filter by sport type
+                // Step 1: Filter by sport type — fetch from both APIs in parallel
                 if (currentSportType) {
-                    // Fetch matches for specific sport
-                    const response = await fetch(`${WESTREAM_BASE_URL}/matches/${currentSportType}`);
-                    sportMatches = await response.json();
+                    const westreamPromise = (async () => {
+                        const response = await fetch(`${WESTREAM_BASE_URL}/matches/${currentSportType}`);
+                        return await response.json();
+                    })();
+
+                    // Find the UI category slug for SportSRC
+                    const uiCategory = Object.entries({
+                        'football': 'Football', 'basketball': 'Basketball',
+                        'american-football': 'American Football', 'hockey': 'Ice Hockey',
+                        'baseball': 'Baseball', 'motor-sports': 'Motorsport',
+                        'fight': 'MMA', 'tennis': 'Tennis', 'rugby': 'Rugby',
+                        'golf': 'Golf', 'cricket': 'Cricket', 'darts': 'Darts'
+                    }).find(([, v]) => v === currentSportType || v.toLowerCase() === String(currentSportType).toLowerCase())?.[0];
+
+                    const sportsrcPromise = uiCategory ? (async () => {
+                        const srcCat = sportsrcCategoryFor(uiCategory);
+                        const response = await fetch(`${SPORTSRC_BASE_URL}?data=matches&category=${encodeURIComponent(srcCat)}`);
+                        const matches = await response.json();
+                        return (Array.isArray(matches) ? matches : []).map(m => normalizeSportSRCMatch(m, srcCat));
+                    })() : Promise.resolve([]);
+
+                    const [wsResult, srcResult] = await Promise.allSettled([westreamPromise, sportsrcPromise]);
+
+                    const wsMatches = wsResult.status === 'fulfilled' ? wsResult.value : [];
+                    const srcMatches = srcResult.status === 'fulfilled' ? srcResult.value : [];
+                    if (wsResult.status === 'rejected') console.warn('Westream sport fetch failed:', wsResult.reason);
+                    if (srcResult.status === 'rejected') console.warn('SportSRC sport fetch failed:', srcResult.reason);
+
+                    sportMatches = mergeMatchLists(Array.isArray(wsMatches) ? wsMatches : [], srcMatches);
                 } else {
-                    // Use all matches
                     sportMatches = allSportsMatches;
                 }
 
@@ -20496,21 +20627,31 @@
 
                 // Step 2: Apply live filter if active
                 if (isLiveFilterActive) {
-                    // Filter to show only live matches from the sport selection
                     const liveResponse = await fetch(`${WESTREAM_BASE_URL}/matches/live`);
                     const allLiveMatches = await liveResponse.json();
 
-                    // If a sport is selected, filter live matches to that sport
+                    // Also include SportSRC matches that are within ~2 hours of now as "live"
+                    const now = Date.now();
+                    const twoHours = 2 * 60 * 60 * 1000;
+                    const liveSportsrc = sportMatches.filter(m =>
+                        m._provider === 'sportsrc' && m.date &&
+                        Math.abs(new Date(m.date).getTime() - now) < twoHours
+                    );
+
+                    let combinedLive = mergeMatchLists(
+                        Array.isArray(allLiveMatches) ? allLiveMatches : [],
+                        liveSportsrc
+                    );
+
                     if (currentSportType) {
-                        filteredMatches = allLiveMatches.filter(match =>
-                            match.category === currentSportType
+                        filteredMatches = combinedLive.filter(match =>
+                            match.category === currentSportType ||
+                            match._provider === 'sportsrc'
                         );
                     } else {
-                        // Show all live matches
-                        filteredMatches = allLiveMatches;
+                        filteredMatches = combinedLive;
                     }
                 } else {
-                    // Show all matches for selected sport (or all sports)
                     filteredMatches = sportMatches;
                 }
 
@@ -20761,12 +20902,37 @@
         }
 
         // Play sports stream in the content player
-        function playSportsStream(matchIndex, sourceIndex = 0) {
+        async function playSportsStream(matchIndex, sourceIndex = 0) {
             // Get the match from the global array
             const match = window.currentSportsMatches[matchIndex];
             if (!match) {
                 showError('Match not found');
                 return;
+            }
+
+            // Lazy-load sources for SportSRC matches
+            if (match.sources === null && match._provider === 'sportsrc') {
+                showStatus('Loading stream sources...');
+                try {
+                    match.sources = await fetchSportSRCDetail(match);
+                } catch (e) {
+                    console.error('Failed to load SportSRC sources:', e);
+                    showError('Failed to load stream sources');
+                    return;
+                }
+            }
+
+            // If match exists in both APIs, also fetch SportSRC sources and append
+            if (match._sportsrcDuplicate && !match._sportsrcDuplicate._sourcesFetched) {
+                try {
+                    const extraSources = await fetchSportSRCDetail(match._sportsrcDuplicate);
+                    if (extraSources.length > 0) {
+                        match.sources = [...(match.sources || []), ...extraSources];
+                    }
+                    match._sportsrcDuplicate._sourcesFetched = true;
+                } catch (e) {
+                    console.warn('Failed to load extra SportSRC sources:', e);
+                }
             }
 
             // Get streaming source
@@ -20781,12 +20947,17 @@
 
             // Get the selected source
             const selectedSource = match.sources[sourceIndex];
-            const source = selectedSource.source;
-            const sourceId = selectedSource.id;
-            const streamNo = 1; // Default stream number
 
-            // Build the embed URL
-            const embedUrl = `https://westream.su/embed/${source}/${sourceId}/${streamNo}`;
+            // Build the embed URL based on provider
+            let embedUrl;
+            if (selectedSource._provider === 'sportsrc') {
+                embedUrl = selectedSource.embedUrl;
+            } else {
+                const source = selectedSource.source;
+                const sourceId = selectedSource.id;
+                const streamNo = selectedSource.streamNo || 1;
+                embedUrl = `https://westream.su/embed/${source}/${sourceId}/${streamNo}`;
+            }
 
             console.log('Playing sports stream:', embedUrl);
             console.log('Match data:', match);
@@ -20902,18 +21073,19 @@
             if (sources.length > 1) {
                 btn.style.display = 'inline-block';
 
-                // Get source name
+                // Get source name with provider tag
                 const currentSource = sources[currentSportsSourceIndex];
                 const sourceName = currentSource?.source?.toUpperCase() || `Source ${currentSportsSourceIndex + 1}`;
+                const providerTag = currentSource?._provider === 'sportsrc' ? '[SRC]' : '[WS]';
 
-                btnText.textContent = `${sourceName} (${currentSportsSourceIndex + 1}/${sources.length})`;
+                btnText.textContent = `${providerTag} ${sourceName} (${currentSportsSourceIndex + 1}/${sources.length})`;
             } else {
                 btn.style.display = 'none';
             }
         }
 
         // Switch to the next available sports source
-        window.switchSportsSource = function() {
+        window.switchSportsSource = async function() {
             if (!currentSportsMatch || !currentSportsMatch.sources) {
                 showError('No match is currently playing');
                 return;
@@ -20933,10 +21105,12 @@
 
             if (matchIndex !== -1) {
                 // Replay the match with the new source
-                playSportsStream(matchIndex, currentSportsSourceIndex);
+                await playSportsStream(matchIndex, currentSportsSourceIndex);
 
-                const sourceName = sources[currentSportsSourceIndex].source.toUpperCase();
-                showStatus(`Switched to ${sourceName} (${currentSportsSourceIndex + 1}/${sources.length})`);
+                const currentSource = sources[currentSportsSourceIndex];
+                const sourceName = currentSource.source.toUpperCase();
+                const providerTag = currentSource._provider === 'sportsrc' ? '[SRC]' : '[WS]';
+                showStatus(`Switched to ${providerTag} ${sourceName} (${currentSportsSourceIndex + 1}/${sources.length})`);
             } else {
                 showError('Unable to switch source');
             }
