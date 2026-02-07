@@ -4,7 +4,7 @@ const PRECACHE = [
   '/',
   '/index.html',
   '/Icons/GlitchBoxFavicon.png',
-  '/Icons/GlitchBoxGlassCube.PNG'
+  '/Icons/GBiconBig.PNG'
 ];
 
 self.addEventListener('install', (e) => {
